@@ -4,8 +4,16 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>9</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>9</LangVersion>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="StreamJsonRpc" Version="2.9.85" />
+    <ProjectReference Include="..\vendor\Custom StreamJsonRPC\src\StreamJsonRpc\StreamJsonRpc.csproj" />
   </ItemGroup>
 
 </Project>

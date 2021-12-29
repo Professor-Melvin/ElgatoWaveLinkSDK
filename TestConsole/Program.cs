@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
 using ElgatoWaveAPI;
+using ElgatoWaveAPI.Models;
 
 namespace TestConsole
 {
     internal class Program
     {
-        static async System.Threading.Tasks.Task Main(string[] args)
+        static async Task Main()
         {
-            var client = new ElgatoWaveAPIClient("localhost", 1824);
+            var client = new ElgatoWaveAPIClient("localhost", 1825);
 
             if (await client.ConnectAsync())
             {
@@ -44,6 +47,10 @@ namespace TestConsole
                                   $"\n\t\tIs Available: {c.IsAvailable}");
                 });
 
+                //var newSetting = await client.SetInputMixer(channelInfos[3].MixId, channelInfos[3].);
+
+                //var newSetting = await client.SetOutputMixer(50, false, 50, false);
+
                 var micState = await client.GetMicrophoneState();
                 Console.WriteLine($"\nMic Connected: {micState.IsMicrophoneConnected}");
 
@@ -60,8 +67,7 @@ namespace TestConsole
                                   $"\n\tLocal Vol: {monitoringState.LocalVolumeOut}" +
                                   $"\n\tLocal Muted: {monitoringState.IsLocalOutMuted}" +
                                   $"\n\tStream Vol: {monitoringState.StreamVolumeOut}" +
-                                  $"\n\tStream Muted: {monitoringState.IsStreamOutMuted}" +
-                                  $"");
+                                  $"\n\tStream Muted: {monitoringState.IsStreamOutMuted}");
 
                 var monitorMixOutputList = await client.GetMonitorMixOutputList();
                 Console.WriteLine($"Monitor Output: {monitorMixOutputList.MonitorMix}" +
@@ -73,6 +79,8 @@ namespace TestConsole
 
                 Console.WriteLine("\nPress any key to exit...");
                 Console.ReadKey();
+
+                client.Disconnect();
             }
             else
             {

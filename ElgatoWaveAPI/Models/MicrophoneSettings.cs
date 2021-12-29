@@ -14,12 +14,12 @@ namespace ElgatoWaveAPI.Models
         public bool IsMicrophoneLowcutOn { get; set; }
 
         [JsonProperty("microphoneBalance")]
-        public long MicrophoneBalance { get; set; }
+        public int MicrophoneBalance { get; set; }
 
         [JsonProperty("microphoneGain")]
-        public long MicrophoneGain { get; set; }
+        public int MicrophoneGain { get; set; }
 
         [JsonProperty("microphoneOutputVolume")]
-        public long MicrophoneOutputVolume { get; set; }
+        public int MicrophoneOutputVolume { get; set; }
     }
 }
