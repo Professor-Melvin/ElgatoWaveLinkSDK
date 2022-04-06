@@ -1,4 +1,18 @@
 # ElgatoWaveLink-cSharp
 SDK For Elgato Wave Link Software
 
-WIP, all the gets and evnet handlers works but action commands aren't fully implemented or even tested
+Working:
+- Event handlers
+- Get methods
+- Set Commands
+  - setMonitorMixOutput
+  - switchMonitoring !! Only switchin to StreamMix works !!
+  - setMicrophoneSettings
+  - setOutputMixer
+
+Left to do:
+- Unit Test
+- switchMonitorMix won't allow us to change to LocalMix, only to StreamMix
+- setInputMix isn't implemented yet
+- Add support for new filter feature
+- Add client settings
