@@ -12,14 +12,6 @@ namespace ElgatoWaveAPI.Models
 
         [JsonProperty("monitorMixList")]
         public List<MonitorMixList> MonitorMixList { get; set; }
-
-        public override string ToString()
-        {
-            return JsonConvert.SerializeObject(this, new JsonSerializerSettings()
-            {
-                NullValueHandling = NullValueHandling.Ignore
-            });
-        }
     }
 
     public class MonitorMixList
