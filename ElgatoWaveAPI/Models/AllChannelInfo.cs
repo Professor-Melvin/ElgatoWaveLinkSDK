@@ -9,38 +9,47 @@ namespace ElgatoWaveAPI.Models
     {
         [JsonProperty("bgColor")]
         public string BgColor { get; set; }
-
-        [JsonProperty("deltaLinked")]
-        public long DeltaLinked { get; set; }
-
+        
+        [JsonProperty("filters")]
+        public List<Filter> Filters { get; set; }
+        
         [JsonProperty("iconData")]
         public string IconData { get; set; }
 
+        /*[JsonProperty("deltaLinked")]
+        public long DeltaLinked { get; set; }*/
+        
         [JsonProperty("inputType")]
-        public long InputType { get; set; }
+        public int InputType { get; set; }
 
         [JsonProperty("isAvailable")]
         public bool IsAvailable { get; set; }
 
-        [JsonProperty("isLinked")]
-        public bool IsLinked { get; set; }
+        /*[JsonProperty("isLinked")]
+        public bool IsLinked { get; set; }*/
 
         [JsonProperty("isLocalInMuted")]
         public bool IsLocalInMuted { get; set; }
 
         [JsonProperty("isStreamInMuted")]
         public bool IsStreamInMuted { get; set; }
+        
+        [JsonProperty("localMixFilterBypass")]
+        public bool LocalMixFilterBypass { get; set; }
 
         [JsonProperty("localVolumeIn")]
-        public long LocalVolumeIn { get; set; }
+        public int LocalVolumeIn { get; set; }
 
         [JsonProperty("mixId")]
         public string MixId { get; set; }
 
         [JsonProperty("mixerName")]
         public string MixerName { get; set; }
+        
+        [JsonProperty("streamMixFilterBypass")]
+        public bool StreamMixFilterBypass { get; set; }
 
         [JsonProperty("streamVolumeIn")]
-        public long StreamVolumeIn { get; set; }
+        public int StreamVolumeIn { get; set; }
     }
 }

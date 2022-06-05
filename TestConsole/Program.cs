@@ -58,7 +58,9 @@ namespace TestConsole
                                   $"\n\tIs Local Muted: {c.IsLocalInMuted}" +
                                   $"\n\tStream Vol: {c.StreamVolumeIn}" +
                                   $"\n\tIs Stream Muted: {c.IsStreamInMuted}" +
-                                  $"\n\tDelta Linked: {c.DeltaLinked}" +
+                                  $"\n\tIs LocalMixFilterBypass: {c.LocalMixFilterBypass}" +
+                                  $"\n\tIs StreamMixFilterBypass: {c.StreamMixFilterBypass}" +
+                                  $"\n\tFilter Count: {c.Filters.Count}" +
                                   $"\n\tIs Available: {c.IsAvailable}");
             };
             client.ChannelsChanged += (sender, list) =>
@@ -79,7 +81,9 @@ namespace TestConsole
                                   $"\n\t\tIs Local Muted: {c.IsLocalInMuted}" +
                                   $"\n\t\tStream Vol: {c.StreamVolumeIn}" +
                                   $"\n\t\tIs Stream Muted: {c.IsStreamInMuted}" +
-                                  $"\n\t\tDelta Linked: {c.DeltaLinked}" +
+                                  $"\n\tIs LocalMixFilterBypass: {c.LocalMixFilterBypass}" +
+                                  $"\n\tIs StreamMixFilterBypass: {c.StreamMixFilterBypass}" +
+                                  $"\n\tFilter Count: {c.Filters.Count}" +
                                   $"\n\t\tIs Available: {c.IsAvailable}");
                 });
             };
@@ -117,7 +121,9 @@ namespace TestConsole
                                   $"\n\t\tIs Local Muted: {c.IsLocalInMuted}" +
                                   $"\n\t\tStream Vol: {c.StreamVolumeIn}" +
                                   $"\n\t\tIs Stream Muted: {c.IsStreamInMuted}" +
-                                  $"\n\t\tDelta Linked: {c.DeltaLinked}" +
+                                  $"\n\tIs LocalMixFilterBypass: {c.LocalMixFilterBypass}" +
+                                  $"\n\tIs StreamMixFilterBypass: {c.StreamMixFilterBypass}" +
+                                  $"\n\tFilter Count: {c.Filters.Count}" +
                                   $"\n\t\tIs Available: {c.IsAvailable}");
                 });
 

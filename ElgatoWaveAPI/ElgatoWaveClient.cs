@@ -194,29 +194,32 @@ namespace ElgatoWaveAPI
         }
 
         //TODO Need to look at the JS plugin for more details on this
-        //public Task<ChannelInfo> SetInputMixer(string mixId, string name, string color, int inputType, string iconData, int localVol, bool isLocalMuted, int remoteVol, bool isStreamMuted, long deltaLink, bool isAvaible, bool isLinked)
-        //{
-        //    return SetInputMixer(new ChannelInfo()
-        //    {
-        //        MixId = mixId,
-        //        MixerName = name,
-        //        BgColor = color,
-        //        InputType = inputType,
-        //        IconData = iconData,
-        //        LocalVolumeIn = localVol,
-        //        IsLocalInMuted = isLocalMuted,
-        //        StreamVolumeIn = remoteVol,
-        //        IsStreamInMuted = isStreamMuted,
-        //        DeltaLinked = deltaLink,
-        //        IsAvailable = isAvaible,
-        //        IsLinked = isLinked
-        //    });
-        //}
+        /*public Task<ChannelInfo> SetInputMixer(string mixId, string name, string color, int inputType, string iconData, int localVol, bool isLocalMuted, int remoteVol, bool isStreamMuted,/*, long deltaLink, #1#bool isAvaible, /*bool isLinked,#1# List<Filter> filters, bool localMixFilterBypass, bool streamMixFilterBypass)
+        {
+            return SetInputMixer(new ChannelInfo()
+            {
+                MixId = mixId,
+                MixerName = name,
+                BgColor = color,
+                InputType = inputType,
+                IconData = iconData,
+                LocalVolumeIn = localVol,
+                IsLocalInMuted = isLocalMuted,
+                StreamVolumeIn = remoteVol,
+                IsStreamInMuted = isStreamMuted,
+                Filters = filters,
+                LocalMixFilterBypass = localMixFilterBypass,
+                StreamMixFilterBypass = streamMixFilterBypass,
+                /*DeltaLinked = deltaLink,#1#
+                IsAvailable = isAvaible
+                /*IsLinked = isLinked#1#
+            });
+        }
 
-        //public Task<ChannelInfo> SetInputMixer(ChannelInfo info)
-        //{
-        //    return SendCommand<ChannelInfo, ChannelInfo>("setInputMixer", info);
-        //}
+        public Task<ChannelInfo> SetInputMixer(ChannelInfo info)
+        {
+            return SendCommand<ChannelInfo, ChannelInfo>("setInputMixer", info);
+        }*/
 
         #endregion
 
