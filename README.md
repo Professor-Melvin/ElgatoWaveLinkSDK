@@ -1,5 +1,5 @@
 # ElgatoWaveLink-cSharp
-SDK For Elgato Wave Link Software
+SDK For Elgato Wave Link Software, based off of the StreamDeck plugin for the wavelink
 
 Working:
 - Event handlers
