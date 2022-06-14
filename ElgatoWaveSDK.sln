@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31710.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElgatoWaveAPI", "ElgatoWaveAPI\ElgatoWaveAPI.csproj", "{CB7EC2BE-4A02-4BE3-ADD8-B351E5B00E0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElgatoWaveSDK", "ElgatoWaveAPI\ElgatoWaveSDK.csproj", "{CB7EC2BE-4A02-4BE3-ADD8-B351E5B00E0F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestConsole", "TestConsole\TestConsole.csproj", "{E39B87D1-6E87-4082-B33F-9C228754DF76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElgatoWaveSDK.TestRig", "TestConsole\ElgatoWaveSDK.TestRig.csproj", "{E39B87D1-6E87-4082-B33F-9C228754DF76}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

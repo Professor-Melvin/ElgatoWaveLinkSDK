@@ -255,7 +255,6 @@ namespace ElgatoWaveAPI
 
         #endregion Commands
 
-
         #region Reciever
 
         private Task _receiveTask;
