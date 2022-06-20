@@ -50,7 +50,7 @@ jobs:
                     ElgatoWaveAPI\bin\Release\*.nupkg
 
             - name: Publish Pre-Release
-              run: nuget push "ElgatoWaveAPI\bin\Release\*.nupkg"
+              run: nuget push -source "ElgatoWaveAPI\bin\Release\" *.nupkg
 
     beta-publish:
         name: Beta Publish
