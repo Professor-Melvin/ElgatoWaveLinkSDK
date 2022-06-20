@@ -12,16 +12,16 @@ namespace ElgatoWaveAPI
         public int Id { get; set; }
 
         [JsonProperty("jsonrpc")]
-        public string JsonRpc { get; private set; } = "2.0";
+        public string? JsonRpc { get; private set; } = "2.0";
 
         [JsonProperty("method")]
-        public string Method { get; set; }
+        public string? Method { get; set; }
 
         [JsonProperty("params")]
-        public T Obj { get; set; }
+        public T? Obj { get; set; }
 
         [JsonProperty("result")]
-        public T Result { get; set; }
+        public T? Result { get; set; }
 
         public override string ToString()
         {
