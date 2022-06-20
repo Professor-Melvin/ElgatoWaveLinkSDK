@@ -32,7 +32,7 @@ namespace ElgatoWaveAPI
 
         #region Private Vars
         private ClientWebSocket? _socket;
-        private int _port { get; set; }
+        private int Port { get; set; }
         private CancellationTokenSource? _source;
         #endregion
 
@@ -56,7 +56,7 @@ namespace ElgatoWaveAPI
 
         public ElgatoWaveClient()
         {
-            _port = _startPort;
+            Port = _startPort;
             _source = new CancellationTokenSource();
         }
 
@@ -69,14 +69,14 @@ namespace ElgatoWaveAPI
                 _socket = new ClientWebSocket();
                 try
                 {
-                    await _socket.ConnectAsync(new Uri($"ws://127.0.0.1:{_port}/"), _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
+                    await _socket.ConnectAsync(new Uri($"ws://127.0.0.1:{Port}/"), _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
                 }
                 catch (Exception)
                 {
-                    _port++;
-                    if (_port > (_startPort + _portRange))
+                    Port++;
+                    if (Port > (_startPort + _portRange))
                     {
-                        _port = _startPort;
+                        Port = _startPort;
                         cycleCount++;
                     }
                 }
@@ -226,11 +226,11 @@ namespace ElgatoWaveAPI
             return SendCommand<T, string>(method, null);
         }
 
-        private async Task<T?> SendCommand<T, Q>(string method, Q? objectJson = default(Q))
+        private async Task<T?> SendCommand<T, Q>(string method, Q? objectJson = default)
         {
             if (_socket?.State == WebSocketState.Open)
             {
-                SocketBaseObject<Q?> baseObject = new SocketBaseObject<Q?>()
+                SocketBaseObject<Q?> baseObject = new()
                 {
                     Method = method,
                     Id = NextTransactionId(),
@@ -254,7 +254,7 @@ namespace ElgatoWaveAPI
                 }
             }
 
-            return default(T);
+            return default;
         }
 
         #endregion Commands
@@ -269,15 +269,13 @@ namespace ElgatoWaveAPI
 
         private async Task ReceiverRun()
         {
-            var buffer = new byte[_bufferSize];
-
             while (!_source?.IsCancellationRequested ?? false)
             {
                 if (_socket?.State == WebSocketState.Open)
                 {
                     try
                     {
-                        buffer = new byte[_bufferSize];
+                        var buffer = new byte[_bufferSize];
                         var offset = 0;
                         var free = buffer.Length;
 
@@ -390,11 +388,11 @@ namespace ElgatoWaveAPI
         #region TransationTracker
 
         private readonly Dictionary<int, SocketBaseObject<dynamic?>> _responseCache = new();
-        private int _transactionId { get; set; } = 1;
+        private int TransactionId { get; set; } = 1;
 
         private int NextTransactionId()
         {
-            return _transactionId++;
+            return TransactionId++;
         }
         #endregion TransationTracker
 

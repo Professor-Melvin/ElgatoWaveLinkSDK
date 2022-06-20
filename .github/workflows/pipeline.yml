@@ -13,6 +13,8 @@ jobs:
     build:
         name: Build
         runs-on: windows-latest
+        environment:
+            name: beta
         steps:
             - uses: actions/checkout@v3
 
@@ -21,11 +23,11 @@ jobs:
               with:
                 dotnet-version: 6.x
 
-            - name: Setup NuGet
-              uses: nuget/setup-nuget@v1
-              with:
-                nuget-api-key: ${{secrets.NUGETAPI}}
-                nuget-version: 5.x
+            #- name: Setup NuGet
+            #  uses: nuget/setup-nuget@v1
+            #  with:
+            #    nuget-api-key: ${{secrets.NUGETAPI}}
+            #    nuget-version: 5.x
 
             #- name: Set Version
             #  uses: 
@@ -49,30 +51,15 @@ jobs:
                     ElgatoWaveAPI\bin\Release\net6.0
                     ElgatoWaveAPI\bin\Release\*.nupkg
 
+            #- name: Publish Pre-Release
+            #  run: nuget push -source "ElgatoWaveAPI\bin\Release\" *.nupkg
+              
             - name: Publish Pre-Release
-              run: nuget push -source "ElgatoWaveAPI\bin\Release\" *.nupkg
+              run: dotnet nuget push "ElgatoWaveAPI\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols
 
-    beta-publish:
-        name: Beta Publish
+    release:
+        name: Publish
         needs: build
-        runs-on: windows-latest
-        environment:
-            name: beta
-        steps:
-
-            - name: Download Artifacts
-              uses: actions/download-artifact@v3
-              with:
-                name: artifact
-                path: artifactDownload
-
-            #- name: Nugest Package
-
-            #- name: Publich Nuget
-
-    release-publish:
-        name: Release Publish
-        needs: beta-publish
         runs-on: windows-latest
         environment:
             name: release
