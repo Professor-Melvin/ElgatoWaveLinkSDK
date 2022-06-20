@@ -9,9 +9,6 @@ on:
             - '**/*.gitignore'
             - '**/*.gitattributes'
 
-env:
-    buildVersion: ${{ github.run_number }}
-
 jobs:
     build:
         name: Build
@@ -35,15 +32,12 @@ jobs:
 
             - name: Restore
               run: dotnet restore
-            
-            - name: "Say Hello Mona it's Monday"
-              run: echo ${env.buildVersion}
 
             - name: Build
-              run: dotnet build --configuration Release --no-restore --no-logo --version-suffix ${{ github.run_number }}
+              run: dotnet build --configuration Release --no-restore --version-suffix ${{ github.run_number }}
 
             - name: Test
-              run: dotnet test --no-build -c Release --no-restore --no-logo --collect "Code coverage" --blame
+              run: dotnet test --no-build -c Release --no-restore --collect "Code coverage" --blame
 
             - name: Upload Artifacts
               uses: actions/upload-artifact@v3
