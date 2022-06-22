@@ -2,12 +2,23 @@ name: Pipeline
 
 on:
     workflow_dispatch:
+    push:
+        branches: ["main"]
+        paths-ignore:
+            - '**/*.md'
+            - '**/*.gitignore'
+            - '**/*.gitattributes'
     pull_request:
         branches: ["main"]
         paths-ignore:
             - '**/*.md'
             - '**/*.gitignore'
             - '**/*.gitattributes'
+
+#Not sure if I want this to cancel the previous build yet
+#concurrency:
+#  group: ${{ github.workflow }}-${{ github.ref }}
+#  cancel-in-progress: true
 
 jobs:
     build:
@@ -23,20 +34,11 @@ jobs:
               with:
                 dotnet-version: 6.x
 
-            #- name: Setup NuGet
-            #  uses: nuget/setup-nuget@v1
-            #  with:
-            #    nuget-api-key: ${{secrets.NUGETAPI}}
-            #    nuget-version: 5.x
-
-            #- name: Set Version
-            #  uses: 
-
             - name: Restore
               run: dotnet restore
 
             - name: Build
-              run: dotnet build --configuration Release --no-restore --version-suffix ${{ github.run_number }}
+              run: dotnet build --configuration Release --no-restore --version-suffix beta-${{ github.run_number }}
 
             - name: Test
               run: dotnet test --no-build -c Release --no-restore --collect "Code coverage" --blame
@@ -48,13 +50,11 @@ jobs:
                 if-no-files-found: error
                 retention-days: 5
                 path: |
-                    ElgatoWaveAPI\bin\Release\net6.0
-                    ElgatoWaveAPI\bin\Release\*.nupkg
-
-            #- name: Publish Pre-Release
-            #  run: nuget push -source "ElgatoWaveAPI\bin\Release\" *.nupkg
+                    ElgatoWaveAPI/bin/Release/net6.0/
+                    ElgatoWaveAPI/bin/Release/*.nupkg
               
             - name: Publish Pre-Release
+              if: github.event.pull_request.merged == false
               run: dotnet nuget push "ElgatoWaveAPI\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
 
     release:
