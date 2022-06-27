@@ -28,7 +28,7 @@ jobs:
               run: dotnet restore
             
             - name: Build
-              run: dotnet build --not-restore
+              run: dotnet build --no-restore
 
             - name: Test
               run: dotnet test --no-build --no-restore --verbosity normal
@@ -48,6 +48,24 @@ jobs:
         runs-on: windows-latest
         environment:
             name: beta
+        steps:
+
+            - name: Download Artifacts
+              uses: actions/download-artifact@v3
+              with:
+                name: artifact
+                path: artifactDownload
+
+            #- name: Nugest Package
+
+            #- name: Publich Nuget
+
+    releae-publish:
+        name: Release Publish
+        needs: build
+        runs-on: windows-latest
+        environment:
+            name: release
         steps:
 
             - name: Download Artifacts
