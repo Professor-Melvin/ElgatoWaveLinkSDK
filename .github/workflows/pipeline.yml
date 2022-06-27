@@ -34,7 +34,7 @@ jobs:
               run: dotnet restore
             
             - name: Build
-              run: dotnet build --configuration Release --no-restore --no-logo --version-suffix ${GITHUB_RUN_NUMBER}
+              run: dotnet build --configuration Release --no-restore --no-logo --version-suffix $GITHUB_RUN_NUMBER
 
             - name: Test
               run: dotnet test --no-build -c Release --no-restore --no-logo --collect "Code coverage" --blame
