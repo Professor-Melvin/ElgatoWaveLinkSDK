@@ -8,19 +8,19 @@ namespace ElgatoWaveAPI.Models
     public class ApplicationInfo
     {
         [JsonProperty("appId")]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         [JsonProperty("appName")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [JsonProperty("appVersion")]
-        public AppVersion AppVersion { get; set; }
+        public AppVersion? AppVersion { get; set; }
 
         [JsonIgnore]
-        public Version Version => new(AppVersion?.MajorRelease ?? 0, AppVersion?.MinorRelease ?? 0, AppVersion?.BuildNumber ?? 0, AppVersion?.PatchLevel ?? 0);
+        public Version? Version => new(AppVersion?.MajorRelease ?? 0, AppVersion?.MinorRelease ?? 0, AppVersion?.BuildNumber ?? 0, AppVersion?.PatchLevel ?? 0);
 
         [JsonProperty("interfaceRevision")]
-        public int InterfaceRevision { get; set; }
+        public int? InterfaceRevision { get; set; }
     }
 
     public class AppVersion

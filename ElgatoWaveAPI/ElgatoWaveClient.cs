@@ -30,9 +30,9 @@ namespace ElgatoWaveAPI
         #endregion
 
         #region Private Vars
-        private ClientWebSocket _socket;
+        private ClientWebSocket? _socket;
         private int _port { get; set; }
-        private CancellationTokenSource _source;
+        private CancellationTokenSource? _source;
         #endregion
 
         #region Public Vars
@@ -43,13 +43,13 @@ namespace ElgatoWaveAPI
 
         #region Public Events
 
-        public EventHandler<MicrophoneState> MicStateChanged;
-        public EventHandler<MicrophoneSettings> MicSettingsChanged;
-        public EventHandler<ChannelInfo> InputMixerChanged;
-        public EventHandler<MonitoringState> OutputMixerChanged;
-        public EventHandler<string> LocalMonitorOutputChanged;
-        public EventHandler<OutputMix> MonitorSwitchOutputChanged;
-        public EventHandler<List<ChannelInfo>> ChannelsChanged;
+        public EventHandler<MicrophoneState>? MicStateChanged { get; set; }
+        public EventHandler<MicrophoneSettings>? MicSettingsChanged { get; set; }
+        public EventHandler<ChannelInfo>? InputMixerChanged { get; set; }
+        public EventHandler<MonitoringState>? OutputMixerChanged { get; set; }
+        public EventHandler<string>? LocalMonitorOutputChanged { get; set; }
+        public EventHandler<OutputMix>? MonitorSwitchOutputChanged { get; set; }
+        public EventHandler<List<ChannelInfo>>? ChannelsChanged { get; set; }
 
         #endregion
 
@@ -68,7 +68,7 @@ namespace ElgatoWaveAPI
                 _socket = new ClientWebSocket();
                 try
                 {
-                    await _socket.ConnectAsync(new Uri($"ws://127.0.0.1:{_port}/"), _source.Token).ConfigureAwait(false);
+                    await _socket.ConnectAsync(new Uri($"ws://127.0.0.1:{_port}/"), _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
                 }
                 catch (Exception)
                 {
@@ -92,10 +92,10 @@ namespace ElgatoWaveAPI
 
         public void Disconnect()
         {
-            _source.Cancel();
+            _source?.Cancel();
             _source = null;
 
-            _socket.Dispose();
+            _socket?.Dispose();
             _socket = null;
         }
         #endregion Connection
@@ -104,37 +104,37 @@ namespace ElgatoWaveAPI
 
         #region Get Commands
 
-        public Task<ApplicationInfo> GetAppInfo()
+        public Task<ApplicationInfo?> GetAppInfo()
         {
             return SendCommand<ApplicationInfo>("getApplicationInfo");
         }
 
-        public Task<List<ChannelInfo>> GetAllChannelInfo()
+        public Task<List<ChannelInfo>?> GetAllChannelInfo()
         {
             return SendCommand<List<ChannelInfo>>("getAllChannelInfo");
         }
 
-        public Task<MicrophoneState> GetMicrophoneState()
+        public Task<MicrophoneState?> GetMicrophoneState()
         {
             return SendCommand<MicrophoneState>("getMicrophoneState");
         }
 
-        public Task<MicrophoneSettings> GetMicrophoneSettings()
+        public Task<MicrophoneSettings?> GetMicrophoneSettings()
         {
             return SendCommand<MicrophoneSettings>("getMicrophoneSettings");
         }
 
-        public Task<MonitoringState> GetMonitoringState()
+        public Task<MonitoringState?> GetMonitoringState()
         {
             return SendCommand<MonitoringState>("getMonitoringState");
         }
 
-        public Task<MonitorMixOutputList> GetMonitorMixOutputList()
+        public Task<MonitorMixOutputList?> GetMonitorMixOutputList()
         {
             return SendCommand<MonitorMixOutputList>("getMonitorMixOutputList");
         }
 
-        public Task<SwitchState> GetSwitchState()
+        public Task<SwitchState?> GetSwitchState()
         {
             return SendCommand<SwitchState>("getSwitchState");
         }
@@ -143,7 +143,7 @@ namespace ElgatoWaveAPI
 
         #region Set Commands
 
-        public Task<MonitorMixOutputList> SetMonitorMixOutput(string mixOutput)
+        public Task<MonitorMixOutputList?> SetMonitorMixOutput(string mixOutput)
         {
             return SendCommand<MonitorMixOutputList, MonitorMixOutputList>("setMonitorMixOutput", new MonitorMixOutputList()
             {
@@ -152,7 +152,7 @@ namespace ElgatoWaveAPI
         }
 
         //TODO Unable to switch to local for some reason, can switch to stream though
-        public Task<SwitchState> SetMonitoringState(OutputMix mix)
+        public Task<SwitchState?> SetMonitoringState(OutputMix mix)
         {
             return SendCommand<SwitchState, SwitchState>("switchMonitoring", new SwitchState()
             {
@@ -160,7 +160,7 @@ namespace ElgatoWaveAPI
             });
         }
 
-        public Task<MicrophoneSettings> SetMicrophoneSettings(int micGain, int micOutputVol, int micBalcnce, bool isMicLowcutOn, bool isMicClipgaurdOn)
+        public Task<MicrophoneSettings?> SetMicrophoneSettings(int micGain, int micOutputVol, int micBalcnce, bool isMicLowcutOn, bool isMicClipgaurdOn)
         {
             return SetMicrophoneSettings(new MicrophoneSettings()
             {
@@ -172,17 +172,17 @@ namespace ElgatoWaveAPI
             });
         }
 
-        public Task<MicrophoneSettings> SetMicrophoneSettings(MicrophoneSettings settings)
+        public Task<MicrophoneSettings?> SetMicrophoneSettings(MicrophoneSettings settings)
         {
             return SendCommand<MicrophoneSettings, MicrophoneSettings>("setMicrophoneSettings", settings);
         }
 
-        public Task<MonitoringState> SetOutputMixer(MonitoringState state)
+        public Task<MonitoringState?> SetOutputMixer(MonitoringState state)
         {
             return SendCommand<MonitoringState, MonitoringState>("setOutputMixer", state);
         }
 
-        public Task<MonitoringState> SetOutputMixer(int localVolumeOut, bool isLocalOutMuted, int streamVolumeOut, bool isStreamOutMuted)
+        public Task<MonitoringState?> SetOutputMixer(int localVolumeOut, bool isLocalOutMuted, int streamVolumeOut, bool isStreamOutMuted)
         {
             return SetOutputMixer(new MonitoringState()
             {
@@ -220,16 +220,16 @@ namespace ElgatoWaveAPI
 
         #endregion
 
-        private Task<T> SendCommand<T>(string method)
+        private Task<T?> SendCommand<T>(string method)
         {
             return SendCommand<T, string>(method, null);
         }
 
-        private async Task<T> SendCommand<T, Q>(string method, Q objectJson = default(Q))
+        private async Task<T?> SendCommand<T, Q>(string method, Q? objectJson = default(Q))
         {
             if (_socket?.State == WebSocketState.Open)
             {
-                SocketBaseObject<Q> baseObject = new SocketBaseObject<Q>()
+                SocketBaseObject<Q?> baseObject = new SocketBaseObject<Q?>()
                 {
                     Method = method,
                     Id = NextTransactionId(),
@@ -237,7 +237,7 @@ namespace ElgatoWaveAPI
                 };
                 var s = baseObject.ToString();
                 var array = Encoding.UTF8.GetBytes(s);
-                await _socket.SendAsync(array, WebSocketMessageType.Text, true, _source.Token);
+                await _socket.SendAsync(array, WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
 
                 SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(_responseTimeout));
 
@@ -246,7 +246,10 @@ namespace ElgatoWaveAPI
                     var reply = _responseCache[baseObject.Id];
                     _responseCache.Remove(reply.Id);
 
-                    return JsonConvert.DeserializeObject<T>(reply.Result.ToString());
+                    if (reply.Result != null)
+                    {
+                        return JsonConvert.DeserializeObject<T>(reply.Result.ToString());
+                    }
                 }
             }
 
@@ -257,32 +260,30 @@ namespace ElgatoWaveAPI
 
         #region Reciever
 
-        private Task _receiveTask;
+        private Task? _receiveTask;
         private void StartReceiver()
         {
-            _receiveTask ??= Task.Run(ReceiverRun, _source.Token);
+            _receiveTask ??= Task.Run(ReceiverRun, _source?.Token ?? CancellationToken.None);
         }
 
         private async Task ReceiverRun()
         {
             var buffer = new byte[_bufferSize];
-            var offset = 0;
-            var free = buffer.Length;
 
-            while (!_source.IsCancellationRequested)
+            while (!_source?.IsCancellationRequested ?? false)
             {
-                if (_socket.State == WebSocketState.Open)
+                if (_socket?.State == WebSocketState.Open)
                 {
                     try
                     {
                         buffer = new byte[_bufferSize];
-                        offset = 0;
-                        free = buffer.Length;
+                        var offset = 0;
+                        var free = buffer.Length;
 
-                        WebSocketReceiveResult result = null;
+                        WebSocketReceiveResult? result = null;
                         do
                         {
-                            result = await _socket.ReceiveAsync(new ArraySegment<byte>(buffer, offset, free), _source.Token);
+                            result = await _socket.ReceiveAsync(new ArraySegment<byte>(buffer, offset, free), _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
                             offset += result.Count;
                             free -= result.Count;
                             if (free == 0)
@@ -302,31 +303,65 @@ namespace ElgatoWaveAPI
 
                         string json = Encoding.UTF8.GetString(buffer).Replace("\0", "");
 
-                        SocketBaseObject<dynamic> baseObject = JsonConvert.DeserializeObject<SocketBaseObject<dynamic>>(json);
-                        if (baseObject?.Id == 0) //Not a command reply
+                        SocketBaseObject<dynamic?>? baseObject = JsonConvert.DeserializeObject<SocketBaseObject<dynamic?>?>(json);
+                        if (baseObject == null)
                         {
+                            continue;
+                        }
+
+                        if (baseObject.Id == 0) //Not a command reply
+                        {
+                            object? obj = null;
                             switch (baseObject.Method)
                             {
                                 case "microphoneStateChanged":
-                                    MicStateChanged?.Invoke(this, JsonConvert.DeserializeObject<MicrophoneState>(baseObject.Obj.ToString()));
+                                    obj = JsonConvert.DeserializeObject<MicrophoneState>(baseObject.Obj?.ToString());
+                                    if (obj != null)
+                                    {
+                                        MicStateChanged?.Invoke(this, obj as MicrophoneState ?? throw new InvalidOperationException());
+                                    }
                                     break;
                                 case "microphoneSettingsChanged":
-                                    MicSettingsChanged?.Invoke(this, JsonConvert.DeserializeObject<MicrophoneSettings>(baseObject.Obj.ToString()));
+                                    obj = JsonConvert.DeserializeObject<MicrophoneSettings>(baseObject.Obj?.ToString());
+                                    if (obj != null)
+                                    {
+                                        MicSettingsChanged?.Invoke(this, obj as MicrophoneSettings ?? throw new InvalidOperationException());
+                                    }
                                     break;
                                 case "localMonitorOutputChanged":
-                                    LocalMonitorOutputChanged?.Invoke(this, baseObject.Obj.monitorMix.ToString());
+                                    obj = baseObject.Obj?.monitorMix?.ToString();
+                                    if (obj != null)
+                                    {
+                                        LocalMonitorOutputChanged?.Invoke(this, obj as string ?? throw new InvalidOperationException());
+                                    }
                                     break;
                                 case "monitorSwitchOutputChanged":
-                                    MonitorSwitchOutputChanged?.Invoke(this, baseObject.Obj.switchState.ToString() == "LocalMix" ? OutputMix.LocaLMix : OutputMix.StreamMix);
+                                    obj = baseObject.Obj?.switchState?.ToString();
+                                    if (obj != null)
+                                    {
+                                        MonitorSwitchOutputChanged?.Invoke(this, obj?.ToString() == "LocalMix" ? OutputMix.LocaLMix : OutputMix.StreamMix);
+                                    }
                                     break;
                                 case "channelsChanged":
-                                    ChannelsChanged?.Invoke(this, JsonConvert.DeserializeObject<List<ChannelInfo>>(baseObject.Obj.ToString()));
+                                    obj = JsonConvert.DeserializeObject<List<ChannelInfo>>(baseObject.Obj?.ToString());
+                                    if (obj != null)
+                                    {
+                                        ChannelsChanged?.Invoke(this, obj as List<ChannelInfo> ?? throw new InvalidOperationException());
+                                    }
                                     break;
                                 case "outputMixerChanged":
-                                    OutputMixerChanged?.Invoke(this, JsonConvert.DeserializeObject<MonitoringState>(baseObject.Obj.ToString()));
+                                    obj = JsonConvert.DeserializeObject<MonitoringState>(baseObject.Obj?.ToString());
+                                    if (obj != null)
+                                    {
+                                        OutputMixerChanged?.Invoke(this, obj as MonitoringState ?? throw new InvalidOperationException());
+                                    }
                                     break;
                                 case "inputMixerChanged":
-                                    InputMixerChanged?.Invoke(this, JsonConvert.DeserializeObject<ChannelInfo>(baseObject.Obj.ToString()));
+                                    obj = JsonConvert.DeserializeObject<ChannelInfo>(baseObject.Obj?.ToString());
+                                    if (obj != null)
+                                    {
+                                        InputMixerChanged?.Invoke(this, obj as ChannelInfo ?? throw new InvalidOperationException());
+                                    }
                                     break;
                                 default: //Ignore
                                     break;
@@ -343,7 +378,7 @@ namespace ElgatoWaveAPI
                     }
                     catch (Exception ex)
                     {
-
+                        //TODO log
                     }
 
                 }
@@ -353,7 +388,7 @@ namespace ElgatoWaveAPI
 
         #region TransationTracker
 
-        private Dictionary<int, SocketBaseObject<dynamic>> _responseCache = new();
+        private readonly Dictionary<int, SocketBaseObject<dynamic?>> _responseCache = new();
         private int _transactionId { get; set; } = 1;
 
         private int NextTransactionId()

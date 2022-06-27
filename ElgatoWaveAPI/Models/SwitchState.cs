@@ -8,6 +8,6 @@ namespace ElgatoWaveAPI.Models
     public class SwitchState
     {
         [JsonProperty("switchState")]
-        public string switchState { get; set; }
+        public string? switchState { get; set; }
     }
 }

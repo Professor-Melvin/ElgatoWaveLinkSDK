@@ -8,15 +8,15 @@ namespace ElgatoWaveAPI.Models
     public class MonitorMixOutputList
     {
         [JsonProperty("monitorMix")]
-        public string MonitorMix { get; set; }
+        public string? MonitorMix { get; set; }
 
         [JsonProperty("monitorMixList")]
-        public List<MonitorMixList> MonitorMixList { get; set; }
+        public List<MonitorMixList>? MonitorMixList { get; set; }
     }
 
     public class MonitorMixList
     {
         [JsonProperty("monitorMix")]
-        public string MonitorMix { get; set; }
+        public string? MonitorMix { get; set; }
     }
 }
