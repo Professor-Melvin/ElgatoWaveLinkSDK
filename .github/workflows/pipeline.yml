@@ -27,7 +27,7 @@ jobs:
                 nuget-api-key: ${{secrets.NUGETAPI}}
                 nuget-version: 5.x
 
-            - name: Set Version
+            #- name: Set Version
             #  uses: 
 
             - name: Restore
