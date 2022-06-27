@@ -28,7 +28,7 @@ jobs:
               run: dotnet restore
             
             - name: Build
-              run: dotnet build --no-restore
+              run: dotnet build --configuration Release --no-restore
 
             - name: Test
               run: dotnet test --no-build --no-restore --verbosity normal
@@ -60,9 +60,9 @@ jobs:
 
             #- name: Publich Nuget
 
-    releae-publish:
+    release-publish:
         name: Release Publish
-        needs: build
+        needs: beta-publish
         runs-on: windows-latest
         environment:
             name: release
