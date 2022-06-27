@@ -55,7 +55,7 @@ jobs:
             #  run: nuget push -source "ElgatoWaveAPI\bin\Release\" *.nupkg
               
             - name: Publish Pre-Release
-              run: dotnet nuget push "ElgatoWaveAPI\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols
+              run: dotnet nuget push "ElgatoWaveAPI\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
 
     release:
         name: Publish
