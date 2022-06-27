@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ElgatoWaveAPI.Models;
+using ElgatoWaveSDK.Models;
 using Newtonsoft.Json;
 
 namespace ElgatoWaveAPI
@@ -83,7 +84,7 @@ namespace ElgatoWaveAPI
 
             if (_socket?.State != WebSocketState.Open)
             {
-                throw new Exception($"Looped through possible ports {_maxCycles} times and couldn't connect [{_startPort}-{_startPort + _portRange}]");
+                throw new ElgatoException($"Looped through possible ports {_maxCycles} times and couldn't connect [{_startPort}-{_startPort + _portRange}]");
             }
 
             StartReceiver();
@@ -291,7 +292,7 @@ namespace ElgatoWaveAPI
                                 var newSize = buffer.Length + _bufferSize;
                                 if (newSize > _maxBufferSize)
                                 {
-                                    throw new Exception ("Maximum size exceeded");
+                                    throw new ElgatoException("Maximum size exceeded");
                                 }
                                 var newBuffer = new byte[newSize];
                                 Array.Copy(buffer, 0, newBuffer, 0, offset);
@@ -378,7 +379,7 @@ namespace ElgatoWaveAPI
                     }
                     catch (Exception ex)
                     {
-                        //TODO log
+                        throw new ElgatoException("Unknown error in receiving task", ex);
                     }
 
                 }
