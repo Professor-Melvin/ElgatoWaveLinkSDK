@@ -21,17 +21,23 @@ jobs:
               with:
                 dotnet-version: 6.x
 
-            #- name: Set Version
+            - name: Setup NuGet
+              uses: nuget/setup-nuget@v1
+              with:
+                nuget-api-key: ${{secrets.NUGETAPI}}
+                nuget-version: 5.x
+
+            - name: Set Version
             #  uses: 
 
             - name: Restore
               run: dotnet restore
             
             - name: Build
-              run: dotnet build --configuration Release --no-restore
+              run: dotnet build --configuration Release --no-restore --no-logo --version-suffix ${{GITHUB_RUN_NUMBER}}
 
             - name: Test
-              run: dotnet test --no-build --no-restore --verbosity normal
+              run: dotnet test --no-build -c Release --no-restore --no-logo --collect "Code coverage" --blame
 
             - name: Upload Artifacts
               uses: actions/upload-artifact@v3
@@ -40,7 +46,11 @@ jobs:
                 if-no-files-found: error
                 retention-days: 5
                 path: |
-                    ElgatoWaveAPI\bin\Release\netcoreapp3.1
+                    ElgatoWaveAPI\bin\Release\net6.0
+                    ElgatoWaveAPI\bin\Release\*.nupkg
+
+            - name: Publish Pre-Release
+              run: nuget push "ElgatoWaveAPI\bin\Release\*.nupkg"
 
     beta-publish:
         name: Beta Publish
