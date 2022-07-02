@@ -69,6 +69,11 @@ jobs:
         steps:
             - uses: actions/checkout@v3
         
+            - name: Ensure Version Change
+              shell: pwsh
+              run: |
+                 .\VersionCheck.ps1
+
             - name: Restore
               run: dotnet restore
 
@@ -96,6 +101,11 @@ jobs:
             name: release
         steps:
             - uses: actions/checkout@v3
+
+            - name: Ensure Version Change
+              shell: pwsh
+              run: |
+                 .\VersionCheck.ps1
 
             - name: Restore
               run: dotnet restore
