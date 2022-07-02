@@ -11,11 +11,12 @@ $projVersionString = $projNode.Node.InnerText
 $projVersion = New-Object System.Version($projVersionString);
 
 if($projVersion -eq $nugetVersion){
-    Write-Output 'Project version is the same as NuGet release, please update version'
+    Write-Error "Project version[$projVersionString] is the same as NuGet release[$nugetVersionString], please update version"
     exit 1
 }
 if($projVersion -lt $nugetVersion){
-    Write-Output 'Project version is behind NuGet release, please update version'
+    Write-Error "Project version[$projVersionString] is behind NuGet release[$nugetVersionString], please update version"
     exit 1
 }
+Write-Output "Project version[$projVersionString] is ahead of Nuget release[$nugetVersionString], continuing..."
 exit 0
