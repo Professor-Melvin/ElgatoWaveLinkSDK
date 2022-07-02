@@ -87,7 +87,7 @@ jobs:
         name: Release
         if: ${{ github.event_name != 'pull_request' }}
         runs-on: windows-latest
-        needs: build
+        needs: beta-release
         environment:
             name: release
         steps:
