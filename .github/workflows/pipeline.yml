@@ -59,11 +59,11 @@ jobs:
                 path: |
                     ElgatoWaveAPI/bin/Release/net6.0/
               
-    betarelease:
+    beta-release:
         name: Beta Release
         if: ${{ github.event_name != 'pull_request' }}
         runs-on: windows-latest
-        needs: builds
+        needs: build
         environment:
             name: beta
         steps:
