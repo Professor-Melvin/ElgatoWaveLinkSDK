@@ -6,7 +6,7 @@ if($nugetVersionString.Contains("-")){
     $nugetVersion = New-Object System.Version($nugetVersionString) 
 }
 
-$projNode = Select-Xml -Path .\ElgatoWaveAPI\ElgatoWaveSDK.csproj -XPath '/Project/PropertyGroup/Version'
+$projNode = Select-Xml -Path .\ElgatoWaveAPI\ElgatoWaveSDK.csproj -XPath '/Project/PropertyGroup/VersionPrefix'
 $projVersionString = $projNode.Node.InnerText
 $projVersion = New-Object System.Version($projVersionString);
 
