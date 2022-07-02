@@ -22,7 +22,6 @@ on:
 
 env:
     isPrComplete: ${{ github.event.pull_request.merged == true }}
-    isPr: ${{ github.event_name == 'pull_request' }}
     betaVersion:  beta
 
 #Not sure if I want this to cancel the previous build yet
@@ -74,7 +73,7 @@ jobs:
 
     release:
         name: Release
-        if: ${{ !env.isPr }}
+        if: ${{ github.event_name != 'pull_request' }}
         runs-on: windows-latest
         needs: build
         environment:
