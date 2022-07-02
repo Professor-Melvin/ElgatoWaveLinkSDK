@@ -68,7 +68,7 @@ jobs:
                     ElgatoWaveAPI/bin/Release/*.nupkg
               
             - name: Publish 
-              if: ${{ isPrComplete }}
+              if: ${{ env.isPrComplete }}
               run: dotnet nuget push "ElgatoWaveAPI\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
 
     release:
