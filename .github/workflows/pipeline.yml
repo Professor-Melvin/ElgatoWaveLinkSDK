@@ -2,11 +2,6 @@ name: Pipeline
 
 on:
     workflow_dispatch:
-        inputs:
-            version:
-                required: true
-                description: Input version for this build
-
     push:
         branches: ["main"]
         paths-ignore:
@@ -21,7 +16,6 @@ on:
             - '**/*.gitattributes'
 
 env:
-    isPrComplete: ${{ github.event.pull_request.merged == true }}
     betaVersion:  beta
 
 #Not sure if I want this to cancel the previous build yet
@@ -52,7 +46,7 @@ jobs:
               run: dotnet restore
 
             - name: Build Beta
-              run: dotnet build --configuration Release --no-restore --version-suffix ${{ env.betaVersion }}
+              run: dotnet build --configuration Release --no-restore
 
             - name: Test
               run: dotnet test --no-build -c Release --no-restore --collect "Code coverage" --blame
@@ -85,7 +79,7 @@ jobs:
               working-directory: ElgatoWaveAPI/bin/Release/net6.0/
 
             - name: Package
-              run: dotnet pack --configuration Release --no-restore --version-suffix beta
+              run: dotnet pack --configuration Release --no-restore --version-suffix ${{ env.betaVersion }}
               
             - name: Publish
               run: dotnet nuget push "*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
