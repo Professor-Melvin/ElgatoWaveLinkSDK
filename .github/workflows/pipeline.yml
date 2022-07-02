@@ -53,9 +53,9 @@ jobs:
             - name: Upload Artifacts
               uses: actions/upload-artifact@v3
               with:
-                name: artifact
+                name: BuildArtifact
                 if-no-files-found: error
-                retention-days: 5
+                retention-days: 7
                 path: |
                     ElgatoWaveAPI/bin/Release/net6.0*/*
               
@@ -69,17 +69,20 @@ jobs:
         steps:
             - uses: actions/checkout@v3
         
-            - name: Download artifacts
-              uses: actions/download-artifact@v3
-              with:
-                name: artifact
-                path: ElgatoWaveAPI/bin/Release/
-
-            - name: List Files
-              run: Get-ChildItem -Path ./ElgatoWaveAPI/bin/Release/
+            - name: Restore
+              run: dotnet restore
 
             - name: Package
               run: dotnet pack --configuration Release --no-restore --version-suffix ${{ env.betaVersion }}
+
+            - name: Upload Artifacts
+              uses: actions/upload-artifact@v3
+              with:
+                name: BuildArtifact
+                if-no-files-found: error
+                retention-days: 7
+                path: |
+                    ElgatoWaveAPI/bin/Release/net6.0*/*.nupkg
               
             - name: Publish
               run: dotnet nuget push "*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
@@ -94,14 +97,20 @@ jobs:
         steps:
             - uses: actions/checkout@v3
 
-            - name: Download artifacts
-              uses: actions/download-artifact@v3
-              with:
-                name: artifact
-                path: ElgatoWaveAPI/bin/Release/
+            - name: Restore
+              run: dotnet restore
 
             - name: Package
               run: dotnet pack --configuration Release --no-restore
               
+            - name: Upload Artifacts
+              uses: actions/upload-artifact@v3
+              with:
+                name: BuildArtifact
+                if-no-files-found: error
+                retention-days: 7
+                path: |
+                    ElgatoWaveAPI/bin/Release/net6.0*/*.nupkg
+
             - name: Publish
               run: dotnet nuget push "*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
