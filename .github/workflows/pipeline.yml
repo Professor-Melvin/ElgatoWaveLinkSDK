@@ -9,7 +9,6 @@ on:
             - '**/*.gitignore'
             - '**/*.gitattributes'
     pull_request:
-        branches: ["main"]
         paths-ignore:
             - '**/*.md'
             - '**/*.gitignore'
