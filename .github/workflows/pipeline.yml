@@ -21,7 +21,7 @@ on:
             - '**/*.gitattributes'
 
 env:
-    isPrComplete: ${{ github.event_name == 'pull_request' }}
+    isPrComplete: ${{ github.event.pull_request.merged == true }}
     betaVersion:  beta
 
 #Not sure if I want this to cancel the previous build yet
