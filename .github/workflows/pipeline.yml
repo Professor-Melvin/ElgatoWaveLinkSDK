@@ -96,7 +96,7 @@ jobs:
                     ElgatoWaveAPI/bin/Release/*.nupkg
               
             - name: Publish
-              run: dotnet nuget push "*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
+              run: dotnet nuget push "ElgatoWaveAPI\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
 
     release:
         name: Release
@@ -135,4 +135,4 @@ jobs:
                     ElgatoWaveAPI/bin/Release/*.nupkg
 
             - name: Publish
-              run: dotnet nuget push "*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
+              run: dotnet nuget push "ElgatoWaveAPI\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
