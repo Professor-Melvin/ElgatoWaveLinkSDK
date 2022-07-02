@@ -57,7 +57,7 @@ jobs:
                 if-no-files-found: error
                 retention-days: 7
                 path: |
-                    ElgatoWaveAPI/bin/Release/net6.0*/*
+                    ElgatoWaveAPI/bin/Release/net6.0-windows/*
               
     beta-release:
         name: Beta Release
@@ -77,13 +77,19 @@ jobs:
             - name: Restore
               run: dotnet restore
 
+            - name: Download Artifacts
+              uses: actions/download-artifact@v3
+              with:
+                name: BuildArtifact
+                path: ElgatoWaveAPI/bin/Release/net6.0-windows/
+
             - name: Package
               run: dotnet pack --configuration Release --no-restore --version-suffix ${{ env.betaVersion }}
 
             - name: Upload Artifacts
               uses: actions/upload-artifact@v3
               with:
-                name: BuildArtifact
+                name: BetaArtifact
                 if-no-files-found: error
                 retention-days: 7
                 path: |
@@ -110,13 +116,19 @@ jobs:
             - name: Restore
               run: dotnet restore
 
+            - name: Download Artifacts
+              uses: actions/download-artifact@v3
+              with:
+                name: BuildArtifact
+                path: ElgatoWaveAPI/bin/Release/net6.0-windows/
+
             - name: Package
               run: dotnet pack --configuration Release --no-restore
               
             - name: Upload Artifacts
               uses: actions/upload-artifact@v3
               with:
-                name: BuildArtifact
+                name: ReleaseArtifact
                 if-no-files-found: error
                 retention-days: 7
                 path: |
