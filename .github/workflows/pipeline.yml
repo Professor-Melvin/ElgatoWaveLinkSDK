@@ -93,7 +93,7 @@ jobs:
                 if-no-files-found: error
                 retention-days: 7
                 path: |
-                    ElgatoWaveAPI/bin/Release/net6.0*/*.nupkg
+                    ElgatoWaveAPI/bin/Release/*.nupkg
               
             - name: Publish
               run: dotnet nuget push "*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
@@ -132,7 +132,7 @@ jobs:
                 if-no-files-found: error
                 retention-days: 7
                 path: |
-                    ElgatoWaveAPI/bin/Release/net6.0*/*.nupkg
+                    ElgatoWaveAPI/bin/Release/*.nupkg
 
             - name: Publish
               run: dotnet nuget push "*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
