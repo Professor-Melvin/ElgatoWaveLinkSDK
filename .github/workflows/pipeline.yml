@@ -74,8 +74,7 @@ jobs:
                 path: ElgatoWaveAPI/bin/Release/
 
             - name: List Files
-              run: dir /s /b /o:gn
-              working-directory: ElgatoWaveAPI/bin/Release/
+              run: Get-ChildItem -Path ./ElgatoWaveAPI/bin/Release/
 
             - name: Package
               run: dotnet pack --configuration Release --no-restore --version-suffix ${{ env.betaVersion }}
@@ -98,8 +97,7 @@ jobs:
                 path: ElgatoWaveAPI/bin/Release/
 
             - name: List Files
-              run: dir /s /b /o:gn
-              working-directory: ElgatoWaveAPI/bin/Release/
+              run: Get-ChildItem -Path ./ElgatoWaveAPI/bin/Release/
 
             - name: Package
               run: dotnet pack --configuration Release --no-restore
