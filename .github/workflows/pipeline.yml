@@ -20,6 +20,10 @@ on:
             - '**/*.gitignore'
             - '**/*.gitattributes'
 
+env:
+    isPrComplete: ${{ github.event_name == 'pull_request' }}
+    betaVersion:  beta
+
 #Not sure if I want this to cancel the previous build yet
 #concurrency:
 #  group: ${{ github.workflow }}-${{ github.ref }}
@@ -34,6 +38,11 @@ jobs:
         steps:
             - uses: actions/checkout@v3
 
+            - name: Ensure Version Change
+              shell: pwsh
+              run: |
+                 .\VersionCheck.ps1
+
             - name: Setup .Net
               uses: actions/setup-dotnet@v2
               with:
@@ -42,15 +51,8 @@ jobs:
             - name: Restore
               run: dotnet restore
 
-            - name: Version Bump
-              if: ${{ github.event.inputs.version == '' }}
-              uses: SiqiLu/dotnet-bump-version@master
-              with:
-                version_files: "**/*.csproj"
-                github_token: ${{ secrets.GITHUBTOKEN }}
-
-            - name: Build
-              run: dotnet build --configuration Release --no-restore --version-suffix beta-${{ github.run_number }}
+            - name: Build Beta
+              run: dotnet build --configuration Release --no-restore --version-suffix ${{ env.betaVersion }}
 
             - name: Test
               run: dotnet test --no-build -c Release --no-restore --collect "Code coverage" --blame
@@ -65,24 +67,44 @@ jobs:
                     ElgatoWaveAPI/bin/Release/net6.0/
                     ElgatoWaveAPI/bin/Release/*.nupkg
               
-            - name: Publish Pre-Release
-              if: github.event.pull_request.merged == false
+            - name: Publish 
+              if: ${{ isPrComplete }}
               run: dotnet nuget push "ElgatoWaveAPI\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
 
-    #release:
-    #    name: Publish
-    #    needs: build
-    #    runs-on: windows-latest
-    #    environment:
-    #        name: release
-    #    steps:
+    release:
+        name: Release
+        runs-on: windows-latest
+        needs: build
+        environment:
+            name: release
+        steps:
+            - uses: actions/checkout@v3
 
-    #        - name: Download Artifacts
-    #          uses: actions/download-artifact@v3
-    #          with:
-    #            name: artifact
-    #            path: artifactDownload
+            - name: Ensure Version Change
+              shell: pwsh
+              run: |
+                 .\VersionCheck.ps1
 
-            #- name: Nugest Package
+            - name: Setup .Net
+              uses: actions/setup-dotnet@v2
+              with:
+                dotnet-version: 6.x
 
-            #- name: Publich Nuget
+            - name: Restore
+              run: dotnet restore
+
+            - name: Build Release
+              run: dotnet build --configuration Release --no-restore
+
+            - name: Upload Artifacts
+              uses: actions/upload-artifact@v3
+              with:
+                name: artifact
+                if-no-files-found: error
+                retention-days: 5
+                path: |
+                    ElgatoWaveAPI/bin/Release/net6.0/
+                    ElgatoWaveAPI/bin/Release/*.nupkg
+              
+            - name: Publish
+              run: dotnet nuget push "ElgatoWaveAPI\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
