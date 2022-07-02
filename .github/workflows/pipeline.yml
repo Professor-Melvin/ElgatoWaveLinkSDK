@@ -34,7 +34,7 @@ jobs:
         name: Build
         runs-on: windows-latest
         environment:
-            name: beta
+            name: pr
         steps:
             - uses: actions/checkout@v3
 
@@ -65,11 +65,30 @@ jobs:
                 retention-days: 5
                 path: |
                     ElgatoWaveAPI/bin/Release/net6.0/
-                    ElgatoWaveAPI/bin/Release/*.nupkg
               
-            - name: Publish 
-              if: ${{ env.isPrComplete }}
-              run: dotnet nuget push "ElgatoWaveAPI\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
+    betaRelease:
+        name: Beta Release
+        if: ${{ github.event_name != 'pull_request' }}
+        runs-on: windows-latest
+        needs: builds
+        environment:
+            name: beta
+        steps:
+            - name: Download artifacts
+              uses: actions/download-artifact@v3
+              with:
+                name: artifact
+                path: ElgatoWaveAPI/bin/Release/net6.0/
+
+            - name: List Files
+              run: dir /s /b /o:gn
+              working-directory: ElgatoWaveAPI/bin/Release/net6.0/
+
+            - name: Package
+              run: dotnet pack --configuration Release --no-restore --version-suffix beta
+              
+            - name: Publish
+              run: dotnet nuget push "*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
 
     release:
         name: Release
@@ -79,33 +98,18 @@ jobs:
         environment:
             name: release
         steps:
-            - uses: actions/checkout@v3
-
-            - name: Ensure Version Change
-              shell: pwsh
-              run: |
-                 .\VersionCheck.ps1
-
-            - name: Setup .Net
-              uses: actions/setup-dotnet@v2
-              with:
-                dotnet-version: 6.x
-
-            - name: Restore
-              run: dotnet restore
-
-            - name: Build Release
-              run: dotnet build --configuration Release --no-restore
-
-            - name: Upload Artifacts
-              uses: actions/upload-artifact@v3
+            - name: Download artifacts
+              uses: actions/download-artifact@v3
               with:
                 name: artifact
-                if-no-files-found: error
-                retention-days: 5
-                path: |
-                    ElgatoWaveAPI/bin/Release/net6.0/
-                    ElgatoWaveAPI/bin/Release/*.nupkg
+                path: ElgatoWaveAPI/bin/Release/net6.0/
+
+            - name: List Files
+              run: dir /s /b /o:gn
+              working-directory: ElgatoWaveAPI/bin/Release/net6.0/
+
+            - name: Package
+              run: dotnet pack --configuration Release --no-restore
               
             - name: Publish
-              run: dotnet nuget push "ElgatoWaveAPI\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
+              run: dotnet nuget push "*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
