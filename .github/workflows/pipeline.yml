@@ -57,7 +57,7 @@ jobs:
                 if-no-files-found: error
                 retention-days: 5
                 path: |
-                    ElgatoWaveAPI/bin/Release/net6.0/*
+                    ElgatoWaveAPI/bin/Release/net6.0*/*
               
     beta-release:
         name: Beta Release
