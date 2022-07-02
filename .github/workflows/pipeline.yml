@@ -67,6 +67,8 @@ jobs:
         environment:
             name: beta
         steps:
+            - uses: actions/checkout@v3
+        
             - name: Download artifacts
               uses: actions/download-artifact@v3
               with:
@@ -90,14 +92,13 @@ jobs:
         environment:
             name: release
         steps:
+            - uses: actions/checkout@v3
+
             - name: Download artifacts
               uses: actions/download-artifact@v3
               with:
                 name: artifact
                 path: ElgatoWaveAPI/bin/Release/
-
-            - name: List Files
-              run: Get-ChildItem -Path ./ElgatoWaveAPI/bin/Release/
 
             - name: Package
               run: dotnet pack --configuration Release --no-restore
