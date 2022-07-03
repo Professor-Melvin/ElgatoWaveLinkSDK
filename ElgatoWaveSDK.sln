@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31710.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElgatoWaveSDK", "ElgatoWaveAPI\ElgatoWaveSDK.csproj", "{CB7EC2BE-4A02-4BE3-ADD8-B351E5B00E0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElgatoWaveSDK", "ElgatoWaveSDK\ElgatoWaveSDK.csproj", "{CB7EC2BE-4A02-4BE3-ADD8-B351E5B00E0F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElgatoWaveSDK.TestRig", "TestConsole\ElgatoWaveSDK.TestRig.csproj", "{E39B87D1-6E87-4082-B33F-9C228754DF76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElgatoWaveSDK.TestRig", "ElgatoWaveSDK.TestRig\ElgatoWaveSDK.TestRig.csproj", "{E39B87D1-6E87-4082-B33F-9C228754DF76}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFiles", "SolutionFiles", "{C439C54E-6751-4BE2-9C83-CA847F677B8A}"
 	ProjectSection(SolutionItems) = preProject
@@ -20,6 +20,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github Pipeline", "Github P
 		.github\workflows\pipeline.yml = .github\workflows\pipeline.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElgatoWaveSDK.Tests", "ElgatoWaveLinkSDK.Tests\ElgatoWaveSDK.Tests.csproj", "{D57ABE4E-C961-4708-B816-C69C5CC5EF7E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{E39B87D1-6E87-4082-B33F-9C228754DF76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E39B87D1-6E87-4082-B33F-9C228754DF76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E39B87D1-6E87-4082-B33F-9C228754DF76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D57ABE4E-C961-4708-B816-C69C5CC5EF7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D57ABE4E-C961-4708-B816-C69C5CC5EF7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D57ABE4E-C961-4708-B816-C69C5CC5EF7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D57ABE4E-C961-4708-B816-C69C5CC5EF7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,11 +5,10 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ElgatoWaveAPI.Models;
 using ElgatoWaveSDK.Models;
 using Newtonsoft.Json;
 
-namespace ElgatoWaveAPI
+namespace ElgatoWaveSDK
 {
     public class ElgatoWaveClient
     {
@@ -236,7 +235,7 @@ namespace ElgatoWaveAPI
                     Id = NextTransactionId(),
                     Obj = objectJson
                 };
-                var s = baseObject.ToString();
+                var s = baseObject.ToJson();
                 var array = Encoding.UTF8.GetBytes(s);
                 await _socket.SendAsync(array, WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
 

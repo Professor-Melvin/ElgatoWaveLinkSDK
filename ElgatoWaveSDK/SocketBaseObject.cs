@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace ElgatoWaveAPI
+[assembly: InternalsVisibleTo("ElgatoWaveSDK.Tests")]
+namespace ElgatoWaveSDK
 {
     internal class SocketBaseObject<T>
     {
@@ -12,7 +14,7 @@ namespace ElgatoWaveAPI
         public int Id { get; set; }
 
         [JsonProperty("jsonrpc")]
-        public string? JsonRpc { get; private set; } = "2.0";
+        public string? JsonRpc { get; } = "2.0";
 
         [JsonProperty("method")]
         public string? Method { get; set; }
@@ -23,7 +25,7 @@ namespace ElgatoWaveAPI
         [JsonProperty("result")]
         public T? Result { get; set; }
 
-        public override string ToString()
+        public string ToJson()
         {
             return JsonConvert.SerializeObject(this, new JsonSerializerSettings()
             {

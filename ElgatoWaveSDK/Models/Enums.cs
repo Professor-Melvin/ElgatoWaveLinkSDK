@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ElgatoWaveAPI.Models
+namespace ElgatoWaveSDK.Models
 {
     public enum OutputMix
     {

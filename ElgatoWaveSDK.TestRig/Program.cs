@@ -1,25 +1,14 @@
 ﻿using System;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using ElgatoWaveAPI;
-using ElgatoWaveAPI.Models;
-using Newtonsoft.Json;
-using Websocket.Client;
 
-namespace TestConsole
+namespace ElgatoWaveSDK.TestRig
 {
-    internal class Program
+    internal static class Program
     {
-        static async Task Main()
+        public static async Task Main()
         {
-            ElgatoWaveClient client = new ElgatoWaveClient();
+            ElgatoWaveClient client = new ();
             client.MicStateChanged += (sender, state) =>
             {
                 Console.WriteLine($"\nUpdate | Mic Connected: {state.IsMicrophoneConnected}");
@@ -69,7 +58,7 @@ namespace TestConsole
                                   $"\n\t\tID: {c.MixId}" +
                                   $"\n\t\tColor: ");
                     Color channelColor = ColorTranslator.FromHtml(c.BgColor);
-                    Console.ForegroundColor = ClosestConsoleColor(channelColor.R, channelColor.G, channelColor.B);
+                    Console.ForegroundColor = ClosestConsoleColour(channelColor.R, channelColor.G, channelColor.B);
                     Console.Write(c.BgColor);
                     Console.ForegroundColor = ConsoleColor.White;
 
@@ -92,7 +81,7 @@ namespace TestConsole
                 Console.WriteLine("\nPress any key to start test...");
                 Console.ReadKey();
 
-                var appInfo = await client.GetAppInfo();
+                var appInfo = await client.GetAppInfo().ConfigureAwait(false);
                 Console.WriteLine($"App Settings:" +
                                   $"\n\tApp ID: {appInfo.Id}" +
                                   $"\n\tApp Name: {appInfo.Name}" +
@@ -101,13 +90,13 @@ namespace TestConsole
 
                 var channelInfos = await client.GetAllChannelInfo().ConfigureAwait(false);
                 Console.WriteLine($"All Channel Info:");
-                channelInfos.ForEach(c =>
+                channelInfos?.ForEach(c =>
                 {
                     Console.Write($"\n\t{c.MixerName}:" +
                                   $"\n\t\tID: {c.MixId}" +
                                   $"\n\t\tColor: ");
-                    Color channelColor = ColorTranslator.FromHtml(c.BgColor);
-                    Console.ForegroundColor = ClosestConsoleColor(channelColor.R, channelColor.G, channelColor.B);
+                    var channelColour = ColorTranslator.FromHtml(c.BgColor ?? "");
+                    Console.ForegroundColor = ClosestConsoleColour(channelColour.R, channelColour.G, channelColour.B);
                     Console.Write(c.BgColor);
                     Console.ForegroundColor = ConsoleColor.White;
 
@@ -126,33 +115,36 @@ namespace TestConsole
 
                 //var newSetting = await client.SetOutputMixer(80, false, 50, true);
 
-                var micState = await client.GetMicrophoneState();
-                Console.WriteLine($"\nMic Connected: {micState.IsMicrophoneConnected}");
+                var micState = await client.GetMicrophoneState().ConfigureAwait(false);
+                Console.WriteLine($"\nMic Connected: {micState?.IsMicrophoneConnected ?? false}");
 
-                var micSettings = await client.GetMicrophoneSettings();
+                var micSettings = await client.GetMicrophoneSettings().ConfigureAwait(false);
                 Console.WriteLine($"Mic Setting:" +
-                                  $"\n\tMic Balance: {micSettings.MicrophoneBalance}" +
-                                  $"\n\tMic Gain: {micSettings.MicrophoneGain}" +
-                                  $"\n\tMic Output Vol: {micSettings.MicrophoneOutputVolume}" +
-                                  $"\n\tLowCut On: {micSettings.IsMicrophoneLowcutOn}" +
-                                  $"\n\tClipGuard On: {micSettings.IsMicrophoneClipguardOn}");
-                micSettings.MicrophoneGain = 100;
+                                  $"\n\tMic Balance: {micSettings?.MicrophoneBalance}" +
+                                  $"\n\tMic Gain: {micSettings?.MicrophoneGain}" +
+                                  $"\n\tMic Output Vol: {micSettings?.MicrophoneOutputVolume}" +
+                                  $"\n\tLowCut On: {micSettings?.IsMicrophoneLowcutOn}" +
+                                  $"\n\tClipGuard On: {micSettings?.IsMicrophoneClipguardOn}");
+                if (micSettings != null)
+                {
+                    micSettings.MicrophoneGain = 100;
+                }
 
 
-                var monitoringState = await client.GetMonitoringState();
+                var monitoringState = await client.GetMonitoringState().ConfigureAwait(false);
                 Console.WriteLine($"Monitoring State:" +
-                                  $"\n\tLocal Vol: {monitoringState.LocalVolumeOut}" +
-                                  $"\n\tLocal Muted: {monitoringState.IsLocalOutMuted}" +
-                                  $"\n\tStream Vol: {monitoringState.StreamVolumeOut}" +
-                                  $"\n\tStream Muted: {monitoringState.IsStreamOutMuted}");
+                                  $"\n\tLocal Vol: {monitoringState?.LocalVolumeOut}" +
+                                  $"\n\tLocal Muted: {monitoringState?.IsLocalOutMuted}" +
+                                  $"\n\tStream Vol: {monitoringState?.StreamVolumeOut}" +
+                                  $"\n\tStream Muted: {monitoringState?.IsStreamOutMuted}");
 
-                var monitorMixOutputList = await client.GetMonitorMixOutputList();
-                Console.WriteLine($"Monitor Output: {monitorMixOutputList.MonitorMix}" +
+                var monitorMixOutputList = await client.GetMonitorMixOutputList().ConfigureAwait(false);
+                Console.WriteLine($"Monitor Output: {monitorMixOutputList?.MonitorMix}" +
                                   $"\nPossible Outputs:");
-                monitorMixOutputList.MonitorMixList.ForEach(o => Console.WriteLine($"\t{o.MonitorMix}"));
+                monitorMixOutputList?.MonitorMixList?.ForEach(o => Console.WriteLine($"\t{o.MonitorMix}"));
 
-                var switchState = await client.GetSwitchState();
-                Console.WriteLine($"Switch State: {switchState.switchState}");
+                var switchState = await client.GetSwitchState().ConfigureAwait(false);
+                Console.WriteLine($"Switch State: {switchState?.switchState}");
 
                 Console.WriteLine("\nPress any key to exit...");
                 Console.ReadKey();
@@ -165,7 +157,7 @@ namespace TestConsole
             }
         }
 
-        private static ConsoleColor ClosestConsoleColor(byte r, byte g, byte b)
+        private static ConsoleColor ClosestConsoleColour(byte r, byte g, byte b)
         {
             ConsoleColor ret = 0;
             double rr = r, gg = g, bb = b, delta = double.MaxValue;
@@ -173,7 +165,7 @@ namespace TestConsole
             foreach (ConsoleColor cc in Enum.GetValues(typeof(ConsoleColor)))
             {
                 var n = Enum.GetName(typeof(ConsoleColor), cc);
-                var c = System.Drawing.Color.FromName(n == "DarkYellow" ? "Orange" : n); // bug fix
+                var c = System.Drawing.Color.FromName(n == "DarkYellow" ? "Orange" : n ?? "white");
                 var t = Math.Pow(c.R - rr, 2.0) + Math.Pow(c.G - gg, 2.0) + Math.Pow(c.B - bb, 2.0);
                 if (t == 0.0)
                     return cc;
