@@ -57,7 +57,7 @@ jobs:
                 if-no-files-found: error
                 retention-days: 7
                 path: |
-                    ElgatoWaveAPI/bin/Release/net6.0-windows/*
+                    ElgatoWaveSDK/bin/Release/net6.0-windows/*
               
     beta-release:
         name: Beta Release
@@ -81,7 +81,7 @@ jobs:
               uses: actions/download-artifact@v3
               with:
                 name: BuildArtifact
-                path: ElgatoWaveAPI/bin/Release/net6.0-windows/
+                path: ElgatoWaveSDK/bin/Release/net6.0-windows/
 
             - name: Package
               run: dotnet pack --configuration Release --no-restore --version-suffix ${{ env.betaVersion }}
@@ -93,10 +93,10 @@ jobs:
                 if-no-files-found: error
                 retention-days: 7
                 path: |
-                    ElgatoWaveAPI/bin/Release/*.nupkg
+                    ElgatoWaveSDK/bin/Release/*.nupkg
               
             - name: Publish
-              run: dotnet nuget push "ElgatoWaveAPI\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
+              run: dotnet nuget push "ElgatoWaveSDK\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
 
     release:
         name: Release
@@ -120,7 +120,7 @@ jobs:
               uses: actions/download-artifact@v3
               with:
                 name: BuildArtifact
-                path: ElgatoWaveAPI/bin/Release/net6.0-windows/
+                path: ElgatoWaveSDK/bin/Release/net6.0-windows/
 
             - name: Package
               run: dotnet pack --configuration Release --no-restore
@@ -132,7 +132,7 @@ jobs:
                 if-no-files-found: error
                 retention-days: 7
                 path: |
-                    ElgatoWaveAPI/bin/Release/*.nupkg
+                    ElgatoWaveSDK/bin/Release/*.nupkg
 
             - name: Publish
-              run: dotnet nuget push "ElgatoWaveAPI\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
+              run: dotnet nuget push "ElgatoWaveSDK\bin\Release\*.nupkg" --api-key ${{secrets.NUGETAPI}} --no-symbols --skip-duplicate --source https://api.nuget.org/v3/index.json
