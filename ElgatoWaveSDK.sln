@@ -20,7 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github Pipeline", "Github P
 		.github\workflows\pipeline.yml = .github\workflows\pipeline.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElgatoWaveSDK.Tests", "ElgatoWaveLinkSDK.Tests\ElgatoWaveSDK.Tests.csproj", "{D57ABE4E-C961-4708-B816-C69C5CC5EF7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElgatoWaveSDK.Tests", "ElgatoWaveSDK.Tests\ElgatoWaveSDK.Tests.csproj", "{D57ABE4E-C961-4708-B816-C69C5CC5EF7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
