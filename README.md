@@ -1,4 +1,6 @@
 # ElgatoWaveLink-cSharp
+![Nuget](https://img.shields.io/nuget/v/elgatowavesdk) ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/elgatowavesdk)
+
 SDK For Elgato Wave Link Software, based off of the StreamDeck plugin for the wavelink
 
 Working:
