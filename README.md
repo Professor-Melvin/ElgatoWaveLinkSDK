@@ -11,10 +11,10 @@ Working:
   - switchMonitoring !! Only switchin to StreamMix works !!
   - setMicrophoneSettings
   - setOutputMixer
+  - switchMonitorMix
 
 Left to do:
 - Unit Test
-- switchMonitorMix won't allow us to change to LocalMix, only to StreamMix
 - setInputMix isn't implemented yet
 - Add support for new filter feature
 - Add client settings
