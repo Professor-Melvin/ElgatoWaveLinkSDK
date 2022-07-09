@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ElgatoWaveSDK.Emulator (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "ElgatoWaveSDK.Emulator (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
