@@ -111,7 +111,7 @@ jobs:
             - name: Ensure Version Change
               shell: pwsh
               run: |
-                 .\VersionCheck.ps1
+                 .\VersionCheck.ps1 -ignoreBeta
 
             - name: Restore
               run: dotnet restore
