@@ -6,7 +6,7 @@ namespace ElgatoWaveSDK.Models
 {
     public enum OutputMix
     {
-        LocaLMix,
+        LocalMix,
         StreamMix
     }
 }
