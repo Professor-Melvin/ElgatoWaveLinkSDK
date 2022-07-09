@@ -8,7 +8,7 @@ Working:
 - Get methods
 - Set Commands
   - setMonitorMixOutput
-  - switchMonitoring !! Only switchin to StreamMix works !!
+  - switchMonitoring
   - setMicrophoneSettings
   - setOutputMixer
   - switchMonitorMix
