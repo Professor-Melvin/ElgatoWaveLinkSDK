@@ -52,7 +52,11 @@ namespace ElgatoWaveSDK.Tests
 
                             if (listValue != null)
                             {
-                                ((IList)tempValue).Add(listValue);
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                                _ = ((IList)tempValue).Add(listValue);
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
                             }
                         }
 

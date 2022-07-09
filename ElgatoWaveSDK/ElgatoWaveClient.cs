@@ -151,7 +151,6 @@ namespace ElgatoWaveSDK
             });
         }
 
-        //TODO Unable to switch to local for some reason, can switch to stream though
         public Task<SwitchState?> SetMonitoringState(OutputMix mix)
         {
             return SendCommand<SwitchState, SwitchState>("switchMonitoring", new SwitchState()
@@ -337,7 +336,7 @@ namespace ElgatoWaveSDK
                                     obj = baseObject.Obj?.switchState?.ToString();
                                     if (obj != null)
                                     {
-                                        MonitorSwitchOutputChanged?.Invoke(this, obj?.ToString() == "LocalMix" ? OutputMix.LocaLMix : OutputMix.StreamMix);
+                                        MonitorSwitchOutputChanged?.Invoke(this, obj?.ToString() == "LocalMix" ? OutputMix.LocalMix : OutputMix.StreamMix);
                                     }
                                     break;
                                 case "channelsChanged":
