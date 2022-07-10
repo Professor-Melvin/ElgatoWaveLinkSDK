@@ -110,8 +110,8 @@ namespace ElgatoWaveSDK.TestRig
                                   $"\n\t\tIs Available: {c.IsAvailable}");
                 });
 
-
-                //var newSetting = await client.SetInputMixer(channelInfos[3].MixId, channelInfos[3].);
+                channelInfos[0].LocalVolumeIn = 0;
+                var newSetting = await client.SetInputMixer(channelInfos[0]);
 
                 //var newSetting = await client.SetOutputMixer(80, false, 50, true);
 

@@ -10,6 +10,9 @@ namespace ElgatoWaveSDK.Models
         [JsonProperty("bgColor")]
         public string? BgColor { get; set; }
 
+        [JsonProperty("filters")]
+        public List<Filter>? Filters { get; set; }
+
         [JsonProperty("deltaLinked")]
         public long? DeltaLinked { get; set; }
 
