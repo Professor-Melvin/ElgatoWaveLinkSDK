@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFiles", "SolutionFi
 		LICENSE = LICENSE
 		README.md = README.md
 		VersionCheck.ps1 = VersionCheck.ps1
+		WaveLinkClient.js = WaveLinkClient.js
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github Pipeline", "Github Pipeline", "{7F6F3443-DC33-4E63-8F6E-6DED90F8BEAC}"
@@ -20,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github Pipeline", "Github P
 		.github\workflows\pipeline.yml = .github\workflows\pipeline.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElgatoWaveSDK.Tests", "ElgatoWaveSDK.Tests\ElgatoWaveSDK.Tests.csproj", "{D57ABE4E-C961-4708-B816-C69C5CC5EF7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElgatoWaveSDK.Tests", "ElgatoWaveSDK.Tests\ElgatoWaveSDK.Tests.csproj", "{D57ABE4E-C961-4708-B816-C69C5CC5EF7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
