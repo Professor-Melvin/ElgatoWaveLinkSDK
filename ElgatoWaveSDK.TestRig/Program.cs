@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Threading.Tasks;
+using ElgatoWaveSDK.Models;
 
 namespace ElgatoWaveSDK.TestRig
 {
@@ -110,8 +111,8 @@ namespace ElgatoWaveSDK.TestRig
                                   $"\n\t\tIs Available: {c.IsAvailable}");
                 });
 
-
-                //var newSetting = await client.SetInputMixer(channelInfos[3].MixId, channelInfos[3].);
+                //channelInfos[0].LocalVolumeIn = channelInfos[0].LocalVolumeIn == 0 ? 100 : 0;
+                //var newSetting = await client.SetInputMixer(channelInfos[0], MixType.LocalMix).ConfigureAwait(false);
 
                 //var newSetting = await client.SetOutputMixer(80, false, 50, true);
 

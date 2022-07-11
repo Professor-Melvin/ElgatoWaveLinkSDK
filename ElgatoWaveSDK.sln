@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFiles", "SolutionFi
 		LICENSE = LICENSE
 		README.md = README.md
 		VersionCheck.ps1 = VersionCheck.ps1
+		WaveLinkClient.js = WaveLinkClient.js
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github Pipeline", "Github Pipeline", "{7F6F3443-DC33-4E63-8F6E-6DED90F8BEAC}"
