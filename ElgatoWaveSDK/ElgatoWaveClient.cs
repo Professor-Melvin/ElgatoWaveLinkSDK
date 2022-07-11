@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -100,7 +98,6 @@ namespace ElgatoWaveSDK
             _socket = null;
         }
         #endregion Connection
-
 
         #region Commands
 
