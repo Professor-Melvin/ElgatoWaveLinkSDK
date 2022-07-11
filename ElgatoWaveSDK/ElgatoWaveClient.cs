@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -48,7 +47,7 @@ namespace ElgatoWaveSDK
         public EventHandler<ChannelInfo>? InputMixerChanged { get; set; }
         public EventHandler<MonitoringState>? OutputMixerChanged { get; set; }
         public EventHandler<string>? LocalMonitorOutputChanged { get; set; }
-        public EventHandler<OutputMix>? MonitorSwitchOutputChanged { get; set; }
+        public EventHandler<MixType>? MonitorSwitchOutputChanged { get; set; }
         public EventHandler<List<ChannelInfo>>? ChannelsChanged { get; set; }
 
         #endregion
@@ -151,7 +150,7 @@ namespace ElgatoWaveSDK
             });
         }
 
-        public Task<SwitchState?> SetMonitoringState(OutputMix mix)
+        public Task<SwitchState?> SetMonitoringState(MixType mix)
         {
             return SendCommand<SwitchState, SwitchState>("switchMonitoring", new SwitchState()
             {
@@ -192,30 +191,34 @@ namespace ElgatoWaveSDK
             });
         }
 
-        //TODO Need to look at the JS plugin for more details on this
-        //public Task<ChannelInfo> SetInputMixer(string mixId, string name, string color, int inputType, string iconData, int localVol, bool isLocalMuted, int remoteVol, bool isStreamMuted, long deltaLink, bool isAvaible, bool isLinked)
-        //{
-        //    return SetInputMixer(new ChannelInfo()
-        //    {
-        //        MixId = mixId,
-        //        MixerName = name,
-        //        BgColor = color,
-        //        InputType = inputType,
-        //        IconData = iconData,
-        //        LocalVolumeIn = localVol,
-        //        IsLocalInMuted = isLocalMuted,
-        //        StreamVolumeIn = remoteVol,
-        //        IsStreamInMuted = isStreamMuted,
-        //        DeltaLinked = deltaLink,
-        //        IsAvailable = isAvaible,
-        //        IsLinked = isLinked
-        //    });
-        //}
+        public Task<ChannelInfo?> SetInputMixer(string mixId, int localVol, bool isLocalMuted, int remoteVol, bool isStreamMuted, List<Filter> filters, bool localByPass, bool streamByPass, MixType mixType)
+        {
+            return SetInputMixer(new ChannelInfo()
+            {
+                MixId = mixId,
+                LocalVolumeIn = localVol,
+                IsLocalInMuted = isLocalMuted,
+                StreamVolumeIn = remoteVol,
+                IsStreamInMuted = isStreamMuted,
+                Filters = filters,
+                LocalMixFilterBypass = localByPass,
+                StreamMixFilterBypass = streamByPass
+            }, mixType);
+        }
 
-        //public Task<ChannelInfo> SetInputMixer(ChannelInfo info)
-        //{
-        //    return SendCommand<ChannelInfo, ChannelInfo>("setInputMixer", info);
-        //}
+        public Task<ChannelInfo?> SetInputMixer(ChannelInfo info, MixType mixType)
+        {
+            info.BgColor = null;
+            info.DeltaLinked = null;
+            info.IconData = null;
+            info.InputType = null;
+            info.IsAvailable = null;
+            info.IsLinked = null;
+            info.MixerName = null;
+            info.Slider = mixType == MixType.LocalMix ? "local" : "stream";
+
+            return SendCommand<ChannelInfo, ChannelInfo>("setInputMixer", info);
+        }
 
         #endregion
 
@@ -224,11 +227,11 @@ namespace ElgatoWaveSDK
             return SendCommand<T, string>(method, null);
         }
 
-        private async Task<T?> SendCommand<T, Q>(string method, Q? objectJson = default)
+        private async Task<OutT?> SendCommand<OutT, InT>(string method, InT? objectJson = default)
         {
             if (_socket?.State == WebSocketState.Open)
             {
-                SocketBaseObject<Q?> baseObject = new()
+                SocketBaseObject<InT?> baseObject = new()
                 {
                     Method = method,
                     Id = NextTransactionId(),
@@ -247,7 +250,7 @@ namespace ElgatoWaveSDK
 
                     if (reply.Result != null)
                     {
-                        return JsonConvert.DeserializeObject<T>(reply.Result.ToString());
+                        return JsonConvert.DeserializeObject<OutT>(reply.Result.ToString());
                     }
                 }
             }
@@ -336,7 +339,7 @@ namespace ElgatoWaveSDK
                                     obj = baseObject.Obj?.switchState?.ToString();
                                     if (obj != null)
                                     {
-                                        MonitorSwitchOutputChanged?.Invoke(this, obj?.ToString() == "LocalMix" ? OutputMix.LocalMix : OutputMix.StreamMix);
+                                        MonitorSwitchOutputChanged?.Invoke(this, obj?.ToString() == "LocalMix" ? MixType.LocalMix : MixType.StreamMix);
                                     }
                                     break;
                                 case "channelsChanged":
