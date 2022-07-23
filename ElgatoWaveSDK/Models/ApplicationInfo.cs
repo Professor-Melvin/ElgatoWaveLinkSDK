@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace ElgatoWaveSDK.Models
 {
@@ -17,24 +15,25 @@ namespace ElgatoWaveSDK.Models
         public AppVersion? AppVersion { get; set; }
 
         [JsonIgnore]
-        public Version? Version => new(AppVersion?.MajorRelease ?? 0, AppVersion?.MinorRelease ?? 0, AppVersion?.BuildNumber ?? 0, AppVersion?.PatchLevel ?? 0);
+        public Version? Version => AppVersion is not null ? new Version(AppVersion?.MajorRelease ?? 0, AppVersion?.MinorRelease ?? 0, AppVersion?.BuildNumber ?? 0, AppVersion?.PatchLevel ?? 0) : null;
 
         [JsonProperty("interfaceRevision")]
         public int? InterfaceRevision { get; set; }
+
     }
 
     public class AppVersion
     {
         [JsonProperty("appVersionBuildNumber")]
-        public int BuildNumber { get; set; }
+        public int? BuildNumber { get; set; }
 
         [JsonProperty("appVersionMajorRelease")]
-        public int MajorRelease { get; set; }
+        public int? MajorRelease { get; set; }
 
         [JsonProperty("appVersionMinorRelease")]
-        public int MinorRelease { get; set; }
+        public int? MinorRelease { get; set; }
 
         [JsonProperty("appVersionPatchLevel")]
-        public int PatchLevel { get; set; }
+        public int? PatchLevel { get; set; }
     }
 }

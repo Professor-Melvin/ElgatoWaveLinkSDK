@@ -8,6 +8,6 @@ namespace ElgatoWaveSDK.Models
     public class MicrophoneState
     {
         [JsonProperty("isMicrophoneConnected")]
-        public bool IsMicrophoneConnected { get; set; }
+        public bool? IsMicrophoneConnected { get; set; }
     }
 }

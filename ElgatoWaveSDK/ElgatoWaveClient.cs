@@ -4,6 +4,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ElgatoWaveSDK.HumbleObjects;
 using ElgatoWaveSDK.Models;
 using Newtonsoft.Json;
 
@@ -29,9 +30,10 @@ namespace ElgatoWaveSDK
         #endregion
 
         #region Private Vars
-        private ClientWebSocket? _socket;
+        private IHumbleClientWebSocket? _socket;
         private int Port { get; set; }
         private CancellationTokenSource? _source;
+        private readonly ITransactionTracker _transactionTracker;
         #endregion
 
         #region Public Vars
@@ -56,6 +58,13 @@ namespace ElgatoWaveSDK
         {
             Port = _startPort;
             _source = new CancellationTokenSource();
+            _transactionTracker ??= new TransactionTracker();
+        }
+
+        internal ElgatoWaveClient(IHumbleClientWebSocket socket, ITransactionTracker transactionTracker) : this()
+        {
+            _socket = socket;
+            _transactionTracker = transactionTracker;
         }
 
         #region Connection
@@ -64,25 +73,31 @@ namespace ElgatoWaveSDK
             int cycleCount = 0;
             while (_socket?.State != WebSocketState.Open && (cycleCount < _maxCycles))
             {
-                _socket = new ClientWebSocket();
+                _socket ??= new HumbleClientWebSocket();
                 try
                 {
-                    await _socket.ConnectAsync(new Uri($"ws://127.0.0.1:{Port}/"), _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
+                    await _socket
+                        .ConnectAsync(new Uri($"ws://127.0.0.1:{Port}/"), _source?.Token ?? CancellationToken.None)
+                        .ConfigureAwait(false);
                 }
                 catch (Exception)
+                {
+                    //ignore for now
+                }
+                finally
                 {
                     Port++;
                     if (Port > (_startPort + _portRange))
                     {
-                        Port = _startPort;
                         cycleCount++;
+                        Port = _startPort;
                     }
                 }
             }
 
             if (_socket?.State != WebSocketState.Open)
             {
-                throw new ElgatoException($"Looped through possible ports {_maxCycles} times and couldn't connect [{_startPort}-{_startPort + _portRange}]");
+                throw new ElgatoException($"Looped through possible ports {_maxCycles} times and couldn't connect [{_startPort}-{_startPort + _portRange}]", _socket?.State);
             }
 
             StartReceiver();
@@ -154,7 +169,7 @@ namespace ElgatoWaveSDK
         {
             return SendCommand<SwitchState, SwitchState>("switchMonitoring", new SwitchState()
             {
-                switchState = mix.ToString()
+                CurrentState = mix.ToString()
             });
         }
 
@@ -224,17 +239,17 @@ namespace ElgatoWaveSDK
 
         private Task<T?> SendCommand<T>(string method)
         {
-            return SendCommand<T, string>(method, null);
+            return SendCommand<T, T>(method, default);
         }
 
         private async Task<OutT?> SendCommand<OutT, InT>(string method, InT? objectJson = default)
         {
             if (_socket?.State == WebSocketState.Open)
             {
-                SocketBaseObject<InT?> baseObject = new()
+                SocketBaseObject<InT?, OutT?> baseObject = new()
                 {
                     Method = method,
-                    Id = NextTransactionId(),
+                    Id = _transactionTracker.NextTransactionId(),
                     Obj = objectJson
                 };
                 var s = baseObject.ToJson();
@@ -248,10 +263,7 @@ namespace ElgatoWaveSDK
                     var reply = _responseCache[baseObject.Id];
                     _responseCache.Remove(reply.Id);
 
-                    if (reply.Result != null)
-                    {
-                        return JsonConvert.DeserializeObject<OutT>(reply.Result.ToString());
-                    }
+                    return JsonConvert.DeserializeObject<OutT>(reply.Result);
                 }
             }
 
@@ -261,6 +273,8 @@ namespace ElgatoWaveSDK
         #endregion Commands
 
         #region Reciever
+
+        private readonly Dictionary<int, SocketBaseObject<dynamic?, dynamic?>> _responseCache = new();
 
         private Task? _receiveTask;
         private void StartReceiver()
@@ -291,7 +305,7 @@ namespace ElgatoWaveSDK
                                 var newSize = buffer.Length + _bufferSize;
                                 if (newSize > _maxBufferSize)
                                 {
-                                    throw new ElgatoException("Maximum size exceeded");
+                                    throw new ElgatoException("Maximum receive buffer size exceeded", _socket.State);
                                 }
                                 var newBuffer = new byte[newSize];
                                 Array.Copy(buffer, 0, newBuffer, 0, offset);
@@ -303,10 +317,19 @@ namespace ElgatoWaveSDK
 
                         string json = Encoding.UTF8.GetString(buffer).Replace("\0", "");
 
-                        SocketBaseObject<dynamic?>? baseObject = JsonConvert.DeserializeObject<SocketBaseObject<dynamic?>?>(json);
+                        SocketBaseObject<dynamic?, dynamic?>? baseObject = JsonConvert.DeserializeObject<SocketBaseObject<dynamic?, dynamic?>?>(json);
                         if (baseObject == null)
                         {
                             continue;
+                        }
+
+                        baseObject.ReceivedAt = DateTime.Now;
+                        foreach (var (key, value) in _responseCache)
+                        {
+                            if (value.ReceivedAt < DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(2)))
+                            {
+                                _responseCache.Remove(key);
+                            }
                         }
 
                         if (baseObject.Id == 0) //Not a command reply
@@ -363,8 +386,8 @@ namespace ElgatoWaveSDK
                                         InputMixerChanged?.Invoke(this, obj as ChannelInfo ?? throw new InvalidOperationException());
                                     }
                                     break;
-                                default: //Ignore
-                                    break;
+                                default:
+                                    throw new ElgatoException($"Unsupported method received | {baseObject.Method}", _socket.State);
 
                             }
                         }
@@ -378,24 +401,12 @@ namespace ElgatoWaveSDK
                     }
                     catch (Exception ex)
                     {
-                        throw new ElgatoException("Unknown error in receiving task", ex);
+                        throw new ElgatoException("Unknown error in receiving task", ex, _socket.State);
                     }
 
                 }
             }
         }
         #endregion
-
-        #region TransationTracker
-
-        private readonly Dictionary<int, SocketBaseObject<dynamic?>> _responseCache = new();
-        private int TransactionId { get; set; } = 1;
-
-        private int NextTransactionId()
-        {
-            return TransactionId++;
-        }
-        #endregion TransationTracker
-
     }
 }
