@@ -4,9 +4,9 @@ using System.Text;
 
 namespace ElgatoWaveSDK.Models
 {
-    public enum OutputMix
+    public enum MixType
     {
-        LocaLMix,
+        LocalMix,
         StreamMix
     }
 }
