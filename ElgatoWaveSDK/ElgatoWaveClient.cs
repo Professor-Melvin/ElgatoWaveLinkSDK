@@ -89,8 +89,8 @@ namespace ElgatoWaveSDK
                     Port++;
                     if (Port > (_startPort + _portRange))
                     {
-                        Port = _startPort;
                         cycleCount++;
+                        Port = _startPort;
                     }
                 }
             }
@@ -169,7 +169,7 @@ namespace ElgatoWaveSDK
         {
             return SendCommand<SwitchState, SwitchState>("switchMonitoring", new SwitchState()
             {
-                switchState = mix.ToString()
+                CurrentState = mix.ToString()
             });
         }
 

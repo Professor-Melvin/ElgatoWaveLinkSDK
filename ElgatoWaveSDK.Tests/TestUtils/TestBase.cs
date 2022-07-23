@@ -9,29 +9,29 @@ namespace ElgatoWaveSDK.Tests.TestUtils
     {
         internal ElgatoWaveClient Subject { get; set; }
 
-        internal Mock<IHumbleClientWebSocket> mockSocket { get; set; }
-        internal Mock<ITransactionTracker> mockTracker { get; set; }
+        internal Mock<IHumbleClientWebSocket> MockSocket { get; set; }
+        internal Mock<ITransactionTracker> MockTracker { get; set; }
 
         internal int CommandId { get; set; }
 
-        private byte[]? receiveData { get;set;}
-        private int receiveDataCount => receiveData?.Length ?? 0;
+        private byte[]? ReceiveData { get;set;}
+        private int ReceiveDataCount => ReceiveData?.Length ?? 0;
 
         internal TestBase()
         {
             CommandId = new Random().Next(1000000);
 
-            mockSocket = new Mock<IHumbleClientWebSocket>();
-            mockTracker = new Mock<ITransactionTracker>();
+            MockSocket = new Mock<IHumbleClientWebSocket>();
+            MockTracker = new Mock<ITransactionTracker>();
 
-            mockTracker.Setup(c => c.NextTransactionId()).Returns(CommandId);
+            MockTracker.Setup(c => c.NextTransactionId()).Returns(CommandId);
 
-            Subject = new ElgatoWaveClient(mockSocket.Object, mockTracker.Object);
+            Subject = new ElgatoWaveClient(MockSocket.Object, MockTracker.Object);
         }
 
         internal void SetupConnection(WebSocketState value = WebSocketState.Open)
         {
-            mockSocket.Setup(c => c.State).Returns(value);
+            MockSocket.Setup(c => c.State).Returns(value);
         }
 
         internal void SetupReply(string replyObjectJson, string? method = null)
@@ -43,35 +43,35 @@ namespace ElgatoWaveSDK.Tests.TestUtils
                 Result = replyObjectJson
             };
 
-            receiveData = Encoding.UTF8.GetBytes(replyObject.ToJson());
+            ReceiveData = Encoding.UTF8.GetBytes(replyObject.ToJson());
 
             var setupSequence = new MockSequence();
-            int timesX = receiveDataCount / 1024;
+            int timesX = ReceiveDataCount / 1024;
 
             for (int i = 0; i < timesX; i++)
             {
-                mockSocket.InSequence(setupSequence)
+                MockSocket.InSequence(setupSequence)
                     .Setup(c => c.ReceiveAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<CancellationToken>()))
                     .Callback(ReturnCallback)
                     .ReturnsAsync(new WebSocketReceiveResult(1024, WebSocketMessageType.Text, false));
             }
 
-            mockSocket.InSequence(setupSequence)
+            MockSocket.InSequence(setupSequence)
                     .Setup(c => c.ReceiveAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<CancellationToken>()))
                     .Callback(ReturnCallback)
-                    .ReturnsAsync(new WebSocketReceiveResult(receiveDataCount % 1024, WebSocketMessageType.Text, true));
+                    .ReturnsAsync(new WebSocketReceiveResult(ReceiveDataCount % 1024, WebSocketMessageType.Text, true));
 
 #pragma warning disable S1172 // Unused method parameters should be removed
             void ReturnCallback(ArraySegment<byte> array, CancellationToken token)
 #pragma warning restore S1172 // Unused method parameters should be removed
             {
-                if ((array.Offset + array.Count) > receiveDataCount) 
+                if ((array.Offset + array.Count) > ReceiveDataCount) 
                 {
-                    Array.Copy(receiveData, array.Offset, array.Array!, array.Offset, receiveDataCount - array.Offset);
+                    Array.Copy(ReceiveData, array.Offset, array.Array!, array.Offset, ReceiveDataCount - array.Offset);
                 }
                 else
                 {
-                    Array.Copy(receiveData, array.Offset, array.Array!, 0, array.Count);
+                    Array.Copy(ReceiveData, array.Offset, array.Array!, 0, array.Count);
                 }
             }
         }

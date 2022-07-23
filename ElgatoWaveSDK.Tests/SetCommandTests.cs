@@ -23,7 +23,7 @@ namespace ElgatoWaveSDK.Tests
             await Subject.ConnectAsync().ConfigureAwait(false);
             var result = await Subject.SetMonitorMixOutput("input").ConfigureAwait(false);
 
-            mockSocket.Verify(c => c.SendAsync(
+            MockSocket.Verify(c => c.SendAsync(
                 Encoding.UTF8.GetBytes(new SocketBaseObject<MonitorMixOutputList, MonitorMixOutputList>()
                 {
                     Method = "setMonitorMixOutput",
@@ -55,19 +55,19 @@ namespace ElgatoWaveSDK.Tests
             await Subject.ConnectAsync().ConfigureAwait(false);
             var result = await Subject.SetMonitoringState(MixType.LocalMix).ConfigureAwait(false);
 
-            mockSocket.Verify(c => c.SendAsync(
+            MockSocket.Verify(c => c.SendAsync(
                 Encoding.UTF8.GetBytes(new SocketBaseObject<SwitchState, SwitchState>()
                 {
                     Method = "switchMonitoring",
                     Id = CommandId,
                     Obj = new SwitchState
                     {
-                        switchState = "LocalMix"
+                        CurrentState = "LocalMix"
                     }
                 }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
             result.Should().NotBeNull();
-            result?.switchState.Should().Be(MixType.LocalMix.ToString());
+            result?.CurrentState.Should().Be(MixType.LocalMix.ToString());
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace ElgatoWaveSDK.Tests
             await Subject.ConnectAsync().ConfigureAwait(false);
             var result = await Subject.SetMicrophoneSettings(2, 3,1,true,false).ConfigureAwait(false);
 
-            mockSocket.Verify(c => c.SendAsync(
+            MockSocket.Verify(c => c.SendAsync(
                 Encoding.UTF8.GetBytes(new SocketBaseObject<MicrophoneSettings, MicrophoneSettings>()
                 {
                     Method = "setMicrophoneSettings",
@@ -109,7 +109,7 @@ namespace ElgatoWaveSDK.Tests
             await Subject.ConnectAsync().ConfigureAwait(false);
             var result = await Subject.SetOutputMixer(1, true, 2, false).ConfigureAwait(false);
 
-            mockSocket.Verify(c => c.SendAsync(
+            MockSocket.Verify(c => c.SendAsync(
                 Encoding.UTF8.GetBytes(new SocketBaseObject<MonitoringState, MonitoringState>()
                 {
                     Method = "setOutputMixer",
@@ -141,7 +141,7 @@ namespace ElgatoWaveSDK.Tests
                 .SetInputMixer("id1", 1, false, 2, true, new List<Filter>(), false, true, MixType.LocalMix)
                 .ConfigureAwait(false);
 
-            mockSocket.Verify(c => c.SendAsync(
+            MockSocket.Verify(c => c.SendAsync(
                 Encoding.UTF8.GetBytes(new SocketBaseObject<ChannelInfo, ChannelInfo>()
                 {
                     Method = "setInputMixer",

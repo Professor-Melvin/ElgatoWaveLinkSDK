@@ -72,11 +72,11 @@ namespace ElgatoWaveSDK.Tests
             {
                 Obj = new SwitchState()
                 {
-                    switchState = "ObjState"
+                    CurrentState = "ObjState"
                 },
                 Result = new SwitchState()
                 {
-                    switchState = "ResultState"
+                    CurrentState = "ResultState"
                 },
                 Id = 123,
                 Method = "Method"
