@@ -4,7 +4,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionPrefix>2.0.0</VersionPrefix>
     <Authors>Professor_Melvin</Authors>
     <PackageProjectUrl>https://github.com/Professor-Melvin/ElgatoWaveLinkSDK</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -12,7 +12,7 @@
     <RepositoryType>git</RepositoryType>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageTags>Elgato,Wave Link</PackageTags>
-    <Description>,Net library for control of Elgato Wave Link</Description>
+    <Description>.Net library for control of Elgato Wave Link</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

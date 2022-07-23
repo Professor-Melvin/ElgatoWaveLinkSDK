@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using FluentAssertions;
 
-namespace ElgatoWaveSDK.Tests
+namespace ElgatoWaveSDK.Tests.TestUtils
 {
     internal static class ModelUtils
     {

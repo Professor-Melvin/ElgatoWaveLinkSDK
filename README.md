@@ -4,6 +4,7 @@
 SDK For Elgato Wave Link Software, based on the StreamDeck plugin for the WaveLink
 
 Working:
+- Unit Tests
 - Event handlers
 - Get methods
 - Set Commands
@@ -17,5 +18,4 @@ Working:
     - Setting filters is possible, but not tested as I'm not sure how to get a list of available filters
 
 Left to do:
-- Unit Test
 - Add client settings

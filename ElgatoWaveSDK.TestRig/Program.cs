@@ -111,11 +111,6 @@ namespace ElgatoWaveSDK.TestRig
                                   $"\n\t\tIs Available: {c.IsAvailable}");
                 });
 
-                //channelInfos[0].LocalVolumeIn = channelInfos[0].LocalVolumeIn == 0 ? 100 : 0;
-                //var newSetting = await client.SetInputMixer(channelInfos[0], MixType.LocalMix).ConfigureAwait(false);
-
-                //var newSetting = await client.SetOutputMixer(80, false, 50, true);
-
                 var micState = await client.GetMicrophoneState().ConfigureAwait(false);
                 Console.WriteLine($"\nMic Connected: {micState?.IsMicrophoneConnected ?? false}");
 
@@ -145,7 +140,7 @@ namespace ElgatoWaveSDK.TestRig
                 monitorMixOutputList?.MonitorMixList?.ForEach(o => Console.WriteLine($"\t{o.MonitorMix}"));
 
                 var switchState = await client.GetSwitchState().ConfigureAwait(false);
-                Console.WriteLine($"Switch State: {switchState?.switchState}");
+                Console.WriteLine($"Switch State: {switchState?.CurrentState}");
 
                 Console.WriteLine("\nPress any key to exit...");
                 Console.ReadKey();

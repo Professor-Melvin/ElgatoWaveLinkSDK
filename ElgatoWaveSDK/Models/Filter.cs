@@ -10,7 +10,7 @@ namespace ElgatoWaveSDK.Models
     public class Filter
     {
         [JsonProperty("active")]
-        public bool Active { get; set; }
+        public bool? Active { get; set; }
 
         [JsonProperty("filterID")]
         public string? FilterId { get; set; }
