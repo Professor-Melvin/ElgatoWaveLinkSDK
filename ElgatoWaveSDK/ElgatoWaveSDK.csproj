@@ -12,7 +12,7 @@
     <RepositoryType>git</RepositoryType>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageTags>Elgato,Wave Link</PackageTags>
-    <Description>,Net library for control of Elgato Wave Link</Description>
+    <Description>.Net library for control of Elgato Wave Link</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

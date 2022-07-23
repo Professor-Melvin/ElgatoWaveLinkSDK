@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace ElgatoWaveSDK.Models
 {
@@ -21,6 +19,7 @@ namespace ElgatoWaveSDK.Models
 
         [JsonProperty("interfaceRevision")]
         public int? InterfaceRevision { get; set; }
+
     }
 
     public class AppVersion

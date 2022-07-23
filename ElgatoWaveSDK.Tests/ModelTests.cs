@@ -1,9 +1,9 @@
-﻿using ElgatoWaveSDK;
-using ElgatoWaveSDK.Models;
-using ElgatoWaveSDK.Tests;
+﻿using ElgatoWaveSDK.Models;
+using ElgatoWaveSDK.Tests.TestUtils;
 using FluentAssertions;
+using Xunit;
 
-namespace ElgatoWaveLinkSDK.Tests
+namespace ElgatoWaveSDK.Tests
 {
     public class ModelTests
     {
@@ -39,12 +39,12 @@ namespace ElgatoWaveLinkSDK.Tests
         [Fact]
         public void SocketBaseObject()
         {
-            Type classType = typeof(SocketBaseObject<SwitchState>);
+            Type classType = typeof(SocketBaseObject<SwitchState, SwitchState>);
             var testData = ModelUtils.GenerateValues(classType);
 
             ModelUtils.Verify(classType,testData.Item1,testData.values);
 
-            var obj = testData.Item1 as SocketBaseObject<SwitchState>;
+            var obj = testData.Item1 as SocketBaseObject<SwitchState, SwitchState>;
             obj.Should().NotBeNull();
             obj?.JsonRpc.Should().Be("2.0");
         }
@@ -52,7 +52,7 @@ namespace ElgatoWaveLinkSDK.Tests
         [Fact]
         public void SocketBaseObject_Json_String()
         {
-            var subject = new SocketBaseObject<string>()
+            var subject = new SocketBaseObject<string, string>()
             {
                 Obj = "Obj",
                 Result = "Result",
@@ -68,7 +68,7 @@ namespace ElgatoWaveLinkSDK.Tests
         [Fact]
         public void SocketBaseObject_Json_SwitchState()
         {
-            var subject = new SocketBaseObject<SwitchState>()
+            var subject = new SocketBaseObject<SwitchState, SwitchState>()
             {
                 Obj = new SwitchState()
                 {
