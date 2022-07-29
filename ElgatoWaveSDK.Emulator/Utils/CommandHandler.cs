@@ -7,8 +7,8 @@ namespace ElgatoWaveSDK.Emulator.Utils
 {
     public class CommandHandler : ICommand
     {
-        private readonly Func<object?, Task> _asyncAction;
-        private readonly Action<object?> _action;
+        private readonly Func<object?, Task>? _asyncAction;
+        private readonly Action<object?>? _action;
         private readonly Func<bool> _canExecute;
 
         public CommandHandler(Func<object?, Task> action, Func<bool> canExecute)

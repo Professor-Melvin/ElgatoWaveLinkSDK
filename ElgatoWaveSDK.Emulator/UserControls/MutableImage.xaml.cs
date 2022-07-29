@@ -20,9 +20,9 @@ namespace ElgatoWaveSDK.Emulator.UserControls;
 public partial class MutableImage : UserControl
 {
 
-    public ImageSource MainImageSource { get; set; }
+    public ImageSource? MainImageSource { get; set; }
 
-    public ImageSource MutedImageSource { get; set; }
+    public ImageSource? MutedImageSource { get; set; }
 
     public MutableImage()
     {
