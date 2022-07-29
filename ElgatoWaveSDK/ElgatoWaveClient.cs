@@ -44,13 +44,13 @@ namespace ElgatoWaveSDK
 
         #region Public Events
 
-        public EventHandler<MicrophoneState>? MicStateChanged { get; set; }
-        public EventHandler<MicrophoneSettings>? MicSettingsChanged { get; set; }
-        public EventHandler<ChannelInfo>? InputMixerChanged { get; set; }
-        public EventHandler<MonitoringState>? OutputMixerChanged { get; set; }
-        public EventHandler<string>? LocalMonitorOutputChanged { get; set; }
-        public EventHandler<MixType>? MonitorSwitchOutputChanged { get; set; }
-        public EventHandler<List<ChannelInfo>>? ChannelsChanged { get; set; }
+        public event EventHandler<MicrophoneState>? MicStateChanged;
+        public event EventHandler<MicrophoneSettings>? MicSettingsChanged;
+        public event EventHandler<ChannelInfo>? InputMixerChanged;
+        public event EventHandler<MonitoringState>? OutputMixerChanged;
+        public event EventHandler<string>? LocalMonitorOutputChanged;
+        public event EventHandler<MixType>? MonitorSwitchOutputChanged;
+        public event EventHandler<List<ChannelInfo>>? ChannelsChanged;
 
         #endregion
 
@@ -68,7 +68,7 @@ namespace ElgatoWaveSDK
         }
 
         #region Connection
-        public async Task<bool> ConnectAsync()
+        public async Task ConnectAsync()
         {
             int cycleCount = 0;
             while (_socket?.State != WebSocketState.Open && (cycleCount < _maxCycles))
@@ -101,7 +101,6 @@ namespace ElgatoWaveSDK
             }
 
             StartReceiver();
-            return true;
         }
 
         public void Disconnect()
@@ -263,7 +262,7 @@ namespace ElgatoWaveSDK
                     var reply = _responseCache[baseObject.Id];
                     _responseCache.Remove(reply.Id);
 
-                    return JsonConvert.DeserializeObject<OutT>(reply.Result);
+                    return JsonConvert.DeserializeObject<OutT>(reply.Result?.ToString());
                 }
             }
 

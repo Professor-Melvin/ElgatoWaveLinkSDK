@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="ElgatoWaveSDK.Emulator.UserControls.MutableImage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ElgatoWaveSDK.Emulator.UserControls"
+             xmlns:viewModels="clr-namespace:ElgatoWaveSDK.Emulator.ViewModels"
+             mc:Ignorable="d" x:Name="ParentControl">
+    <Grid>
+        <Image Name="MainImage" Source="{Binding Path=MainImageSource, ElementName=ParentControl, Mode=OneTime}"></Image>
+        <Image Source="{Binding Path=MutedImageSource, ElementName=ParentControl, Mode=OneTime}"></Image>
+    </Grid>
+</UserControl>

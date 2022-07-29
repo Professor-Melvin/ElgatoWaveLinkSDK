@@ -12,20 +12,20 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using ElgatoWaveSDK.Emulator.ViewModels;
 
-namespace ElgatoWaveSDK.Emulator
+namespace ElgatoWaveSDK.Emulator.UserControls;
+/// <summary>
+/// Interaction logic for MutableImage.xaml
+/// </summary>
+public partial class MutableImage : UserControl
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
-    {
-        public MainWindow()
-        {
-            InitializeComponent();
 
-            this.DataContext = new MainWindowViewModel();
-        }
+    public ImageSource MainImageSource { get; set; }
+
+    public ImageSource MutedImageSource { get; set; }
+
+    public MutableImage()
+    {
+        InitializeComponent();
     }
 }

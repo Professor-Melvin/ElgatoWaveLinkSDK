@@ -74,8 +74,16 @@ namespace ElgatoWaveSDK.TestRig
                 });
             };
 
+            try
+            {
+                await client.ConnectAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to connect: " + ex.Message);
+                return;
+            }
 
-            if (await client.ConnectAsync().ConfigureAwait(false))
             {
                 Console.WriteLine("Connected!\n\n");
 
@@ -146,10 +154,6 @@ namespace ElgatoWaveSDK.TestRig
                 Console.ReadKey();
 
                 client.Disconnect();
-            }
-            else
-            {
-                Console.WriteLine("Failed to connect");
             }
         }
 

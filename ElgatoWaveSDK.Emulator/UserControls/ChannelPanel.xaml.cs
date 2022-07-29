@@ -13,19 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ElgatoWaveSDK.Emulator.ViewModels;
+using ElgatoWaveSDK.Models;
 
-namespace ElgatoWaveSDK.Emulator
+namespace ElgatoWaveSDK.Emulator.UserControls;
+/// <summary>
+/// Interaction logic for ChannelPanel.xaml
+/// </summary>
+public partial class ChannelPanel : UserControl
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public ChannelPanel()
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-
-            this.DataContext = new MainWindowViewModel();
-        }
+        InitializeComponent();
     }
 }
