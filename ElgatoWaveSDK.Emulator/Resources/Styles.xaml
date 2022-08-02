@@ -1,0 +1,72 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ScrollBar.xaml"></ResourceDictionary>
+    </ResourceDictionary.MergedDictionaries>
+
+    <Style TargetType="{x:Type Button}">
+        <Setter Property="Background" Value="Transparent"></Setter>
+        <Setter Property="BorderThickness" Value="0"></Setter>
+        <Setter Property="Padding" Value="0"></Setter>
+        <Setter Property="Foreground" Value="{StaticResource FontColour}"></Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="Transparent"></Setter>
+                <Setter Property="BorderThickness" Value="0"></Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type ListView}">
+        <Setter Property="Background" Value="Transparent"></Setter>
+        <Setter Property="BorderThickness" Value="0"></Setter>
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="Focusable" Value="false"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected"
+                                 Value="True">
+                            <Setter Property="Background"
+                                    Value="Transparent" />
+                            <Setter Property="BorderBrush"
+                                    Value="Transparent" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver"
+                                 Value="True">
+                            <Setter Property="Background"
+                                    Value="Transparent" />
+                            <Setter Property="BorderBrush"
+                                    Value="Transparent" />
+                        </Trigger>
+                        <Trigger Property="IsFocused"
+                                 Value="True">
+                            <Setter Property="Background"
+                                    Value="Transparent" />
+                            <Setter Property="BorderBrush"
+                                    Value="Transparent" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type Label}">
+        <Setter Property="Foreground" Value="{StaticResource FontColour}"></Setter>
+    </Style>
+
+    <Style TargetType="{x:Type ProgressBar}">
+        <Setter Property="Background" Value="Black"></Setter>
+        <Setter Property="BorderThickness" Value="0"></Setter>
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}">
+        <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        <Setter Property="Foreground" Value="{StaticResource FontColour}"></Setter>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"></Setter>
+    </Style>
+
+</ResourceDictionary>

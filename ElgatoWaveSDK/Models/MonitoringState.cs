@@ -8,15 +8,15 @@ namespace ElgatoWaveSDK.Models
     public class MonitoringState
     {
         [JsonProperty("isLocalOutMuted")]
-        public bool IsLocalOutMuted { get; set; }
+        public bool? IsLocalOutMuted { get; set; }
 
         [JsonProperty("isStreamOutMuted")]
-        public bool IsStreamOutMuted { get; set; }
+        public bool? IsStreamOutMuted { get; set; }
 
         [JsonProperty("localVolumeOut")]
-        public long LocalVolumeOut { get; set; }
+        public long? LocalVolumeOut { get; set; }
 
         [JsonProperty("streamVolumeOut")]
-        public long StreamVolumeOut { get; set; }
+        public long? StreamVolumeOut { get; set; }
     }
 }

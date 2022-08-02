@@ -1,0 +1,72 @@
+﻿<Window x:Class="ElgatoWaveSDK.Emulator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="using:ElgatoWaveSDK.Emulator.ViewModels"
+        xmlns:controls="using:ElgatoWaveSDK.Emulator.Controls"
+        xmlns:windowing="using:Microsoft.UI.Windowing"
+        mc:Ignorable="d" 
+        Title="Elgato WaveLink SDK Test App"
+        windowing:OverlappedPresenter.>
+    <!--Width="1024" Height="768"
+                IsMaximizable="False" IsMinimizable="False" IsResizable="True"-->
+    <!--d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"-->
+
+    <Grid Background="{StaticResource BackgroundColour}" >
+        <Grid Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="250" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="Inputs" />
+
+                    <RelativePanel Grid.Column="1" HorizontalAlignment="Right" Width="200">
+                        <Button Style="{StaticResource SettingButtons}" Name="ConnectButton" RelativePanel.LeftOf="AudioButton" Click="ConnectButton_OnClick">
+                            <Image Source="{StaticResource ConnectSource}"></Image>
+                        </Button>
+                        <Button Margin="3 0 0 0" Style="{StaticResource SettingButtons}" Name="AudioButton" RelativePanel.LeftOf="SettingsButton">
+                            <Image Source="{StaticResource SliderIconSource}"></Image>
+                        </Button>
+                        <Button Margin="3 0 0 0" Name="SettingsButton" RelativePanel.AlignRightWithPanel="True" Grid.Column="3" Style="{StaticResource SettingButtons}">
+                            <Image Source="{StaticResource GearIconSource}"></Image>
+                        </Button>
+                    </RelativePanel>
+                </Grid>
+
+                <ListView Grid.Row="1"
+                          ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                          ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollMode="Enabled"
+                          ItemsSource="{Binding ViewModel.Channels}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="viewModels:ChannelViewModel">
+                            <controls:ChannelPanel DataContext="{Binding}"></controls:ChannelPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <!--<StackPanel Grid.Row="1" Orientation="Horizontal">
+                    <controls:ChannelPanel></controls:ChannelPanel>
+                    <controls:ChannelPanel></controls:ChannelPanel>
+                    <controls:ChannelPanel></controls:ChannelPanel>
+                    <controls:ChannelPanel></controls:ChannelPanel>
+                </StackPanel>-->
+            </Grid>
+
+            <Grid Grid.Row="1"></Grid>
+        </Grid>
+    </Grid>
+</Window>
