@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 [assembly: InternalsVisibleTo("ElgatoWaveSDK.Tests")]
+[assembly: InternalsVisibleTo("ElgatoWaveLinkEmulator")]
 namespace ElgatoWaveSDK
 {
     internal class SocketBaseObject<InT, OutT>
@@ -26,7 +27,7 @@ namespace ElgatoWaveSDK
         public OutT? Result { get; set; }
 
         [JsonIgnore] 
-        public DateTime ReceivedAt { get; set; }
+        public DateTime? ReceivedAt { get; set; }
 
         public string ToJson()
         {
