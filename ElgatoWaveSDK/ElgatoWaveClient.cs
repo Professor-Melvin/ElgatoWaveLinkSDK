@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -12,32 +13,19 @@ namespace ElgatoWaveSDK
 {
     public class ElgatoWaveClient
     {
-        #region Constants
-
-        private const int _bufferSize = 1024;
-        private const int _maxBufferSize = 2000000; //2gig is a massive max size
-
-#if  DEBUG
-        private const int _responseTimeout = 10 * 60 * 1000;  
-#else
-        private const int _responseTimeout = 2 * 1000;
-#endif
-
-        private const int _startPort = 1824;
-        private const int _portRange = 10;
-        private const int _maxCycles = 2;
-
-        #endregion
-
         #region Private Vars
+
         private IHumbleClientWebSocket? _socket;
+        private ClientConfig _clientConfig { get; set; }
         private int Port { get; set; }
         private CancellationTokenSource? _source;
         private readonly ITransactionTracker _transactionTracker;
+
         #endregion
 
         #region Public Vars
 
+        public ClientConfig ClientConfig => _clientConfig;
         public bool IsConnected => _socket?.State == WebSocketState.Open;
 
         #endregion
@@ -56,9 +44,14 @@ namespace ElgatoWaveSDK
 
         public ElgatoWaveClient()
         {
-            Port = _startPort;
+            _clientConfig ??= new ClientConfig();
             _source = new CancellationTokenSource();
             _transactionTracker ??= new TransactionTracker();
+        }
+
+        public ElgatoWaveClient(ClientConfig config) : this()
+        {
+            _clientConfig = config;
         }
 
         internal ElgatoWaveClient(IHumbleClientWebSocket socket, ITransactionTracker transactionTracker) : this()
@@ -70,8 +63,8 @@ namespace ElgatoWaveSDK
         #region Connection
         public async Task ConnectAsync()
         {
-            int cycleCount = 0;
-            while (_socket?.State != WebSocketState.Open && (cycleCount < _maxCycles))
+            var cycleCount = 0;
+            while (_socket?.State != WebSocketState.Open && (cycleCount < _clientConfig.MaxAttempts))
             {
                 _socket ??= new HumbleClientWebSocket();
                 try
@@ -87,17 +80,19 @@ namespace ElgatoWaveSDK
                 finally
                 {
                     Port++;
-                    if (Port > (_startPort + _portRange))
+                    if (Port > (_clientConfig.PortStart + _clientConfig.PortRange))
                     {
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
                         cycleCount++;
-                        Port = _startPort;
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
+                        Port = _clientConfig.PortStart;
                     }
                 }
             }
 
             if (_socket?.State != WebSocketState.Open)
             {
-                throw new ElgatoException($"Looped through possible ports {_maxCycles} times and couldn't connect [{_startPort}-{_startPort + _portRange}]", _socket?.State);
+                throw new ElgatoException($"Looped through possible ports {_clientConfig.MaxAttempts} times and couldn't connect [{_clientConfig.PortStart}-{_clientConfig.PortStart + _clientConfig.PortRange}]", _socket?.State);
             }
 
             StartReceiver();
@@ -255,13 +250,13 @@ namespace ElgatoWaveSDK
                 var array = Encoding.UTF8.GetBytes(s);
                 await _socket.SendAsync(array, WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
 
-                SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(_responseTimeout));
+                SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(_clientConfig.ResponseTimeout));
 
                 if (_responseCache.ContainsKey(baseObject.Id))
                 {
                     var reply = _responseCache[baseObject.Id];
                     _responseCache.Remove(reply.Id);
-
+                    
                     return JsonConvert.DeserializeObject<OutT>(reply.Result?.ToString());
                 }
             }
@@ -275,10 +270,9 @@ namespace ElgatoWaveSDK
 
         private readonly Dictionary<int, SocketBaseObject<dynamic?, dynamic?>> _responseCache = new();
 
-        private Task? _receiveTask;
         private void StartReceiver()
         {
-            _receiveTask ??= Task.Run(ReceiverRun, _source?.Token ?? CancellationToken.None);
+            Task.Run(ReceiverRun, _source?.Token ?? CancellationToken.None);
         }
 
         private async Task ReceiverRun()
@@ -289,7 +283,7 @@ namespace ElgatoWaveSDK
                 {
                     try
                     {
-                        var buffer = new byte[_bufferSize];
+                        var buffer = new byte[_clientConfig.BufferSize];
                         var offset = 0;
                         var free = buffer.Length;
 
@@ -301,8 +295,8 @@ namespace ElgatoWaveSDK
                             free -= result.Count;
                             if (free == 0)
                             {
-                                var newSize = buffer.Length + _bufferSize;
-                                if (newSize > _maxBufferSize)
+                                var newSize = buffer.Length + _clientConfig.BufferSize;
+                                if (newSize > _clientConfig.MaxBufferSize)
                                 {
                                     throw new ElgatoException("Maximum receive buffer size exceeded", _socket.State);
                                 }
@@ -314,9 +308,9 @@ namespace ElgatoWaveSDK
 
                         } while (!result?.EndOfMessage ?? false);
 
-                        string json = Encoding.UTF8.GetString(buffer).Replace("\0", "");
+                        var json = Encoding.UTF8.GetString(buffer).Replace("\0", "");
 
-                        SocketBaseObject<dynamic?, dynamic?>? baseObject = JsonConvert.DeserializeObject<SocketBaseObject<dynamic?, dynamic?>?>(json);
+                        var baseObject = JsonConvert.DeserializeObject<SocketBaseObject<dynamic?, dynamic?>?>(json);
                         if (baseObject == null)
                         {
                             continue;

@@ -7,14 +7,15 @@ using AudioSwitcher.AudioApi;
 using AudioSwitcher.AudioApi.CoreAudio;
 
 namespace ElgatoWaveSDK.Emulator.Utils;
+
 internal class AudioInterface
 {
-    private List<CoreAudioDevice> AudioDevices;
-    private CoreAudioController controller = new ();
+    private List<CoreAudioDevice> AudioDevices = new();
+    private readonly CoreAudioController controller = new();
 
     public AudioInterface()
     {
-        Refresh();     
+        Refresh();
     }
 
     public CoreAudioDevice? GetDevice(string name)

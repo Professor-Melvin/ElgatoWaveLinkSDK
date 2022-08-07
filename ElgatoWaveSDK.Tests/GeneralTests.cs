@@ -2,38 +2,47 @@
 using ElgatoWaveSDK.Models;
 using ElgatoWaveSDK.Tests.TestUtils;
 using FluentAssertions;
+using FluentAssertions.Extensions;
 using Xunit;
 
-namespace ElgatoWaveSDK.Tests
+namespace ElgatoWaveSDK.Tests;
+
+public class GeneralTests : TestBase
 {
-    public class GeneralTests : TestBase
+
+    [Theory]
+    [
+        InlineData(WebSocketState.Aborted),
+        InlineData(WebSocketState.CloseReceived),
+        InlineData(WebSocketState.CloseSent),
+        InlineData(WebSocketState.Closed),
+        InlineData(WebSocketState.Connecting),
+        InlineData(WebSocketState.None),
+    ]
+    public async Task ConnectFails(WebSocketState state)
     {
-        [Theory]
-        [
-            InlineData(WebSocketState.Aborted),
-            InlineData(WebSocketState.CloseReceived),
-            InlineData(WebSocketState.CloseSent),
-            InlineData(WebSocketState.Closed),
-            InlineData(WebSocketState.Connecting),
-            InlineData(WebSocketState.None),
-        ]
-        public void ConnectFails(WebSocketState state)
-        {
-            SetupConnection(state);
+        SetupConnection(state);
 
-            var action = () => Subject.ConnectAsync();
+        var testTask = new TaskCompletionSource<Task>();
+        testTask.SetResult(Subject.ConnectAsync());
 
-            action.Should().ThrowExactlyAsync<ElgatoException>();
-        }
+        await testTask.Should().CompleteWithinAsync(1.Seconds());
 
-        [Fact]
-        public void ConnectSuccess()
-        {
-            SetupConnection();
+        _ = await Subject.Invoking(c => c.ConnectAsync())
+            .Should().ThrowExactlyAsync<ElgatoException>();
+    }
 
-            var action = () => Subject.ConnectAsync();
+    [Fact]
+    public async Task ConnectSuccess()
+    {
+        SetupConnection();
 
-            action.Should().NotThrowAsync();
-        }
+        var testTask = new TaskCompletionSource<Task>();
+        testTask.SetResult(Subject.ConnectAsync());
+
+        await testTask.Should().CompleteWithinAsync(1.Seconds());
+
+        _ = await Subject.Invoking(c => c.ConnectAsync())
+            .Should().NotThrowAsync();
     }
 }
