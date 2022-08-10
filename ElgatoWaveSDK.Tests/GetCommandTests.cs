@@ -18,13 +18,25 @@ namespace ElgatoWaveSDK.Tests
         [Fact]
         public async Task GetAppInfo()
         {
-            SetupReply("{  \"appId\": \"TestId\",  \"appName\": \"TestName\",  \"appVersion\": {    \"appVersionBuildNumber\": 3,    \"appVersionMajorRelease\": 1,    \"appVersionMinorRelease\": 2,    \"appVersionPatchLevel\": 4  },  \"interfaceRevision\": 5}");
+            SetupReply(new ApplicationInfo()
+            {
+                Name = "TestName",
+                Id = "TestId",
+                AppVersion = new AppVersion()
+                {
+                    MajorRelease = 1,
+                    MinorRelease = 2,
+                    BuildNumber = 3,
+                    PatchLevel = 4
+                },
+                InterfaceRevision = 5
+            });
 
             await Subject.ConnectAsync().ConfigureAwait(false);
             var result = await Subject.GetAppInfo().ConfigureAwait(false);
 
             MockSocket.Verify(c => c.SendAsync(
-                Encoding.UTF8.GetBytes(new SocketBaseObject<ApplicationInfo, string>()
+                Encoding.UTF8.GetBytes(new SocketBaseObject<string, string>()
                 {
                     Method = "getApplicationInfo",
                     Id = CommandId
@@ -47,13 +59,62 @@ namespace ElgatoWaveSDK.Tests
         [Fact]
         public async Task GetAllChannelInfo()
         {
-            SetupReply("[    {      \"bgColor\": \"Color-1\",      \"filters\": [],      \"slider\": \"Slider-1\",      \"deltaLinked\": 12,      \"iconData\": \"IconData-1\",      \"inputType\": 13,      \"isAvailable\": true,      \"isLinked\": true,      \"isLocalInMuted\": true,      \"isStreamInMuted\": true,      \"localVolumeIn\": 14,      \"localMixFilterBypass\": true,      \"mixId\": \"MixId-1\",      \"mixerName\": \"MixerName-1\",      \"streamMixFilterBypass\": true,      \"streamVolumeIn\": 15    },    {      \"bgColor\": \"Color-2\",      \"filters\": [        {          \"active\": false,          \"filterID\": \"FilterID-1\",          \"name\": \"FilterName-1\",          \"pluginID\": \"PluginId-1\"        },        {          \"active\": true,          \"filterID\": \"FilterID-2\",          \"name\": \"FilterName-2\",          \"pluginID\": \"PluginId-2\"        }      ],      \"slider\": \"Slider-2\",      \"deltaLinked\": 22,      \"iconData\": \"IconData-2\",      \"inputType\": 23,      \"isAvailable\": false,      \"isLinked\": false,      \"isLocalInMuted\": false,      \"isStreamInMuted\": false,      \"localVolumeIn\": 24,      \"localMixFilterBypass\": false,      \"mixId\": \"MixId-2\",      \"mixerName\": \"MixerName-2\",      \"streamMixFilterBypass\": false,      \"streamVolumeIn\": 25    }  ]");
+            SetupReply(new List<ChannelInfo>()
+            {
+                new ChannelInfo()
+                {
+                    BgColor = "Color-1",
+                    IconData = "IconData-1",
+                    InputType = 11,
+                    IsAvailable = true,
+                    IsLocalInMuted = false,
+                    IsStreamInMuted = true,
+                    LocalMixFilterBypass = false,
+                    StreamMixFilterBypass = true,
+                    LocalVolumeIn = 12,
+                    StreamVolumeIn = 13,
+                    MixId = "MixId-1",
+                    MixerName = "MixName-1",
+                },
+                new ChannelInfo()
+                {
+                    BgColor = "Color-2",
+                    IconData = "IconData-2",
+                    InputType = 21,
+                    IsAvailable = false,
+                    IsLocalInMuted = true,
+                    IsStreamInMuted = false,
+                    LocalMixFilterBypass = true,
+                    StreamMixFilterBypass = false,
+                    LocalVolumeIn = 22,
+                    StreamVolumeIn = 23,
+                    MixId = "MixId-2",
+                    MixerName = "MixName-2",
+                    Filters = new List<Filter>()
+                    {
+                        new Filter()
+                        {
+                            Name = "FilterName-1",
+                            Active = false,
+                            FilterId = "FilterId-1",
+                            PluginId = "PluginId-1"
+                        },
+                        new Filter()
+                        {
+                            Name = "FilterName-2",
+                            Active = true,
+                            FilterId = "FilterId-2",
+                            PluginId = "PluginId-2"
+                        }
+                    }
+                }
+            });
 
-            await Subject.ConnectAsync().ConfigureAwait(false);
+        await Subject.ConnectAsync().ConfigureAwait(false);
             var result = await Subject.GetAllChannelInfo().ConfigureAwait(false);
 
             MockSocket.Verify(c => c.SendAsync(
-                Encoding.UTF8.GetBytes(new SocketBaseObject<ApplicationInfo, string>()
+                Encoding.UTF8.GetBytes(new SocketBaseObject<string, string>()
                 {
                     Method = "getAllChannelInfo",
                     Id = CommandId
@@ -64,39 +125,35 @@ namespace ElgatoWaveSDK.Tests
 
             var channelOne = result?.First();
             channelOne.Should().NotBeNull();
-            channelOne?.DeltaLinked.Should().Be(12);
             channelOne?.BgColor.Should().Be("Color-1");
             channelOne?.IconData.Should().Be("IconData-1");
-            channelOne?.InputType.Should().Be(13);
+            channelOne?.InputType.Should().Be(11);
             channelOne?.IsAvailable.Should().BeTrue();
-            channelOne?.IsLinked.Should().BeTrue();
-            channelOne?.IsLocalInMuted.Should().BeTrue();
+            channelOne?.IsLocalInMuted.Should().BeFalse();
             channelOne?.IsStreamInMuted.Should().BeTrue();
-            channelOne?.LocalMixFilterBypass.Should().BeTrue();
-            channelOne?.LocalVolumeIn.Should().Be(14);
+            channelOne?.LocalMixFilterBypass.Should().BeFalse();
+            channelOne?.LocalVolumeIn.Should().Be(12);
             channelOne?.MixId.Should().Be("MixId-1");
-            channelOne?.MixerName.Should().Be("MixerName-1");
-            channelOne?.Slider.Should().Be("Slider-1");
-            channelOne?.StreamVolumeIn.Should().Be(15);
+            channelOne?.MixerName.Should().Be("MixName-1");
+            channelOne?.Slider.Should().BeNull();
+            channelOne?.StreamVolumeIn.Should().Be(13);
             channelOne?.StreamMixFilterBypass.Should().BeTrue();
-            channelOne?.Filters.Should().BeEmpty();
+            channelOne?.Filters.Should().BeNull();
 
             var channelTwo = result?.Last();
             channelTwo.Should().NotBeNull();
-            channelTwo?.DeltaLinked.Should().Be(22);
             channelTwo?.BgColor.Should().Be("Color-2");
             channelTwo?.IconData.Should().Be("IconData-2");
-            channelTwo?.InputType.Should().Be(23);
+            channelTwo?.InputType.Should().Be(21);
             channelTwo?.IsAvailable.Should().BeFalse();
-            channelTwo?.IsLinked.Should().BeFalse();
-            channelTwo?.IsLocalInMuted.Should().BeFalse();
+            channelTwo?.IsLocalInMuted.Should().BeTrue();
             channelTwo?.IsStreamInMuted.Should().BeFalse();
-            channelTwo?.LocalMixFilterBypass.Should().BeFalse();
-            channelTwo?.LocalVolumeIn.Should().Be(24);
+            channelTwo?.LocalMixFilterBypass.Should().BeTrue();
+            channelTwo?.LocalVolumeIn.Should().Be(22);
             channelTwo?.MixId.Should().Be("MixId-2");
-            channelTwo?.MixerName.Should().Be("MixerName-2");
-            channelTwo?.Slider.Should().Be("Slider-2");
-            channelTwo?.StreamVolumeIn.Should().Be(25);
+            channelTwo?.MixerName.Should().Be("MixName-2");
+            channelTwo?.Slider.Should().BeNull();
+            channelTwo?.StreamVolumeIn.Should().Be(23);
             channelTwo?.StreamMixFilterBypass.Should().BeFalse();
             channelTwo?.Filters.Should().HaveCount(2);
 
@@ -104,21 +161,26 @@ namespace ElgatoWaveSDK.Tests
             filterOne.Should().NotBeNull();
             filterOne?.Name.Should().Be("FilterName-1");
             filterOne?.Active.Should().Be(false);
-            filterOne?.FilterId.Should().Be("FilterID-1");
+            filterOne?.FilterId.Should().Be("FilterId-1");
             filterOne?.PluginId.Should().Be("PluginId-1");
 
             var filterTwo = channelTwo?.Filters?.Last();
             filterTwo.Should().NotBeNull();
             filterTwo?.Name.Should().Be("FilterName-2");
             filterTwo?.Active.Should().Be(true);
-            filterTwo?.FilterId.Should().Be("FilterID-2");
+            filterTwo?.FilterId.Should().Be("FilterId-2");
             filterTwo?.PluginId.Should().Be("PluginId-2");
         }
 
         [Fact]
         public async Task GetMicrophoneState()
         {
-            SetupReply("{  \"isMicrophoneConnected\": false}");
+            SetupReply("{\"isMicrophoneConnected\":true}");
+
+            SetupReply(new MicrophoneState()
+            {
+                IsMicrophoneConnected = true
+            });
 
             await Subject.ConnectAsync().ConfigureAwait(false);
             var result = await Subject.GetMicrophoneState().ConfigureAwait(false);
@@ -131,13 +193,20 @@ namespace ElgatoWaveSDK.Tests
                 }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
             result.Should().NotBeNull();
-            result?.IsMicrophoneConnected.Should().BeFalse();
+            result?.IsMicrophoneConnected.Should().BeTrue();
         }
 
         [Fact]
         public async Task GetMicrophoneSettings()
         {
-            SetupReply("{    \"isMicrophoneClipguardOn\": false,    \"isMicrophoneLowcutOn\": true,    \"microphoneBalance\": 1,    \"microphoneGain\": 2,    \"microphoneOutputVolume\": 3  }");
+            SetupReply(new MicrophoneSettings()
+            {
+                MicrophoneBalance = 1,
+                MicrophoneGain = 2,
+                MicrophoneOutputVolume = 3,
+                IsMicrophoneClipguardOn = true,
+                IsMicrophoneLowcutOn = false
+            });
 
             await Subject.ConnectAsync().ConfigureAwait(false);
             var result = await Subject.GetMicrophoneSettings().ConfigureAwait(false);
@@ -150,8 +219,8 @@ namespace ElgatoWaveSDK.Tests
                 }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
             result.Should().NotBeNull();
-            result?.IsMicrophoneClipguardOn.Should().BeFalse();
-            result?.IsMicrophoneLowcutOn.Should().BeTrue();
+            result?.IsMicrophoneClipguardOn.Should().BeTrue();
+            result?.IsMicrophoneLowcutOn.Should().BeFalse();
             result?.MicrophoneBalance.Should().Be(1);
             result?.MicrophoneGain.Should().Be(2);
             result?.MicrophoneOutputVolume.Should().Be(3);
@@ -160,7 +229,13 @@ namespace ElgatoWaveSDK.Tests
         [Fact]
         public async Task GetMonitoringState()
         {
-            SetupReply("{    \"isLocalOutMuted\": false,    \"isStreamOutMuted\": true,    \"localVolumeOut\": 1,    \"streamVolumeOut\": 2  }");
+            SetupReply(new MonitoringState()
+            {
+                IsLocalOutMuted = false,
+                IsStreamOutMuted = true,
+                LocalVolumeOut = 1,
+                StreamVolumeOut = 2
+            });
 
             await Subject.ConnectAsync().ConfigureAwait(false);
             var result = await Subject.GetMonitoringState().ConfigureAwait(false);
@@ -182,7 +257,21 @@ namespace ElgatoWaveSDK.Tests
         [Fact]
         public async Task GetMonitorMixOutputList()
         {
-            SetupReply("{    \"monitorMix\": \"SelectedMix\",    \"monitorMixList\": [      {        \"monitorMix\": \"SelectedMix-1\"      },      {        \"monitorMix\": \"SelectedMix-2\"      }    ]  }");
+            SetupReply(new MonitorMixOutputList()
+            {
+                MonitorMix = "SelectedMix",
+                MonitorMixList = new List<MonitorMixList>()
+                {
+                    new MonitorMixList()
+                    {
+                        MonitorMix = "SelectedMix-1"
+                    },
+                    new MonitorMixList()
+                    {
+                        MonitorMix = "SelectedMix-2"
+                    }
+                }
+            });
 
             await Subject.ConnectAsync().ConfigureAwait(false);
             var result = await Subject.GetMonitorMixOutputList().ConfigureAwait(false);
@@ -210,7 +299,10 @@ namespace ElgatoWaveSDK.Tests
         [Fact]
         public async Task GetSwitchState()
         {
-            SetupReply("{  \"switchState\": \"localMix\"}");
+            SetupReply(new SwitchState()
+            {
+                CurrentState = MixType.LocalMix.ToString()
+            });
 
             await Subject.ConnectAsync().ConfigureAwait(false);
             var result = await Subject.GetSwitchState().ConfigureAwait(false);
@@ -223,7 +315,7 @@ namespace ElgatoWaveSDK.Tests
                 }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
             result.Should().NotBeNull();
-            result?.CurrentState.Should().Be("localMix");
+            result?.CurrentState.Should().Be("LocalMix");
         }
     }
 }

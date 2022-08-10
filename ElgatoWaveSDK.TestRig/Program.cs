@@ -48,7 +48,6 @@ namespace ElgatoWaveSDK.TestRig
                                   $"\n\tIs Local Muted: {c.IsLocalInMuted}" +
                                   $"\n\tStream Vol: {c.StreamVolumeIn}" +
                                   $"\n\tIs Stream Muted: {c.IsStreamInMuted}" +
-                                  $"\n\tDelta Linked: {c.DeltaLinked}" +
                                   $"\n\tIs Available: {c.IsAvailable}");
             };
             client.ChannelsChanged += (sender, list) =>
@@ -69,7 +68,6 @@ namespace ElgatoWaveSDK.TestRig
                                   $"\n\t\tIs Local Muted: {c.IsLocalInMuted}" +
                                   $"\n\t\tStream Vol: {c.StreamVolumeIn}" +
                                   $"\n\t\tIs Stream Muted: {c.IsStreamInMuted}" +
-                                  $"\n\t\tDelta Linked: {c.DeltaLinked}" +
                                   $"\n\t\tIs Available: {c.IsAvailable}");
                 });
             };
@@ -107,7 +105,6 @@ namespace ElgatoWaveSDK.TestRig
                                   $"\n\t\tIs Local Muted: {c.IsLocalInMuted}" +
                                   $"\n\t\tStream Vol: {c.StreamVolumeIn}" +
                                   $"\n\t\tIs Stream Muted: {c.IsStreamInMuted}" +
-                                  $"\n\t\tDelta Linked: {c.DeltaLinked}" +
                                   $"\n\t\tIs Available: {c.IsAvailable}");
                 });
 

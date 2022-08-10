@@ -34,16 +34,17 @@ namespace ElgatoWaveSDK.Tests.TestUtils
             MockSocket.Setup(c => c.State).Returns(value);
         }
 
-        internal void SetupReply(string replyObjectJson, string? method = null)
+        internal void SetupReply(object replyObjectJson, string? method = null)
         {
-            var replyObject = new SocketBaseObject<string, string>()
+            var replyObject = new SocketBaseObject<string, object>()
             {
                 Id= CommandId,
                 Method = method,
                 Result = replyObjectJson
             };
 
-            ReceiveData = Encoding.UTF8.GetBytes(replyObject.ToJson());
+            string json = replyObject.ToJson();
+            ReceiveData = Encoding.UTF8.GetBytes(json);
 
             var setupSequence = new MockSequence();
             int timesX = ReceiveDataCount / 1024;

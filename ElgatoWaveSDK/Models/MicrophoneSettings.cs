@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace ElgatoWaveSDK.Models
 {
     public class MicrophoneSettings
     {
-        [JsonProperty("isMicrophoneClipguardOn")]
+        [JsonPropertyName("isMicrophoneClipguardOn")]
         public bool? IsMicrophoneClipguardOn { get; set; }
 
-        [JsonProperty("isMicrophoneLowcutOn")]
+        [JsonPropertyName("isMicrophoneLowcutOn")]
         public bool? IsMicrophoneLowcutOn { get; set; }
 
-        [JsonProperty("microphoneBalance")]
+        [JsonPropertyName("microphoneBalance")]
         public int? MicrophoneBalance { get; set; }
 
-        [JsonProperty("microphoneGain")]
+        [JsonPropertyName("microphoneGain")]
         public int? MicrophoneGain { get; set; }
 
-        [JsonProperty("microphoneOutputVolume")]
+        [JsonPropertyName("microphoneOutputVolume")]
         public int? MicrophoneOutputVolume { get; set; }
     }
 }

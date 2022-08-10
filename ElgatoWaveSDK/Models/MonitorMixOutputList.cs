@@ -1,22 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace ElgatoWaveSDK.Models
 {
     public class MonitorMixOutputList
     {
-        [JsonProperty("monitorMix")]
+        [JsonPropertyName("monitorMix")]
         public string? MonitorMix { get; set; }
 
-        [JsonProperty("monitorMixList")]
+        [JsonPropertyName("monitorMixList")]
         public List<MonitorMixList>? MonitorMixList { get; set; }
     }
 
     public class MonitorMixList
     {
-        [JsonProperty("monitorMix")]
+        [JsonPropertyName("monitorMix")]
         public string? MonitorMix { get; set; }
     }
 }
