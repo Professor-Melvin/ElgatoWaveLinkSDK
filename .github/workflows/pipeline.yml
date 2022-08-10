@@ -80,7 +80,7 @@ jobs:
               uses: actions/download-artifact@v3
               with:
                 name: BuildArtifact
-                path: ElgatoWaveSDK/bin/Release/*
+                path: ElgatoWaveSDK/bin/Release/
 
             - name: Package
               run: dotnet pack --configuration Release --no-restore --version-suffix ${{ env.betaVersion }}
