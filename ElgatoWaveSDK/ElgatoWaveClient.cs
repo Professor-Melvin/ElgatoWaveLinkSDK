@@ -253,7 +253,7 @@ namespace ElgatoWaveSDK
                 };
                 var s = baseObject.ToJson();
                 var array = Encoding.UTF8.GetBytes(s);
-                await _socket.SendAsync(array, WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
+                await _socket.SendAsync(new ArraySegment<byte>(array), WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
 
                 SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(_responseTimeout));
 
@@ -323,12 +323,10 @@ namespace ElgatoWaveSDK
                         }
 
                         baseObject.ReceivedAt = DateTime.Now;
-                        foreach (var (key, value) in _responseCache)
+
+                        foreach (var cache in _responseCache.Where(c => c.Value.ReceivedAt < DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(2))))
                         {
-                            if (value.ReceivedAt < DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(2)))
-                            {
-                                _responseCache.Remove(key);
-                            }
+                            _responseCache.Remove(cache.Key);
                         }
 
                         if (baseObject.Id == 0) //Not a command reply
