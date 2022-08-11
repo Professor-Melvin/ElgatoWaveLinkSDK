@@ -56,7 +56,9 @@ jobs:
                 name: BuildArtifact
                 if-no-files-found: error
                 retention-days: 7
-                path: ElgatoWaveSDK/bin/Release/*
+                path: |
+                    ElgatoWaveSDK/bin/Release/net6.0-windows/*
+                    ElgatoWaveSDK/bin/Release/netstandard2.0/*
               
     beta-release:
         name: Beta Release
