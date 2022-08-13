@@ -1,58 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
+[assembly: InternalsVisibleTo("System.Text.Json")]
 namespace ElgatoWaveSDK.Models
 {
     public class ChannelInfo
     {
-        [JsonProperty("bgColor")]
+        [JsonInclude]
+        [JsonPropertyName("slider")] 
+        public string? Slider { get; internal set; }
+
+        [JsonInclude]
+        [JsonPropertyName("bgColor")]
         public string? BgColor { get; internal set; }
 
-        [JsonProperty("filters")]
+        [JsonPropertyName("filters")]
         public List<Filter>? Filters { get; set; }
 
-        [JsonProperty("slider")] 
-        internal string? Slider { get; set; }
+        [JsonPropertyName("iconData")]
+        public string? IconData { get; set; }
 
-        [JsonProperty("deltaLinked")]
-        public long? DeltaLinked { get; internal set; }
+        [JsonPropertyName("inputType")]
+        public int? InputType { get; set; }
 
-        [JsonProperty("iconData")]
-        public string? IconData { get; internal set; }
+        [JsonPropertyName("isAvailable")]
+        public bool? IsAvailable { get; set; }
 
-        [JsonProperty("inputType")]
-        public long? InputType { get; internal set; }
-
-        [JsonProperty("isAvailable")]
-        public bool? IsAvailable { get; internal set; }
-
-        [JsonProperty("isLinked")]
-        public bool? IsLinked { get; internal set; }
-
-        [JsonProperty("isLocalInMuted")]
+        [JsonPropertyName("isLocalInMuted")]
         public bool? IsLocalInMuted { get; set; }
 
-        [JsonProperty("isStreamInMuted")]
+        [JsonPropertyName("isStreamInMuted")]
         public bool? IsStreamInMuted { get; set; }
 
-        [JsonProperty("localVolumeIn")]
-        public long? LocalVolumeIn { get; set; }
-
-        [JsonProperty("localMixFilterBypass")] 
+        [JsonPropertyName("localMixFilterBypass")]
         public bool? LocalMixFilterBypass { get; set; }
 
-        [JsonProperty("mixId")]
+        [JsonPropertyName("localVolumeIn")]
+        public int? LocalVolumeIn { get; set; }
+
+        [JsonPropertyName("mixId")]
         public string? MixId { get; set; }
 
-        [JsonProperty("mixerName")]
-        public string? MixerName { get; internal set; }
+        [JsonPropertyName("mixerName")]
+        public string? MixerName { get; set; }
 
-        [JsonProperty("streamMixFilterBypass")]
+        [JsonPropertyName("streamMixFilterBypass")]
         public bool? StreamMixFilterBypass { get; set; }
 
-        [JsonProperty("streamVolumeIn")]
-        public long? StreamVolumeIn { get; set; }
+        [JsonPropertyName("streamVolumeIn")]
+        public int? StreamVolumeIn { get; set; }
     }
 }

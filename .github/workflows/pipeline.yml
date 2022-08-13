@@ -58,6 +58,7 @@ jobs:
                 retention-days: 7
                 path: |
                     ElgatoWaveSDK/bin/Release/net6.0-windows/*
+                    ElgatoWaveSDK/bin/Release/netstandard2.0/*
               
     beta-release:
         name: Beta Release
@@ -81,7 +82,7 @@ jobs:
               uses: actions/download-artifact@v3
               with:
                 name: BuildArtifact
-                path: ElgatoWaveSDK/bin/Release/net6.0-windows/
+                path: ElgatoWaveSDK/bin/Release/
 
             - name: Package
               run: dotnet pack --configuration Release --no-restore --version-suffix ${{ env.betaVersion }}

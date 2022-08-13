@@ -15,10 +15,24 @@ public class SetCommandTests : TestBase
         SetupConnection();
     }
 
-    [Fact]
-    public async Task SetMonitorMixOutput()
-    {
-        SetupReply("{    \"monitorMix\": \"SelectedMix\",    \"monitorMixList\": [      {        \"monitorMix\": \"SelectedMix-1\"      },      {        \"monitorMix\": \"SelectedMix-2\"      }    ]  }");
+        [Fact]
+        public async Task SetMonitorMixOutput()
+        {
+            SetupReply(new MonitorMixOutputList()
+            {
+                MonitorMix = "SelectedMix",
+                MonitorMixList = new List<MonitorMixList>()
+                {
+                    new MonitorMixList()
+                    {
+                        MonitorMix = "SelectedMix-1"
+                    },
+                    new MonitorMixList()
+                    {
+                        MonitorMix = "SelectedMix-2"
+                    }
+                }
+            });
 
         await Subject.ConnectAsync().ConfigureAwait(false);
         var result = await Subject.SetMonitorMixOutput("input").ConfigureAwait(false);
@@ -47,10 +61,13 @@ public class SetCommandTests : TestBase
         mixListTwo?.MonitorMix.Should().Be("SelectedMix-2");
     }
 
-    [Fact]
-    public async Task SetMonitoringState()
-    {
-        SetupReply("{  \"switchState\": \"LocalMix\"}");
+        [Fact]
+        public async Task SetMonitoringState()
+        {
+            SetupReply(new SwitchState()
+            {
+                CurrentState = MixType.LocalMix.ToString()
+            });
 
         await Subject.ConnectAsync().ConfigureAwait(false);
         var result = await Subject.SetMonitoringState(MixType.LocalMix).ConfigureAwait(false);
@@ -70,10 +87,17 @@ public class SetCommandTests : TestBase
         result?.CurrentState.Should().Be(MixType.LocalMix.ToString());
     }
 
-    [Fact]
-    public async Task SetMicrophoneSettings()
-    {
-        SetupReply("{    \"isMicrophoneClipguardOn\": false,    \"isMicrophoneLowcutOn\": true,    \"microphoneBalance\": 1,    \"microphoneGain\": 2,    \"microphoneOutputVolume\": 3  }");
+        [Fact]
+        public async Task SetMicrophoneSettings()
+        {
+            SetupReply(new MicrophoneSettings()
+            {
+                IsMicrophoneClipguardOn = false,
+                IsMicrophoneLowcutOn = true,
+                MicrophoneBalance = 1,
+                MicrophoneGain = 2,
+                MicrophoneOutputVolume = 3
+            });
 
         await Subject.ConnectAsync().ConfigureAwait(false);
         var result = await Subject.SetMicrophoneSettings(2, 3,1,true,false).ConfigureAwait(false);
@@ -101,10 +125,16 @@ public class SetCommandTests : TestBase
         result?.MicrophoneOutputVolume.Should().Be(3);
     }
 
-    [Fact]
-    public async Task SetOutputMixer()
-    {
-        SetupReply("{    \"isLocalOutMuted\": false,    \"isStreamOutMuted\": true,    \"localVolumeOut\": 1,    \"streamVolumeOut\": 2  }");
+        [Fact]
+        public async Task SetOutputMixer()
+        {
+            SetupReply(new MonitoringState()
+            {
+                IsLocalOutMuted = false,
+                IsStreamOutMuted = true,
+                LocalVolumeOut = 1,
+                StreamVolumeOut = 2
+            });
 
         await Subject.ConnectAsync().ConfigureAwait(false);
         var result = await Subject.SetOutputMixer(1, true, 2, false).ConfigureAwait(false);
@@ -130,11 +160,42 @@ public class SetCommandTests : TestBase
         result?.StreamVolumeOut.Should().Be(2);
     }
 
-    [Fact]
-    public async Task SetInputMixer()
-    {
-        SetupReply(
-            "{      \"bgColor\": \"Color-2\",      \"filters\": [        {          \"active\": false,          \"filterID\": \"FilterID-1\",          \"name\": \"FilterName-1\",          \"pluginID\": \"PluginId-1\"        },        {          \"active\": true,          \"filterID\": \"FilterID-2\",          \"name\": \"FilterName-2\",          \"pluginID\": \"PluginId-2\"        }      ],      \"slider\": \"Slider-2\",      \"deltaLinked\": 22,      \"iconData\": \"IconData-2\",      \"inputType\": 23,      \"isAvailable\": false,      \"isLinked\": false,      \"isLocalInMuted\": false,      \"isStreamInMuted\": false,      \"localVolumeIn\": 24,      \"localMixFilterBypass\": false,      \"mixId\": \"MixId-2\",      \"mixerName\": \"MixerName-2\",      \"streamMixFilterBypass\": false,      \"streamVolumeIn\": 25    }");
+        [Fact]
+        public async Task SetInputMixer()
+        {
+            SetupReply(new ChannelInfo()
+            {
+                BgColor = "Color-2",
+                IconData = "IconData-2",
+                InputType = 23,
+                IsAvailable = false,
+                IsLocalInMuted = false,
+                IsStreamInMuted = false,
+                LocalMixFilterBypass = false,
+                LocalVolumeIn = 24,
+                MixId = "MixId-2",
+                MixerName = "MixerName-2",
+                Slider = "Slider-2",
+                StreamVolumeIn = 25,
+                StreamMixFilterBypass = false,
+                Filters = new List<Filter>()
+                {
+                    new Filter()
+                    {
+                        Name = "FilterName-1",
+                        Active = false,
+                        FilterId = "FilterId-1",
+                        PluginId = "PluginId-1"
+                    },
+                    new Filter()
+                    {
+                        Name = "FilterName-2",
+                        Active = true,
+                        FilterId = "FilterId-2",
+                        PluginId = "PluginId-2"
+                    }
+                }
+            });
 
         await Subject.ConnectAsync().ConfigureAwait(false);
         var result = await Subject
@@ -160,36 +221,35 @@ public class SetCommandTests : TestBase
                 }
             }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
-        result.Should().NotBeNull();
-        result?.DeltaLinked.Should().Be(22);
-        result?.BgColor.Should().Be("Color-2");
-        result?.IconData.Should().Be("IconData-2");
-        result?.InputType.Should().Be(23);
-        result?.IsAvailable.Should().BeFalse();
-        result?.IsLinked.Should().BeFalse();
-        result?.IsLocalInMuted.Should().BeFalse();
-        result?.IsStreamInMuted.Should().BeFalse();
-        result?.LocalMixFilterBypass.Should().BeFalse();
-        result?.LocalVolumeIn.Should().Be(24);
-        result?.MixId.Should().Be("MixId-2");
-        result?.MixerName.Should().Be("MixerName-2");
-        result?.Slider.Should().Be("Slider-2");
-        result?.StreamVolumeIn.Should().Be(25);
-        result?.StreamMixFilterBypass.Should().BeFalse();
-        result?.Filters.Should().HaveCount(2);
+            result.Should().NotBeNull();
+            result?.BgColor.Should().Be("Color-2");
+            result?.IconData.Should().Be("IconData-2");
+            result?.InputType.Should().Be(23);
+            result?.IsAvailable.Should().BeFalse();
+            result?.IsLocalInMuted.Should().BeFalse();
+            result?.IsStreamInMuted.Should().BeFalse();
+            result?.LocalMixFilterBypass.Should().BeFalse();
+            result?.LocalVolumeIn.Should().Be(24);
+            result?.MixId.Should().Be("MixId-2");
+            result?.MixerName.Should().Be("MixerName-2");
+            result?.Slider.Should().Be("Slider-2");
+            result?.StreamVolumeIn.Should().Be(25);
+            result?.StreamMixFilterBypass.Should().BeFalse();
+            result?.Filters.Should().HaveCount(2);
 
-        var filterOne = result?.Filters?.First();
-        filterOne.Should().NotBeNull();
-        filterOne?.Name.Should().Be("FilterName-1");
-        filterOne?.Active.Should().Be(false);
-        filterOne?.FilterId.Should().Be("FilterID-1");
-        filterOne?.PluginId.Should().Be("PluginId-1");
+            var filterOne = result?.Filters?.First();
+            filterOne.Should().NotBeNull();
+            filterOne?.Name.Should().Be("FilterName-1");
+            filterOne?.Active.Should().BeFalse();
+            filterOne?.FilterId.Should().Be("FilterId-1");
+            filterOne?.PluginId.Should().Be("PluginId-1");
 
-        var filterTwo = result?.Filters?.Last();
-        filterTwo.Should().NotBeNull();
-        filterTwo?.Name.Should().Be("FilterName-2");
-        filterTwo?.Active.Should().Be(true);
-        filterTwo?.FilterId.Should().Be("FilterID-2");
-        filterTwo?.PluginId.Should().Be("PluginId-2");
+            var filterTwo = result?.Filters?.Last();
+            filterTwo.Should().NotBeNull();
+            filterTwo?.Name.Should().Be("FilterName-2");
+            filterTwo?.Active.Should().BeTrue();
+            filterTwo?.FilterId.Should().Be("FilterId-2");
+            filterTwo?.PluginId.Should().Be("PluginId-2");
+        }
     }
 }

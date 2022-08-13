@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 [assembly: InternalsVisibleTo("ElgatoWaveSDK.Tests")]
 [assembly: InternalsVisibleTo("ElgatoWaveLinkEmulator")]
@@ -11,19 +9,19 @@ namespace ElgatoWaveSDK
 {
     internal class SocketBaseObject<InT, OutT>
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public int Id { get; set; }
 
-        [JsonProperty("jsonrpc")]
+        [JsonPropertyName("jsonrpc")]
         public string? JsonRpc { get; } = "2.0";
 
-        [JsonProperty("method")]
+        [JsonPropertyName("method")]
         public string? Method { get; set; }
 
-        [JsonProperty("params")]
+        [JsonPropertyName("params")]
         public InT? Obj { get; set; }
 
-        [JsonProperty("result")]
+        [JsonPropertyName("result")]
         public OutT? Result { get; set; }
 
         [JsonIgnore] 
@@ -31,9 +29,9 @@ namespace ElgatoWaveSDK
 
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, new JsonSerializerSettings()
+            return JsonSerializer.Serialize(this, new JsonSerializerOptions()
             {
-                NullValueHandling = NullValueHandling.Ignore
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             });
         }
     }

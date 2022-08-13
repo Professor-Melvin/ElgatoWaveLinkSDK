@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using ElgatoWaveSDK.HumbleObjects;
 using ElgatoWaveSDK.Models;
-using Newtonsoft.Json;
 
 namespace ElgatoWaveSDK
 {
@@ -218,11 +220,9 @@ namespace ElgatoWaveSDK
         public Task<ChannelInfo?> SetInputMixer(ChannelInfo info, MixType mixType)
         {
             info.BgColor = null;
-            info.DeltaLinked = null;
             info.IconData = null;
             info.InputType = null;
             info.IsAvailable = null;
-            info.IsLinked = null;
             info.MixerName = null;
             info.Slider = mixType == MixType.LocalMix ? "local" : "stream";
 
@@ -248,7 +248,7 @@ namespace ElgatoWaveSDK
                 };
                 var s = baseObject.ToJson();
                 var array = Encoding.UTF8.GetBytes(s);
-                await _socket.SendAsync(array, WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
+                await _socket.SendAsync(new ArraySegment<byte>(array), WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
 
                 SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(_clientConfig.ResponseTimeout));
 
@@ -256,8 +256,8 @@ namespace ElgatoWaveSDK
                 {
                     var reply = _responseCache[baseObject.Id];
                     _responseCache.Remove(reply.Id);
-                    
-                    return JsonConvert.DeserializeObject<OutT>(reply.Result?.ToString());
+
+                    return JsonSerializer.Deserialize<OutT?>(reply?.Result ?? JsonDocument.Parse("{}"));
                 }
             }
 
@@ -268,7 +268,7 @@ namespace ElgatoWaveSDK
 
         #region Reciever
 
-        private readonly Dictionary<int, SocketBaseObject<dynamic?, dynamic?>> _responseCache = new();
+        private readonly Dictionary<int, SocketBaseObject<JsonNode?, JsonDocument?>> _responseCache = new();
 
         private void StartReceiver()
         {
@@ -310,19 +310,17 @@ namespace ElgatoWaveSDK
 
                         var json = Encoding.UTF8.GetString(buffer).Replace("\0", "");
 
-                        var baseObject = JsonConvert.DeserializeObject<SocketBaseObject<dynamic?, dynamic?>?>(json);
+                        SocketBaseObject<JsonNode?, JsonDocument?>? baseObject = JsonSerializer.Deserialize<SocketBaseObject<JsonNode?, JsonDocument?>?>(json);
                         if (baseObject == null)
                         {
                             continue;
                         }
 
                         baseObject.ReceivedAt = DateTime.Now;
-                        foreach (var (key, value) in _responseCache)
+
+                        foreach (var cache in _responseCache.Where(c => c.Value.ReceivedAt < DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(2))))
                         {
-                            if (value.ReceivedAt < DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(2)))
-                            {
-                                _responseCache.Remove(key);
-                            }
+                            _responseCache.Remove(cache.Key);
                         }
 
                         if (baseObject.Id == 0) //Not a command reply
@@ -331,49 +329,49 @@ namespace ElgatoWaveSDK
                             switch (baseObject.Method)
                             {
                                 case "microphoneStateChanged":
-                                    obj = JsonConvert.DeserializeObject<MicrophoneState>(baseObject.Obj?.ToString());
+                                    obj = JsonSerializer.Deserialize<MicrophoneState>(baseObject.Obj?.ToString() ?? "{}");
                                     if (obj != null)
                                     {
                                         MicStateChanged?.Invoke(this, obj as MicrophoneState ?? throw new InvalidOperationException());
                                     }
                                     break;
                                 case "microphoneSettingsChanged":
-                                    obj = JsonConvert.DeserializeObject<MicrophoneSettings>(baseObject.Obj?.ToString());
+                                    obj = JsonSerializer.Deserialize<MicrophoneSettings>(baseObject.Obj?.ToString() ?? "{}");
                                     if (obj != null)
                                     {
                                         MicSettingsChanged?.Invoke(this, obj as MicrophoneSettings ?? throw new InvalidOperationException());
                                     }
                                     break;
                                 case "localMonitorOutputChanged":
-                                    obj = baseObject.Obj?.monitorMix?.ToString();
+                                    obj = baseObject.Obj?["monitorMix"]?.ToString();
                                     if (obj != null)
                                     {
                                         LocalMonitorOutputChanged?.Invoke(this, obj as string ?? throw new InvalidOperationException());
                                     }
                                     break;
                                 case "monitorSwitchOutputChanged":
-                                    obj = baseObject.Obj?.switchState?.ToString();
+                                    obj = baseObject.Obj?["switchState"]?.ToString();
                                     if (obj != null)
                                     {
                                         MonitorSwitchOutputChanged?.Invoke(this, obj?.ToString() == "LocalMix" ? MixType.LocalMix : MixType.StreamMix);
                                     }
                                     break;
                                 case "channelsChanged":
-                                    obj = JsonConvert.DeserializeObject<List<ChannelInfo>>(baseObject.Obj?.ToString());
+                                    obj = JsonSerializer.Deserialize<List<ChannelInfo>>(baseObject.Obj?["channels"]?.ToString() ?? "{}");
                                     if (obj != null)
                                     {
                                         ChannelsChanged?.Invoke(this, obj as List<ChannelInfo> ?? throw new InvalidOperationException());
                                     }
                                     break;
                                 case "outputMixerChanged":
-                                    obj = JsonConvert.DeserializeObject<MonitoringState>(baseObject.Obj?.ToString());
+                                    obj = JsonSerializer.Deserialize<MonitoringState>(baseObject.Obj?.ToString() ?? "{}");
                                     if (obj != null)
                                     {
                                         OutputMixerChanged?.Invoke(this, obj as MonitoringState ?? throw new InvalidOperationException());
                                     }
                                     break;
                                 case "inputMixerChanged":
-                                    obj = JsonConvert.DeserializeObject<ChannelInfo>(baseObject.Obj?.ToString());
+                                    obj = JsonSerializer.Deserialize<ChannelInfo>(baseObject.Obj?.ToString() ?? "{}");
                                     if (obj != null)
                                     {
                                         InputMixerChanged?.Invoke(this, obj as ChannelInfo ?? throw new InvalidOperationException());

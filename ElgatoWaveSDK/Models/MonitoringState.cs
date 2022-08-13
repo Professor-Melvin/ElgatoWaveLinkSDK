@@ -1,22 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace ElgatoWaveSDK.Models
 {
     public class MonitoringState
     {
-        [JsonProperty("isLocalOutMuted")]
+        [JsonPropertyName("isLocalOutMuted")]
         public bool? IsLocalOutMuted { get; set; }
 
-        [JsonProperty("isStreamOutMuted")]
+        [JsonPropertyName("isStreamOutMuted")]
         public bool? IsStreamOutMuted { get; set; }
 
-        [JsonProperty("localVolumeOut")]
+        [JsonPropertyName("localVolumeOut")]
         public long? LocalVolumeOut { get; set; }
 
-        [JsonProperty("streamVolumeOut")]
+        [JsonPropertyName("streamVolumeOut")]
         public long? StreamVolumeOut { get; set; }
     }
 }

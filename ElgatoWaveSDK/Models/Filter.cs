@@ -1,24 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace ElgatoWaveSDK.Models
 {
     public class Filter
     {
-        [JsonProperty("active")]
+        [JsonPropertyName("active")]
         public bool? Active { get; set; }
 
-        [JsonProperty("filterID")]
+        [JsonPropertyName("filterID")]
         public string? FilterId { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string? Name { get; set; }
 
-        [JsonProperty("pluginID")] 
+        [JsonPropertyName("pluginID")]
         public string? PluginId { get; set; }
     }
 }

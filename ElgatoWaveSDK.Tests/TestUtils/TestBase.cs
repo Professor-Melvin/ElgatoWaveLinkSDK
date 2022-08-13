@@ -34,16 +34,17 @@ public class TestBase
         MockSocket.Setup(c => c.State).Returns(value);
     }
 
-    internal void SetupReply(string replyObjectJson, string? method = null)
-    {
-        var replyObject = new SocketBaseObject<string, string>()
+        internal void SetupReply(object replyObjectJson, string? method = null)
         {
-            Id= CommandId,
-            Method = method,
-            Result = replyObjectJson
-        };
+            var replyObject = new SocketBaseObject<string, object>()
+            {
+                Id= CommandId,
+                Method = method,
+                Result = replyObjectJson
+            };
 
-        ReceiveData = Encoding.UTF8.GetBytes(replyObject.ToJson());
+            string json = replyObject.ToJson();
+            ReceiveData = Encoding.UTF8.GetBytes(json);
 
         var setupSequence = new MockSequence();
         var timesX = ReceiveDataCount / 1024;
