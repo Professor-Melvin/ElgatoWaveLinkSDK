@@ -315,7 +315,7 @@ namespace ElgatoWaveSDK.Tests
                 }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
             result.Should().NotBeNull();
-            result?.CurrentState.Should().Be("LocalMix");
+            result?.Should().Be(MixType.LocalMix);
         }
     }
 }

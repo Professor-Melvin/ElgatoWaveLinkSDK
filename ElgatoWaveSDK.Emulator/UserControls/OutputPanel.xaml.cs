@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ElgatoWaveSDK.Emulator.ViewModels;
+using ElgatoWaveSDK.Models;
 
 namespace ElgatoWaveSDK.Emulator.UserControls;
 /// <summary>
@@ -19,8 +21,22 @@ namespace ElgatoWaveSDK.Emulator.UserControls;
 /// </summary>
 public partial class OutputPanel : UserControl
 {
+
+    public static readonly DependencyProperty TypeProperty =
+        DependencyProperty.Register("Type", typeof(MixType), typeof(OutputPanel), new UIPropertyMetadata(null));
+    public MixType Type
+    {
+        get => (MixType)GetValue(TypeProperty);
+        set => SetValue(TypeProperty, value);
+    }
+
     public OutputPanel()
     {
         InitializeComponent();
+
+        this.Loaded += (sender, obj) =>
+        {
+            DataContext = new OutputPanelViewModel(Type);
+        };
     }
 }

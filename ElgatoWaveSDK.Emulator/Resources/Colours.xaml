@@ -4,6 +4,8 @@
     <SolidColorBrush x:Key="PanelColour" Color="#292929"></SolidColorBrush>
     <SolidColorBrush x:Key="BackgroundColour" Color="#111111"></SolidColorBrush>
 
+    <SolidColorBrush x:Key="SelectedIconBackgroundColor" Color="#20b954"></SolidColorBrush>
+
     <SolidColorBrush x:Key="FontColour" Color="White"></SolidColorBrush>
 
 </ResourceDictionary>

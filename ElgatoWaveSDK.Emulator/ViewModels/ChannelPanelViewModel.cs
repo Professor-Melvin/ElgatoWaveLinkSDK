@@ -50,17 +50,15 @@ public interface IChannelPanelViewModel : INotifyPropertyChanged
 public class ChannelPanelViewModel : IChannelPanelViewModel
 {
     private ChannelInfo Info { get; set; }
-    private ElgatoWaveClient Client{ get; }
 
     public ICommand MuteLocal { get; set; }
     public ICommand MuteStream { get; set; }
 
-    public ChannelPanelViewModel(ElgatoWaveClient client, ChannelInfo info)
+    public ChannelPanelViewModel(ChannelInfo info)
     {
         Info = info;
-        Client = client;
 
-        client.InputMixerChanged += (sender, channelInfo) =>
+        MainWindow.Client.InputMixerChanged += (sender, channelInfo) =>
         {
             if (channelInfo.MixId == Info.MixId)
             {
@@ -86,7 +84,7 @@ public class ChannelPanelViewModel : IChannelPanelViewModel
     {
         Task.Run(async () =>
         {
-            var newInfo = await Client.SetInputMixer(Info, slider).ConfigureAwait(true);
+            var newInfo = await MainWindow.Client.SetInputMixer(Info, slider).ConfigureAwait(true);
             if (newInfo != null)
             {
                 Info = newInfo;

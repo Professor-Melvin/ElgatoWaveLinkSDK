@@ -9,15 +9,60 @@
              d:DataContext="{d:DesignInstance viewModels:IOutputPanelViewModel}"
              d:DesignHeight="50" d:DesignWidth="850">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/Icons.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <Border CornerRadius="5"  Background="{StaticResource PanelColour}">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="150"></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition Width="99"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="40"/>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Column="0" Content="{Binding OutputName}"></Label>
+            <Label Grid.Column="0" Content="{Binding OutputName}" VerticalAlignment="Center" Margin="10 0 0 0"></Label>
+
+            <ComboBox Grid.Column="1"></ComboBox>
+
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <ProgressBar Grid.Row="0" Value="50" Minimum="0" Maximum="100" Height="10" VerticalAlignment="Bottom" Margin="0 0 0 2"></ProgressBar>
+                <ProgressBar Grid.Row="1" Value="80" Minimum="0" Maximum="100" Height="10" VerticalAlignment="Top" Margin="0 2 0 0"></ProgressBar>
+            </Grid>
+
+            <!--<Image Grid.Column="3" Source="{StaticResource ic_speaker}" Margin="5 0 5 0"></Image>-->
+
+            <Slider Grid.Column="4" VerticalAlignment="Center"></Slider>
+
+            <Button Grid.Column="5" Height="35" Margin="0 0 5 0" Command="{Binding Select}">
+                <Border Width="35" Height="35">
+                    
+                    <Image Source="{StaticResource ic_ear}" Height="30"></Image>
+
+                    <Border.Style>
+                        <Style TargetType="{x:Type Border}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected}" Value="true">
+                                    <Setter Property="Background" Value="{StaticResource SelectedIconBackgroundColor}"></Setter>
+                                    <Setter Property="CornerRadius" Value="5"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                </Border>
+            </Button>
         </Grid>
     </Border>
 

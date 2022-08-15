@@ -92,8 +92,8 @@
 
             <Label Grid.Row="0" >OUTPUTS</Label>
 
-            <Border Grid.Row="1" CornerRadius="5"  Background="{StaticResource PanelColour}"></Border>
-            <Border Grid.Row="2" Margin="0 5 0 0" CornerRadius="5" Background="{StaticResource PanelColour}"></Border>
+            <userControls:OutputPanel Grid.Row="1" Type="LocalMix" x:Name="LocalMixOutputPanel"></userControls:OutputPanel>
+            <userControls:OutputPanel Grid.Row="2" Type="StreamMix" x:Name="StreamMixOutputPanel" Margin="0 5 0 0"></userControls:OutputPanel>
         </Grid>
 
     </Grid>
