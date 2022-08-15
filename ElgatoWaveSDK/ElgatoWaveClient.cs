@@ -18,7 +18,7 @@ namespace ElgatoWaveSDK
         #region Private Vars
 
         private IHumbleClientWebSocket? _socket;
-        private ClientConfig _clientConfig { get; set; }
+        private ClientConfig Config { get; set; }
         private int Port { get; set; }
         private CancellationTokenSource? _source;
         private readonly ITransactionTracker _transactionTracker;
@@ -27,7 +27,7 @@ namespace ElgatoWaveSDK
 
         #region Public Vars
 
-        public ClientConfig ClientConfig => _clientConfig;
+        public ClientConfig ClientConfig => Config;
         public bool IsConnected => _socket?.State == WebSocketState.Open;
 
         #endregion
@@ -48,16 +48,16 @@ namespace ElgatoWaveSDK
 
         public ElgatoWaveClient()
         {
-            _clientConfig ??= new ClientConfig();
+            Config ??= new ClientConfig();
             _source = new CancellationTokenSource();
             _transactionTracker ??= new TransactionTracker();
 
-            Port = _clientConfig.PortStart;
+            Port = Config.PortStart;
         }
 
         public ElgatoWaveClient(ClientConfig config) : this()
         {
-            _clientConfig = config;
+            Config = config;
         }
 
         internal ElgatoWaveClient(IHumbleClientWebSocket socket, ITransactionTracker transactionTracker) : this()
@@ -70,7 +70,7 @@ namespace ElgatoWaveSDK
         public async Task ConnectAsync()
         {
             var cycleCount = 0;
-            while (_socket?.State != WebSocketState.Open && (cycleCount < _clientConfig.MaxAttempts))
+            while (_socket?.State != WebSocketState.Open && (cycleCount < Config.MaxAttempts))
             {
                 _socket ??= new HumbleClientWebSocket();
                 try
@@ -86,19 +86,19 @@ namespace ElgatoWaveSDK
                 finally
                 {
                     Port++;
-                    if (Port > (_clientConfig.PortStart + _clientConfig.PortRange))
+                    if (Port > (Config.PortStart + Config.PortRange))
                     {
 #pragma warning disable IDE0059 // Unnecessary assignment of a value
                         cycleCount++;
 #pragma warning restore IDE0059 // Unnecessary assignment of a value
-                        Port = _clientConfig.PortStart;
+                        Port = Config.PortStart;
                     }
                 }
             }
 
             if (_socket?.State != WebSocketState.Open)
             {
-                var ex = new ElgatoException($"Looped through possible ports {_clientConfig.MaxAttempts} times and couldn't connect [{_clientConfig.PortStart}-{_clientConfig.PortStart + _clientConfig.PortRange}]", _socket?.State);
+                var ex = new ElgatoException($"Looped through possible ports {Config.MaxAttempts} times and couldn't connect [{Config.PortStart}-{Config.PortStart + Config.PortRange}]", _socket?.State);
                 ExceptionOccured?.Invoke(this, ex);
                 throw ex;
             }
@@ -256,7 +256,7 @@ namespace ElgatoWaveSDK
                 var array = Encoding.UTF8.GetBytes(s);
                 await _socket.SendAsync(new ArraySegment<byte>(array), WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
 
-                SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(_clientConfig.ResponseTimeout));
+                SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(Config.ResponseTimeout));
 
                 if (_responseCache.ContainsKey(baseObject.Id))
                 {
@@ -289,7 +289,7 @@ namespace ElgatoWaveSDK
                 {
                     try
                     {
-                        var buffer = new byte[_clientConfig.BufferSize];
+                        var buffer = new byte[Config.BufferSize];
                         var offset = 0;
                         var free = buffer.Length;
 
@@ -301,8 +301,8 @@ namespace ElgatoWaveSDK
                             free -= result.Count;
                             if (free == 0)
                             {
-                                var newSize = buffer.Length + _clientConfig.BufferSize;
-                                if (newSize > _clientConfig.MaxBufferSize)
+                                var newSize = buffer.Length + Config.BufferSize;
+                                if (newSize > Config.MaxBufferSize)
                                 {
                                     throw new ElgatoException("Maximum receive buffer size exceeded", _socket.State);
                                 }
@@ -316,7 +316,7 @@ namespace ElgatoWaveSDK
 
                         var json = Encoding.UTF8.GetString(buffer).Replace("\0", "");
 
-                        SocketBaseObject<JsonNode?, JsonDocument?>? baseObject = JsonSerializer.Deserialize<SocketBaseObject<JsonNode?, JsonDocument?>?>(json);
+                        var baseObject = JsonSerializer.Deserialize<SocketBaseObject<JsonNode?, JsonDocument?>?>(json);
                         if (baseObject == null)
                         {
                             continue;
