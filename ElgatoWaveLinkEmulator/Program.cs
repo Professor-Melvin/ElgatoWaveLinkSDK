@@ -1,12 +1,9 @@
 ﻿using System.Net;
-using System.Net.Sockets;
 using System.Net.WebSockets;
-using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using ElgatoWaveSDK;
-using ElgatoWaveSDK.Models;
 
 namespace ElgatoWaveLinkEmulator;
 
@@ -102,9 +99,9 @@ internal static class Program
                 SocketBaseObject<string, string>? receivedObject;
                 try
                 {
-                    receivedObject = JsonConvert.DeserializeObject<SocketBaseObject<string, string>?>(receviedJson, new JsonSerializerSettings()
+                    receivedObject = JsonSerializer.Deserialize<SocketBaseObject<string, string>?>(receviedJson, new JsonSerializerOptions()
                     {
-                        NullValueHandling = NullValueHandling.Ignore
+                        DefaultIgnoreCondition = JsonIgnoreCondition.Always
                     });
                 }
                 catch (Exception ex)
@@ -118,25 +115,25 @@ internal static class Program
                     case "emulatorTest":
                         break;
                     case "getApplicationInfo":
-                        receivedObject.Result = JsonConvert.SerializeObject(ObjectGenerator.GetApplicationInfo());
+                        receivedObject.Result = JsonSerializer.Serialize(ObjectGenerator.GetApplicationInfo());
                         break;
                     case "getAllChannelInfo":
-                        receivedObject.Result = JsonConvert.SerializeObject(ObjectGenerator.GetChannels());
+                        receivedObject.Result = JsonSerializer.Serialize(ObjectGenerator.GetChannels());
                         break;
                     case "getMicrophoneState":
-                        receivedObject.Result = JsonConvert.SerializeObject(ObjectGenerator.GetMicrophoneState());
+                        receivedObject.Result = JsonSerializer.Serialize(ObjectGenerator.GetMicrophoneState());
                         break;
                     case "getMicrophoneSettings":
-                        receivedObject.Result = JsonConvert.SerializeObject(ObjectGenerator.GetMicrophoneSettings());
+                        receivedObject.Result = JsonSerializer.Serialize(ObjectGenerator.GetMicrophoneSettings());
                         break;
                     case "getMonitoringState":
-                        receivedObject.Result = JsonConvert.SerializeObject(ObjectGenerator.GetMonitoringState());
+                        receivedObject.Result = JsonSerializer.Serialize(ObjectGenerator.GetMonitoringState());
                         break;
                     case "getMonitorMixOutputList":
-                        receivedObject.Result = JsonConvert.SerializeObject(ObjectGenerator.GetMonitorMixOutputList());
+                        receivedObject.Result = JsonSerializer.Serialize(ObjectGenerator.GetMonitorMixOutputList());
                         break;
                     case "getSwitchState":
-                        receivedObject.Result = JsonConvert.SerializeObject(ObjectGenerator.GetSwitchState());
+                        receivedObject.Result = JsonSerializer.Serialize(ObjectGenerator.GetSwitchState());
                         break;
                     default:
                         throw new WebSocketException("Unknown method");

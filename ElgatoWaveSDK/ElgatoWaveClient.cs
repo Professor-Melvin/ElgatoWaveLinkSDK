@@ -42,6 +42,8 @@ namespace ElgatoWaveSDK
         public event EventHandler<MixType>? MonitorSwitchOutputChanged;
         public event EventHandler<List<ChannelInfo>>? ChannelsChanged;
 
+        public event EventHandler<ElgatoException>? ExceptionOccured;
+
         #endregion
 
         public ElgatoWaveClient()
@@ -49,6 +51,8 @@ namespace ElgatoWaveSDK
             _clientConfig ??= new ClientConfig();
             _source = new CancellationTokenSource();
             _transactionTracker ??= new TransactionTracker();
+
+            Port = _clientConfig.PortStart;
         }
 
         public ElgatoWaveClient(ClientConfig config) : this()
@@ -94,7 +98,9 @@ namespace ElgatoWaveSDK
 
             if (_socket?.State != WebSocketState.Open)
             {
-                throw new ElgatoException($"Looped through possible ports {_clientConfig.MaxAttempts} times and couldn't connect [{_clientConfig.PortStart}-{_clientConfig.PortStart + _clientConfig.PortRange}]", _socket?.State);
+                var ex = new ElgatoException($"Looped through possible ports {_clientConfig.MaxAttempts} times and couldn't connect [{_clientConfig.PortStart}-{_clientConfig.PortStart + _clientConfig.PortRange}]", _socket?.State);
+                ExceptionOccured?.Invoke(this, ex);
+                throw ex;
             }
 
             StartReceiver();
@@ -392,7 +398,7 @@ namespace ElgatoWaveSDK
                     }
                     catch (Exception ex)
                     {
-                        throw new ElgatoException("Unknown error in receiving task", ex, _socket.State);
+                        ExceptionOccured?.Invoke(this, new ElgatoException("Unknown error in receiving task", ex, _socket.State));
                     }
 
                 }
