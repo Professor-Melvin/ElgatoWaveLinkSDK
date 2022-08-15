@@ -72,11 +72,11 @@ public class ModelTests
         {
             Obj = new SwitchState()
             {
-                CurrentState = MixType.LocalMix
+                CurrentState = MixType.LocalMix.ToString()
             },
             Result = new SwitchState()
             {
-                CurrentState = MixType.StreamMix
+                CurrentState = MixType.StreamMix.ToString()
             },
             Id = 123,
             Method = "Method"

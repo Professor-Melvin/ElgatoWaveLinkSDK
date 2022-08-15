@@ -84,7 +84,7 @@ public class SetCommandTests : TestBase
             }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
         result.Should().NotBeNull();
-        result?.CurrentState.Should().Be(MixType.LocalMix.ToString());
+        result?.Should().Be(MixType.LocalMix);
     }
 
     [Fact]
