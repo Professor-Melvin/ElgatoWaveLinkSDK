@@ -282,16 +282,16 @@ namespace ElgatoWaveSDK
                 var array = Encoding.UTF8.GetBytes(s);
                 await _socket.SendAsync(new ArraySegment<byte>(array), WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
 
-                TestMessages?.Invoke(this, "Waiting for response: " + baseObject.Id);
+                TestMessages?.Invoke(this, "SendCommand 1 - Waiting for response: " + baseObject.Id);
                 SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(Config.ResponseTimeout));
 
-                TestMessages?.Invoke(this, "Responses in Cache: " + string.Join(",", _responseCache.Select(c => c.Key)));
+                TestMessages?.Invoke(this, "SendCommand 2 - Responses in Cache: " + string.Join(",", _responseCache.Select(c => c.Key)));
 
                 if (_responseCache.ContainsKey(baseObject.Id))
                 {
-                    TestMessages?.Invoke(this, "Found response: " + baseObject.Id);
+                    TestMessages?.Invoke(this, "SendCommand 3 - Found response: " + baseObject.Id);
                     var reply = _responseCache[baseObject.Id];
-                    TestMessages?.Invoke(this, "Response: " + JsonSerializer.Serialize(baseObject));
+                    TestMessages?.Invoke(this, "SendCommand 4 - Response: " + JsonSerializer.Serialize(baseObject));
                     _responseCache.Remove(reply.Id);
 
                     return JsonSerializer.Deserialize<OutT?>(reply?.Result ?? JsonDocument.Parse("{}"));
@@ -321,6 +321,7 @@ namespace ElgatoWaveSDK
                     try
                     {
                         var baseObject = await _receiver.WaitForData(_socket, ClientConfig, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
+                        TestMessages?.Invoke(this, "ReceiverRun - Received object: " + JsonSerializer.Serialize(baseObject));
                         if (baseObject == null)
                         {
                             continue;
@@ -332,8 +333,6 @@ namespace ElgatoWaveSDK
                         {
                             _responseCache.Remove(cache.Key);
                         }
-
-                        TestMessages?.Invoke(this, "Received object: " + JsonSerializer.Serialize(baseObject));
 
                         if (baseObject.Id == 0) //Not a command reply
                         {

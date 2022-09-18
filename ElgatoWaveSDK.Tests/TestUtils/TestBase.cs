@@ -20,6 +20,8 @@ public class TestBase
 
     internal ITestOutputHelper? _testOutput;
 
+    private List<string> usedExceptions = new List<string>();
+
     internal TestBase(ITestOutputHelper? output = null)
     {
         _testOutput = output;
@@ -37,7 +39,13 @@ public class TestBase
 
         Subject.ExceptionOccurred += (_, exception) =>
         {
-            _testOutput?.WriteLine("Exception Occurred: " + exception.Message + "\nState: " + exception.WebSocketState + "\n" + exception.StackTrace);
+            var s = "Exception Occurred: " + exception.Message + "\nState: " + exception.WebSocketState + "\n" + exception.StackTrace;
+
+            if (!usedExceptions.Contains(s))
+            {
+                _testOutput?.WriteLine(s);
+                usedExceptions.Add(s);
+            }
         };
 
         Subject.TestMessages += (_, s) =>
