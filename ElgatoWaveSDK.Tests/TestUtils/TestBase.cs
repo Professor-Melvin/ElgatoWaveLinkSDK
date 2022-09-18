@@ -1,5 +1,6 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
 using ElgatoWaveSDK.HumbleObjects;
 using Moq;
 
@@ -34,17 +35,18 @@ public class TestBase
         MockSocket.Setup(c => c.State).Returns(value);
     }
 
-        internal void SetupReply(object replyObjectJson, string? method = null)
+    internal void SetupReply(object replyObjectJson, string? method = null, bool isEvent = false)
+    {
+        var replyObject = new SocketBaseObject<object, object>()
         {
-            var replyObject = new SocketBaseObject<string, object>()
-            {
-                Id= CommandId,
-                Method = method,
-                Result = replyObjectJson
-            };
+            Id= isEvent ? 0 : CommandId,
+            Method = method,
+            Result = isEvent ? null : replyObjectJson,
+            Obj = isEvent ? replyObjectJson : null
+        };
 
-            string json = replyObject.ToJson();
-            ReceiveData = Encoding.UTF8.GetBytes(json);
+        var json = replyObject.ToJson();
+        ReceiveData = Encoding.UTF8.GetBytes(json);
 
         var setupSequence = new MockSequence();
         var timesX = ReceiveDataCount / 1024;
@@ -62,9 +64,7 @@ public class TestBase
                 .Callback(ReturnCallback)
                 .ReturnsAsync(new WebSocketReceiveResult(ReceiveDataCount % 1024, WebSocketMessageType.Text, true));
 
-#pragma warning disable S1172 // Unused method parameters should be removed
         void ReturnCallback(ArraySegment<byte> array, CancellationToken token)
-#pragma warning restore S1172 // Unused method parameters should be removed
         {
             if ((array.Offset + array.Count) > ReceiveDataCount) 
             {

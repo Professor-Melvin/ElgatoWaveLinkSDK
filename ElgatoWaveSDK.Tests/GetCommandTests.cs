@@ -110,7 +110,7 @@ namespace ElgatoWaveSDK.Tests
                 }
             });
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
+            await Subject.ConnectAsync().ConfigureAwait(false);
             var result = await Subject.GetAllChannelInfo().ConfigureAwait(false);
 
             MockSocket.Verify(c => c.SendAsync(
@@ -297,11 +297,11 @@ namespace ElgatoWaveSDK.Tests
         }
 
         [Fact]
-        public async Task GetSwitchState()
+        public async Task GetSwitchState_Null()
         {
             SetupReply(new SwitchState()
             {
-                CurrentState = MixType.LocalMix.ToString()
+                CurrentState = ""
             });
 
             await Subject.ConnectAsync().ConfigureAwait(false);
@@ -314,8 +314,7 @@ namespace ElgatoWaveSDK.Tests
                     Id = CommandId
                 }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
-            result.Should().NotBeNull();
-            result?.Should().Be(MixType.LocalMix);
+            result.Should().BeNull();
         }
     }
 }

@@ -15,7 +15,8 @@ public class ModelTests
      InlineData(typeof(MonitoringState)),
      InlineData(typeof(MonitorMixOutputList)),
      InlineData(typeof(MonitorMixList)),
-     InlineData(typeof(SwitchState))
+     InlineData(typeof(SwitchState)),
+    InlineData(typeof(ClientConfig))
     ]
     public void SdkModels(Type classType)
     {

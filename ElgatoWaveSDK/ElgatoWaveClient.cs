@@ -337,6 +337,8 @@ namespace ElgatoWaveSDK
 
                         var json = Encoding.UTF8.GetString(buffer).Replace("\0", "");
 
+                        var emptyCount =  buffer.Count(c => c == 0);
+
                         var baseObject = JsonSerializer.Deserialize<SocketBaseObject<JsonNode?, JsonDocument?>?>(json);
                         if (baseObject == null)
                         {

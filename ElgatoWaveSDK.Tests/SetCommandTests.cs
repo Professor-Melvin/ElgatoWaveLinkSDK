@@ -88,6 +88,20 @@ public class SetCommandTests : TestBase
     }
 
     [Fact]
+    public async Task SetMonitoringState_Null()
+    {
+        SetupReply(new SwitchState()
+        {
+            CurrentState = ""
+        });
+
+        await Subject.ConnectAsync().ConfigureAwait(false);
+        var result = await Subject.SetMonitoringState(MixType.LocalMix).ConfigureAwait(false);
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
     public async Task SetMicrophoneSettings()
     {
         SetupReply(new MicrophoneSettings()
