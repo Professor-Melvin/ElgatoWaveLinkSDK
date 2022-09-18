@@ -282,8 +282,10 @@ namespace ElgatoWaveSDK
                 var array = Encoding.UTF8.GetBytes(s);
                 await _socket.SendAsync(new ArraySegment<byte>(array), WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
 
-                TestMessages?.Invoke(this, "Waiting for response");
+                TestMessages?.Invoke(this, "Waiting for response: " + baseObject.Id);
                 SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(Config.ResponseTimeout));
+
+                TestMessages?.Invoke(this, "Responses in Cache: " + string.Join(",", _responseCache.Select(c => c.Key)));
 
                 if (_responseCache.ContainsKey(baseObject.Id))
                 {
@@ -330,6 +332,8 @@ namespace ElgatoWaveSDK
                         {
                             _responseCache.Remove(cache.Key);
                         }
+
+                        TestMessages?.Invoke(this, "Received object: " + JsonSerializer.Serialize(baseObject));
 
                         if (baseObject.Id == 0) //Not a command reply
                         {
