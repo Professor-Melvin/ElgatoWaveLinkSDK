@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using ElgatoWaveSDK.HumbleObjects;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Moq;
 using Xunit.Abstractions;
 
@@ -19,9 +18,14 @@ public class TestBase
 
     internal int CommandId { get; set; }
 
+    internal ITestOutputHelper? _testOutput;
+
     internal TestBase(ITestOutputHelper? output = null)
     {
+        _testOutput = output;
+
         CommandId = new Random().Next(1000000);
+        _testOutput?.WriteLine("Setting Command ID: " + CommandId);
 
         MockSocket = new Mock<IHumbleClientWebSocket>();
         MockTracker = new Mock<ITransactionTracker>();
@@ -31,14 +35,14 @@ public class TestBase
 
         Subject = new ElgatoWaveClient(MockSocket.Object, MockReceiver.Object, MockTracker.Object);
 
-        Subject.ExceptionOccurred += (sender, exception) =>
+        Subject.ExceptionOccurred += (_, exception) =>
         {
-            output?.WriteLine("Exception Occurred: " + exception.Message + "\nState: " + exception.WebSocketState + "\n" + exception.StackTrace);
+            _testOutput?.WriteLine("Exception Occurred: " + exception.Message + "\nState: " + exception.WebSocketState + "\n" + exception.StackTrace);
         };
 
-        Subject.TestMessages += (sender, s) =>
+        Subject.TestMessages += (_, s) =>
         {
-            output?.WriteLine(s);
+            _testOutput?.WriteLine(s);
         };
     }
 
@@ -51,45 +55,16 @@ public class TestBase
     {
         var replyObject = new SocketBaseObject<JsonNode?, JsonDocument?>()
         {
-            Id= isEvent ? 0 : CommandId,
+            Id = isEvent ? 0 : CommandId,
             Method = method,
             Result = JsonDocument.Parse(JsonSerializer.Serialize(replyObjectJson)),
             Obj = JsonNode.Parse(JsonSerializer.Serialize(replyObjectJson))
         };
 
-        MockReceiver.Setup(c => c.WaitForData(It.IsAny<IHumbleClientWebSocket>(), It.IsAny<ClientConfig>(),
+        MockReceiver.Setup(c => c.WaitForData(
+                It.IsAny<IHumbleClientWebSocket>(), 
+                It.IsAny<ClientConfig>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(replyObject);
-
-        //var json = replyObject.ToJson();
-        //ReceiveData = Encoding.UTF8.GetBytes(json);
-
-        //var setupSequence = new MockSequence();
-        //var timesX = ReceiveDataCount / 1024;
-
-        //for (var i = 0; i < timesX; i++)
-        //{
-        //    MockSocket.InSequence(setupSequence)
-        //        .Setup(c => c.ReceiveAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<CancellationToken>()))
-        //        .Callback(ReturnCallback)
-        //        .ReturnsAsync(new WebSocketReceiveResult(1024, WebSocketMessageType.Text, false));
-        //}
-
-        //MockSocket.InSequence(setupSequence)
-        //        .Setup(c => c.ReceiveAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<CancellationToken>()))
-        //        .Callback(ReturnCallback)
-        //        .ReturnsAsync(new WebSocketReceiveResult(ReceiveDataCount % 1024, WebSocketMessageType.Text, true));
-
-        //void ReturnCallback(ArraySegment<byte> array, CancellationToken token)
-        //{
-        //    if ((array.Offset + array.Count) > ReceiveDataCount) 
-        //    {
-        //        Array.Copy(ReceiveData, array.Offset, array.Array!, array.Offset, ReceiveDataCount - array.Offset);
-        //    }
-        //    else
-        //    {
-        //        Array.Copy(ReceiveData, array.Offset, array.Array!, 0, array.Count);
-        //    }
-        //}
     }
 }
