@@ -42,7 +42,7 @@ namespace ElgatoWaveSDK.Tests
                     Id = CommandId
                 }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
-            result.Should().NotBeNull();
+            result.Should().NotBeNull("but found " + result);
             result?.Id.Should().Be("TestId");
             result?.Name.Should().Be("TestName");
             result?.AppVersion.Should().BeEquivalentTo(new AppVersion()
