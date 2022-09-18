@@ -1,79 +1,85 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
 using ElgatoWaveSDK.HumbleObjects;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Moq;
+using Xunit.Abstractions;
 
-namespace ElgatoWaveSDK.Tests.TestUtils
+namespace ElgatoWaveSDK.Tests.TestUtils;
+
+public class TestBase
 {
-    public class TestBase
+    internal ElgatoWaveClient Subject { get; set; }
+
+    internal Mock<IHumbleClientWebSocket> MockSocket { get; set; }
+    internal Mock<ITransactionTracker> MockTracker { get; set; }
+
+    internal int CommandId { get; set; }
+
+    private byte[]? ReceiveData { get;set;}
+    private int ReceiveDataCount => ReceiveData?.Length ?? 0;
+
+    internal TestBase(ITestOutputHelper? output = null)
     {
-        internal ElgatoWaveClient Subject { get; set; }
+        CommandId = new Random().Next(1000000);
 
-        internal Mock<IHumbleClientWebSocket> MockSocket { get; set; }
-        internal Mock<ITransactionTracker> MockTracker { get; set; }
+        MockSocket = new Mock<IHumbleClientWebSocket>();
+        MockTracker = new Mock<ITransactionTracker>();
 
-        internal int CommandId { get; set; }
+        MockTracker.Setup(c => c.NextTransactionId()).Returns(CommandId);
 
-        private byte[]? ReceiveData { get;set;}
-        private int ReceiveDataCount => ReceiveData?.Length ?? 0;
+        Subject = new ElgatoWaveClient(MockSocket.Object, MockTracker.Object);
 
-        internal TestBase()
+        Subject.ExceptionOccurred += (sender, exception) =>
         {
-            CommandId = new Random().Next(1000000);
+            output?.WriteLine("Exception Occurred: " + exception.Message + "\nState: " + exception.WebSocketState + "\n" + exception.StackTrace);
+        };
+    }
 
-            MockSocket = new Mock<IHumbleClientWebSocket>();
-            MockTracker = new Mock<ITransactionTracker>();
+    internal void SetupConnection(WebSocketState value = WebSocketState.Open)
+    {
+        MockSocket.Setup(c => c.State).Returns(value);
+    }
 
-            MockTracker.Setup(c => c.NextTransactionId()).Returns(CommandId);
-
-            Subject = new ElgatoWaveClient(MockSocket.Object, MockTracker.Object);
-        }
-
-        internal void SetupConnection(WebSocketState value = WebSocketState.Open)
+    internal void SetupReply(object replyObjectJson, string? method = null, bool isEvent = false)
+    {
+        var replyObject = new SocketBaseObject<object, object>()
         {
-            MockSocket.Setup(c => c.State).Returns(value);
-        }
+            Id= isEvent ? 0 : CommandId,
+            Method = method,
+            Result = isEvent ? null : replyObjectJson,
+            Obj = isEvent ? replyObjectJson : null
+        };
 
-        internal void SetupReply(object replyObjectJson, string? method = null)
+        var json = replyObject.ToJson();
+        ReceiveData = Encoding.UTF8.GetBytes(json);
+
+        var setupSequence = new MockSequence();
+        var timesX = ReceiveDataCount / 1024;
+
+        for (var i = 0; i < timesX; i++)
         {
-            var replyObject = new SocketBaseObject<string, object>()
-            {
-                Id= CommandId,
-                Method = method,
-                Result = replyObjectJson
-            };
-
-            string json = replyObject.ToJson();
-            ReceiveData = Encoding.UTF8.GetBytes(json);
-
-            var setupSequence = new MockSequence();
-            int timesX = ReceiveDataCount / 1024;
-
-            for (int i = 0; i < timesX; i++)
-            {
-                MockSocket.InSequence(setupSequence)
-                    .Setup(c => c.ReceiveAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<CancellationToken>()))
-                    .Callback(ReturnCallback)
-                    .ReturnsAsync(new WebSocketReceiveResult(1024, WebSocketMessageType.Text, false));
-            }
-
             MockSocket.InSequence(setupSequence)
-                    .Setup(c => c.ReceiveAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<CancellationToken>()))
-                    .Callback(ReturnCallback)
-                    .ReturnsAsync(new WebSocketReceiveResult(ReceiveDataCount % 1024, WebSocketMessageType.Text, true));
+                .Setup(c => c.ReceiveAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<CancellationToken>()))
+                .Callback(ReturnCallback)
+                .ReturnsAsync(new WebSocketReceiveResult(1024, WebSocketMessageType.Text, false));
+        }
 
-#pragma warning disable S1172 // Unused method parameters should be removed
-            void ReturnCallback(ArraySegment<byte> array, CancellationToken token)
-#pragma warning restore S1172 // Unused method parameters should be removed
+        MockSocket.InSequence(setupSequence)
+                .Setup(c => c.ReceiveAsync(It.IsAny<ArraySegment<byte>>(), It.IsAny<CancellationToken>()))
+                .Callback(ReturnCallback)
+                .ReturnsAsync(new WebSocketReceiveResult(ReceiveDataCount % 1024, WebSocketMessageType.Text, true));
+
+        void ReturnCallback(ArraySegment<byte> array, CancellationToken token)
+        {
+            if ((array.Offset + array.Count) > ReceiveDataCount) 
             {
-                if ((array.Offset + array.Count) > ReceiveDataCount) 
-                {
-                    Array.Copy(ReceiveData, array.Offset, array.Array!, array.Offset, ReceiveDataCount - array.Offset);
-                }
-                else
-                {
-                    Array.Copy(ReceiveData, array.Offset, array.Array!, 0, array.Count);
-                }
+                Array.Copy(ReceiveData, array.Offset, array.Array!, array.Offset, ReceiveDataCount - array.Offset);
+            }
+            else
+            {
+                Array.Copy(ReceiveData, array.Offset, array.Array!, 0, array.Count);
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -14,53 +15,49 @@ namespace ElgatoWaveSDK
 {
     public class ElgatoWaveClient
     {
-        #region Constants
-
-        private const int _bufferSize = 1024;
-        private const int _maxBufferSize = 2000000; //2gig is a massive max size
-
-#if  DEBUG
-        private const int _responseTimeout = 10 * 60 * 1000;  
-#else
-        private const int _responseTimeout = 2 * 1000;
-#endif
-
-        private const int _startPort = 1824;
-        private const int _portRange = 10;
-        private const int _maxCycles = 2;
-
-        #endregion
-
         #region Private Vars
+
         private IHumbleClientWebSocket? _socket;
+        private ClientConfig Config { get; set; }
         private int Port { get; set; }
         private CancellationTokenSource? _source;
         private readonly ITransactionTracker _transactionTracker;
+
         #endregion
 
         #region Public Vars
 
+        public ClientConfig ClientConfig => Config;
         public bool IsConnected => _socket?.State == WebSocketState.Open;
 
         #endregion
 
         #region Public Events
 
-        public EventHandler<MicrophoneState>? MicStateChanged { get; set; }
-        public EventHandler<MicrophoneSettings>? MicSettingsChanged { get; set; }
-        public EventHandler<ChannelInfo>? InputMixerChanged { get; set; }
-        public EventHandler<MonitoringState>? OutputMixerChanged { get; set; }
-        public EventHandler<string>? LocalMonitorOutputChanged { get; set; }
-        public EventHandler<MixType>? MonitorSwitchOutputChanged { get; set; }
-        public EventHandler<List<ChannelInfo>>? ChannelsChanged { get; set; }
+        public event EventHandler<MicrophoneState>? MicStateChanged;
+        public event EventHandler<MicrophoneSettings>? MicSettingsChanged;
+        public event EventHandler<ChannelInfo>? InputMixerChanged;
+        public event EventHandler<MonitoringState>? OutputMixerChanged;
+        public event EventHandler<string>? LocalMonitorOutputChanged;
+        public event EventHandler<MixType>? MonitorSwitchOutputChanged;
+        public event EventHandler<List<ChannelInfo>>? ChannelsChanged;
+
+        public event EventHandler<ElgatoException>? ExceptionOccurred;
 
         #endregion
 
         public ElgatoWaveClient()
         {
-            Port = _startPort;
+            Config ??= new ClientConfig();
             _source = new CancellationTokenSource();
             _transactionTracker ??= new TransactionTracker();
+
+            Port = Config.PortStart;
+        }
+
+        public ElgatoWaveClient(ClientConfig config) : this()
+        {
+            Config = config;
         }
 
         internal ElgatoWaveClient(IHumbleClientWebSocket socket, ITransactionTracker transactionTracker) : this()
@@ -70,10 +67,10 @@ namespace ElgatoWaveSDK
         }
 
         #region Connection
-        public async Task<bool> ConnectAsync()
+        public async Task ConnectAsync()
         {
-            int cycleCount = 0;
-            while (_socket?.State != WebSocketState.Open && (cycleCount < _maxCycles))
+            var cycleCount = 0;
+            while (_socket?.State != WebSocketState.Open && (cycleCount < Config.MaxAttempts))
             {
                 _socket ??= new HumbleClientWebSocket();
                 try
@@ -82,28 +79,38 @@ namespace ElgatoWaveSDK
                         .ConnectAsync(new Uri($"ws://127.0.0.1:{Port}/"), _source?.Token ?? CancellationToken.None)
                         .ConfigureAwait(false);
                 }
-                catch (Exception)
+                catch (WebSocketException e) when(e.Message == "Unable to connect to the remote server")
                 {
                     //ignore for now
+                    if (_socket.State is (WebSocketState.Aborted or WebSocketState.Closed or WebSocketState.CloseReceived))
+                    {
+                        _socket = new HumbleClientWebSocket();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExceptionOccurred?.Invoke(this, new ElgatoException("Unknown exception while trying to connect", ex, _socket.State));
+                    throw;
                 }
                 finally
                 {
                     Port++;
-                    if (Port > (_startPort + _portRange))
+                    if (Port > (Config.PortStart + Config.PortRange))
                     {
                         cycleCount++;
-                        Port = _startPort;
+                        Port = Config.PortStart;
                     }
                 }
             }
 
             if (_socket?.State != WebSocketState.Open)
             {
-                throw new ElgatoException($"Looped through possible ports {_maxCycles} times and couldn't connect [{_startPort}-{_startPort + _portRange}]", _socket?.State);
+                var ex = new ElgatoException($"Looped through possible ports {Config.MaxAttempts} times and couldn't connect [{Config.PortStart}-{Config.PortStart + Config.PortRange}]", _socket?.State);
+                ExceptionOccurred?.Invoke(this, ex);
+                throw ex;
             }
 
             StartReceiver();
-            return true;
         }
 
         public void Disconnect()
@@ -150,9 +157,14 @@ namespace ElgatoWaveSDK
             return SendCommand<MonitorMixOutputList>("getMonitorMixOutputList");
         }
 
-        public Task<SwitchState?> GetSwitchState()
+        public async Task<MixType?> GetSwitchState()
         {
-            return SendCommand<SwitchState>("getSwitchState");
+            var reply = await SendCommand<SwitchState>("getSwitchState").ConfigureAwait(false);
+            if (string.IsNullOrEmpty(reply?.CurrentState))
+            {
+                return null;
+            }
+            return reply?.CurrentState == MixType.LocalMix.ToString() ? MixType.LocalMix : MixType.StreamMix;
         }
 
         #endregion Get Commands
@@ -167,12 +179,21 @@ namespace ElgatoWaveSDK
             });
         }
 
-        public Task<SwitchState?> SetMonitoringState(MixType mix)
+        public async Task<MixType?> SetMonitoringState(MixType mix)
         {
-            return SendCommand<SwitchState, SwitchState>("switchMonitoring", new SwitchState()
+            var reply = await SendCommand<SwitchState, SwitchState>("switchMonitoring", new SwitchState()
             {
                 CurrentState = mix.ToString()
             });
+
+            if (string.IsNullOrEmpty(reply?.CurrentState))
+            {
+                return null;
+            }
+
+            var newValue = reply?.CurrentState == MixType.LocalMix.ToString() ? MixType.LocalMix : MixType.StreamMix;
+            MonitorSwitchOutputChanged?.Invoke(this, newValue);
+            return newValue;
         }
 
         public Task<MicrophoneSettings?> SetMicrophoneSettings(int micGain, int micOutputVol, int micBalcnce, bool isMicLowcutOn, bool isMicClipgaurdOn)
@@ -256,7 +277,7 @@ namespace ElgatoWaveSDK
                 var array = Encoding.UTF8.GetBytes(s);
                 await _socket.SendAsync(new ArraySegment<byte>(array), WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
 
-                SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(_responseTimeout));
+                SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(Config.ResponseTimeout));
 
                 if (_responseCache.ContainsKey(baseObject.Id))
                 {
@@ -276,10 +297,9 @@ namespace ElgatoWaveSDK
 
         private readonly Dictionary<int, SocketBaseObject<JsonNode?, JsonDocument?>> _responseCache = new();
 
-        private Task? _receiveTask;
         private void StartReceiver()
         {
-            _receiveTask ??= Task.Run(ReceiverRun, _source?.Token ?? CancellationToken.None);
+            Task.Run(ReceiverRun, _source?.Token ?? CancellationToken.None);
         }
 
         private async Task ReceiverRun()
@@ -290,7 +310,7 @@ namespace ElgatoWaveSDK
                 {
                     try
                     {
-                        var buffer = new byte[_bufferSize];
+                        var buffer = new byte[Config.BufferSize];
                         var offset = 0;
                         var free = buffer.Length;
 
@@ -302,8 +322,8 @@ namespace ElgatoWaveSDK
                             free -= result.Count;
                             if (free == 0)
                             {
-                                var newSize = buffer.Length + _bufferSize;
-                                if (newSize > _maxBufferSize)
+                                var newSize = buffer.Length + Config.BufferSize;
+                                if (newSize > Config.MaxBufferSize)
                                 {
                                     throw new ElgatoException("Maximum receive buffer size exceeded", _socket.State);
                                 }
@@ -315,9 +335,11 @@ namespace ElgatoWaveSDK
 
                         } while (!result?.EndOfMessage ?? false);
 
-                        string json = Encoding.UTF8.GetString(buffer).Replace("\0", "");
+                        var json = Encoding.UTF8.GetString(buffer).Replace("\0", "");
 
-                        SocketBaseObject<JsonNode?, JsonDocument?>? baseObject = JsonSerializer.Deserialize<SocketBaseObject<JsonNode?, JsonDocument?>?>(json);
+                        var emptyCount =  buffer.Count(c => c == 0);
+
+                        var baseObject = JsonSerializer.Deserialize<SocketBaseObject<JsonNode?, JsonDocument?>?>(json);
                         if (baseObject == null)
                         {
                             continue;
@@ -399,9 +421,24 @@ namespace ElgatoWaveSDK
                     }
                     catch (Exception ex)
                     {
-                        throw new ElgatoException("Unknown error in receiving task", ex, _socket.State);
+                        ExceptionOccurred?.Invoke(this, new ElgatoException("Unknown error in receiving task", ex, _socket.State));
                     }
 
+                }
+                else
+                {
+                    ExceptionOccurred?.Invoke(this, new ElgatoException("Socket connection failed, attempting a reconnect", _socket?.State));
+
+                    Port = Config.PortStart;
+                    try
+                    {
+                        await ConnectAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        ExceptionOccurred?.Invoke(this, new ElgatoException("Failed to reconnect, exiting thread...", ex, _socket?.State));
+                        break;
+                    }
                 }
             }
         }

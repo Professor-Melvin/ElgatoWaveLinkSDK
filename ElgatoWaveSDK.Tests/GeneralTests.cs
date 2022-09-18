@@ -1,52 +1,124 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
-using System.Threading.Tasks;
 using ElgatoWaveSDK.Models;
 using ElgatoWaveSDK.Tests.TestUtils;
 using FluentAssertions;
+using FluentAssertions.Extensions;
+using Moq;
 using Xunit;
 
-namespace ElgatoWaveSDK.Tests
+namespace ElgatoWaveSDK.Tests;
+
+public class GeneralTests : TestBase
 {
-    public class GeneralTests : TestBase
+
+    [Theory]
+    [
+        InlineData(WebSocketState.Aborted),
+        InlineData(WebSocketState.CloseReceived),
+        InlineData(WebSocketState.CloseSent),
+        InlineData(WebSocketState.Closed),
+        InlineData(WebSocketState.Connecting),
+        InlineData(WebSocketState.None),
+    ]
+    public async Task ConnectFails(WebSocketState state)
     {
-        [Theory]
-        [
-            InlineData(WebSocketState.Aborted),
-            InlineData(WebSocketState.CloseReceived),
-            InlineData(WebSocketState.CloseSent),
-            InlineData(WebSocketState.Closed),
-            InlineData(WebSocketState.Connecting),
-            InlineData(WebSocketState.None),
-        ]
-        public async Task ConnectFails(WebSocketState state)
-        {
-            SetupConnection(state);
+        SetupConnection(state);
 
-            try
-            {
-                var connectReply = await Subject.ConnectAsync().ConfigureAwait(false);
-                connectReply.Should().BeFalse();
-            }
-            catch(Exception ex)
-            {
-                ex.Message.Should().Be("Looped through possible ports 2 times and couldn't connect [1824-1834]");
-                ex.Should().BeOfType<ElgatoException>();
-                ((ElgatoException)ex).WebSocketState.Should().Be(state);
-            }
-        }
+        var testTask = new TaskCompletionSource<Task>();
+        testTask.SetResult(Subject.ConnectAsync());
 
-        [Fact]
-        public async Task ConnectSuccess()
-        {
-            SetupConnection();
+        await testTask.Should().CompleteWithinAsync(1.Seconds());
 
-            var connectReply = await Subject.ConnectAsync().ConfigureAwait(false);
-            connectReply.Should().BeTrue();
-        }
+        _ = await Subject.Invoking(c => c.ConnectAsync())
+            .Should().ThrowExactlyAsync<ElgatoException>();
     }
+
+    [Fact]
+    public async Task ConnectSuccess()
+    {
+        SetupConnection();
+
+        var testTask = new TaskCompletionSource<Task>();
+        testTask.SetResult(Subject.ConnectAsync());
+
+        await testTask.Should().CompleteWithinAsync(1.Seconds());
+
+        _ = await Subject.Invoking(c => c.ConnectAsync())
+            .Should().NotThrowAsync();
+    }
+
+    [Fact]
+    public async Task DisconnectSuccess()
+    {
+        SetupConnection();
+
+        var testTask = new TaskCompletionSource<Task>();
+        testTask.SetResult(Subject.ConnectAsync());
+
+        await testTask.Should().CompleteWithinAsync(1.Seconds());
+
+        _ = await Subject.Invoking(c => c.ConnectAsync())
+            .Should().NotThrowAsync();
+
+        Subject.Disconnect();
+
+        MockSocket.Verify(c => c.Dispose(), Times.Once);
+    }
+
+    [Fact]
+    public async Task DisconnectedSendReturnsDefault()
+    {
+        SetupConnection(WebSocketState.Closed);
+
+        var reply = await Subject.GetAppInfo();
+        reply.Should().BeNull();
+    }
+
+    //[Fact]
+    //public async Task LargeDataReceived()
+    //{
+    //    SetupConnection();
+
+    //    var returnObject = new List<ChannelInfo>();
+
+    //    for (int i = 0; i < 15; i++)
+    //    {
+    //        var newObj = new ChannelInfo()
+    //        {
+    //            MixerName = "Name____________________" + i, BgColor = "Color____________________" + i, IconData = "Icon____________________" + i, MixId = "Id____________________" + i, Slider = "Slider____________________" + i,
+    //            InputType = int.MaxValue, LocalVolumeIn = int.MaxValue, StreamVolumeIn = int.MaxValue, 
+    //            IsAvailable = false, IsLocalInMuted = false, IsStreamInMuted = false, LocalMixFilterBypass = false, StreamMixFilterBypass = false,
+    //            Filters = new List<Filter>()
+    //        };
+
+    //        for(int j = 0; j < 3; j++)
+    //        {
+    //            newObj.Filters.Add(new Filter()
+    //            {
+    //                FilterId = "Id____________________" + i + "_" + j, Name = "Name____________________" + i + "_" + j, PluginId = "Plugin____________________" + i + "_" + j,
+    //                Active = false, 
+    //            });
+    //        }
+
+    //        returnObject.Add(newObj);
+    //    }
+
+    //    SetupReply(returnObject);
+
+    //    await Subject.ConnectAsync().ConfigureAwait(false);
+    //    var result = await Subject.GetAllChannelInfo().ConfigureAwait(false);
+
+    //    MockSocket.Verify(c => c.SendAsync(
+    //        Encoding.UTF8.GetBytes(new SocketBaseObject<string, string>()
+    //        {
+    //            Method = "getAllChannelInfo",
+    //            Id = CommandId
+    //        }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
+
+    //    result.Should().NotBeNull();
+    //    result?.Should().HaveCount(10);
+    //    result?.ForEach(c => c.Filters.Should().HaveCount(3));
+    //}
 }

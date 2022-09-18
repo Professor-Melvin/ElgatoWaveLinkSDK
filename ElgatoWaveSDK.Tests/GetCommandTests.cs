@@ -5,12 +5,13 @@ using ElgatoWaveSDK.Tests.TestUtils;
 using FluentAssertions;
 using Moq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace ElgatoWaveSDK.Tests
 {
     public class GetCommandTests : TestBase
     {
-        public GetCommandTests() : base()
+        public GetCommandTests(ITestOutputHelper output) : base(output)
         {
             SetupConnection();
         }
@@ -42,7 +43,7 @@ namespace ElgatoWaveSDK.Tests
                     Id = CommandId
                 }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
-            result.Should().NotBeNull();
+            result.Should().NotBeNull("but found " + result);
             result?.Id.Should().Be("TestId");
             result?.Name.Should().Be("TestName");
             result?.AppVersion.Should().BeEquivalentTo(new AppVersion()
@@ -110,7 +111,7 @@ namespace ElgatoWaveSDK.Tests
                 }
             });
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
+            await Subject.ConnectAsync().ConfigureAwait(false);
             var result = await Subject.GetAllChannelInfo().ConfigureAwait(false);
 
             MockSocket.Verify(c => c.SendAsync(
@@ -297,11 +298,11 @@ namespace ElgatoWaveSDK.Tests
         }
 
         [Fact]
-        public async Task GetSwitchState()
+        public async Task GetSwitchState_Null()
         {
             SetupReply(new SwitchState()
             {
-                CurrentState = MixType.LocalMix.ToString()
+                CurrentState = ""
             });
 
             await Subject.ConnectAsync().ConfigureAwait(false);
@@ -314,8 +315,7 @@ namespace ElgatoWaveSDK.Tests
                     Id = CommandId
                 }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
-            result.Should().NotBeNull();
-            result?.CurrentState.Should().Be("LocalMix");
+            result.Should().BeNull();
         }
     }
 }

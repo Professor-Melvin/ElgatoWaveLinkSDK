@@ -10,30 +10,41 @@ namespace ElgatoWaveSDK
 
     internal class TransactionTracker : ITransactionTracker
     {
-        private int baseNum { get; set; } = 0;
-        private int TransactionId { get; set; } = 1;
+        private int _baseNum { get; set; } = 0;
+        private int _transactionId { get; set; } = 1;
+
+        internal TransactionTracker(int baseNum, int transactionId)
+        {
+            _baseNum = baseNum;
+            _transactionId = transactionId;
+        }
+
+        public TransactionTracker()
+        {
+
+        }
 
         public int NextTransactionId()
         {
-            if(baseNum == 0)
+            if(_baseNum == 0)
             {
-                baseNum = new Random().Next(0, 121);
+                _baseNum = new Random().Next(0, 121);
             }
 
-            TransactionId++;
+            _transactionId++;
 
-            if (TransactionId >= 5752191)
+            if (_transactionId >= 5752191)
             {
-                TransactionId = 0;
-                baseNum++;
+                _transactionId = 0;
+                _baseNum++;
 
-                if(baseNum >= 121)
+                if(_baseNum >= 121)
                 {
-                    baseNum = 0;
+                    _baseNum = 0;
                 }
             }
 
-            return Int32.Parse($"{baseNum:D3}{TransactionId:D7}");
+            return Int32.Parse($"{_baseNum:D3}{_transactionId:D7}");
         }
     }
 }

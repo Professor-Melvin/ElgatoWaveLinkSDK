@@ -4,9 +4,7 @@ using System.Net.WebSockets;
 
 namespace ElgatoWaveSDK.Models
 {
-#pragma warning disable S3925 // "ISerializable" should be implemented correctly
     public class ElgatoException : Exception
-#pragma warning restore S3925 // "ISerializable" should be implemented correctly
     {
         public WebSocketState? WebSocketState { get; set; }
 
