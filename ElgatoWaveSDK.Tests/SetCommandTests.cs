@@ -168,7 +168,7 @@ public class SetCommandTests : TestBase
                 }
             }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
-        result.Should().NotBeNull("but found: " + result);
+        result.Should().NotBeNull();
         result?.IsLocalOutMuted.Should().BeFalse();
         result?.IsStreamOutMuted.Should().BeTrue();
         result?.LocalVolumeOut.Should().Be(1);

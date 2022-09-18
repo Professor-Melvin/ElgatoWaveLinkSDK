@@ -22,7 +22,7 @@ namespace ElgatoWaveSDK
         private int Port { get; set; }
         private CancellationTokenSource? _source;
         private readonly ITransactionTracker _transactionTracker;
-
+        private readonly IReceiverUtils _receiver;
         #endregion
 
         #region Public Vars
@@ -51,6 +51,7 @@ namespace ElgatoWaveSDK
             Config ??= new ClientConfig();
             _source = new CancellationTokenSource();
             _transactionTracker ??= new TransactionTracker();
+            _receiver ??= new ReceiverUtils();
 
             Port = Config.PortStart;
         }
@@ -60,9 +61,10 @@ namespace ElgatoWaveSDK
             Config = config;
         }
 
-        internal ElgatoWaveClient(IHumbleClientWebSocket socket, ITransactionTracker transactionTracker) : this()
+        internal ElgatoWaveClient(IHumbleClientWebSocket socket, IReceiverUtils receiver, ITransactionTracker transactionTracker) : this()
         {
             _socket = socket;
+            _receiver = receiver;
             _transactionTracker = transactionTracker;
         }
 
@@ -310,36 +312,7 @@ namespace ElgatoWaveSDK
                 {
                     try
                     {
-                        var buffer = new byte[Config.BufferSize];
-                        var offset = 0;
-                        var free = buffer.Length;
-
-                        WebSocketReceiveResult? result = null;
-                        do
-                        {
-                            result = await _socket.ReceiveAsync(new ArraySegment<byte>(buffer, offset, free), _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
-                            offset += result.Count;
-                            free -= result.Count;
-                            if (free == 0)
-                            {
-                                var newSize = buffer.Length + Config.BufferSize;
-                                if (newSize > Config.MaxBufferSize)
-                                {
-                                    throw new ElgatoException("Maximum receive buffer size exceeded", _socket.State);
-                                }
-                                var newBuffer = new byte[newSize];
-                                Array.Copy(buffer, 0, newBuffer, 0, offset);
-                                buffer = newBuffer;
-                                free = buffer.Length - offset;
-                            }
-
-                        } while (!result?.EndOfMessage ?? false);
-
-                        var json = Encoding.UTF8.GetString(buffer).Replace("\0", "");
-
-                        var emptyCount =  buffer.Count(c => c == 0);
-
-                        var baseObject = JsonSerializer.Deserialize<SocketBaseObject<JsonNode?, JsonDocument?>?>(json);
+                        var baseObject = await _receiver.WaitForData(_socket, ClientConfig, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
                         if (baseObject == null)
                         {
                             continue;

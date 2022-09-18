@@ -1,10 +1,17 @@
 ﻿using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace ElgatoWaveSDK.Tests;
 
 public class TransactionTrackerTests
 {
+    private ITestOutputHelper _output;
+
+    public TransactionTrackerTests(ITestOutputHelper output)
+    {
+        _output = output;
+    }
 
     [Fact]
     public void ValidTracker()
@@ -21,6 +28,7 @@ public class TransactionTrackerTests
         var subject = new TransactionTracker(0, 10);
 
         var value = subject.NextTransactionId();
+        _output.WriteLine("Value: " + value);
         value.Should().NotBe(0000000011);
     }
 
