@@ -14,6 +14,8 @@ namespace ElgatoWaveSDK.Tests;
 
 public class EventTests : TestBase
 {
+    private int waitTime = 2000;
+
     public EventTests() : base()
     {
         SetupConnection();
@@ -31,7 +33,7 @@ public class EventTests : TestBase
 
         await Subject.ConnectAsync().ConfigureAwait(false);
 
-        await Task.Delay(300).ConfigureAwait(false);
+        await Task.Delay(waitTime).ConfigureAwait(false);
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.MicStateChanged));
         eventMonitor.WithArgs<MicrophoneState>(c => c.IsMicrophoneConnected == (bool?)false);
@@ -53,7 +55,7 @@ public class EventTests : TestBase
 
         await Subject.ConnectAsync().ConfigureAwait(false);
 
-        await Task.Delay(300).ConfigureAwait(false);
+        await Task.Delay(waitTime).ConfigureAwait(false);
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.MicSettingsChanged));
         eventMonitor.WithArgs<MicrophoneSettings>(c => 
@@ -76,7 +78,7 @@ public class EventTests : TestBase
 
         await Subject.ConnectAsync().ConfigureAwait(false);
 
-        await Task.Delay(300).ConfigureAwait(false);
+        await Task.Delay(waitTime).ConfigureAwait(false);
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.LocalMonitorOutputChanged));
         eventMonitor.WithArgs<string>(c => c == "Test");
@@ -94,7 +96,7 @@ public class EventTests : TestBase
 
         await Subject.ConnectAsync().ConfigureAwait(false);
 
-        await Task.Delay(300).ConfigureAwait(false);
+        await Task.Delay(waitTime).ConfigureAwait(false);
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.MonitorSwitchOutputChanged));
         eventMonitor.WithArgs<MixType>(c => c == MixType.LocalMix);
@@ -122,7 +124,7 @@ public class EventTests : TestBase
 
         await Subject.ConnectAsync().ConfigureAwait(false);
 
-        await Task.Delay(300).ConfigureAwait(false);
+        await Task.Delay(waitTime).ConfigureAwait(false);
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.ChannelsChanged));
         eventMonitor.WithArgs<List<ChannelInfo>>(c => c.Last().MixerName == "Test-2" && c.Count == 2);
@@ -143,7 +145,7 @@ public class EventTests : TestBase
 
         await Subject.ConnectAsync().ConfigureAwait(false);
 
-        await Task.Delay(300).ConfigureAwait(false);
+        await Task.Delay(waitTime).ConfigureAwait(false);
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.OutputMixerChanged));
         eventMonitor.WithArgs<MonitoringState>(c => 
@@ -165,7 +167,7 @@ public class EventTests : TestBase
 
         await Subject.ConnectAsync().ConfigureAwait(false);
 
-        await Task.Delay(300).ConfigureAwait(false);
+        await Task.Delay(waitTime).ConfigureAwait(false);
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.InputMixerChanged));
         eventMonitor.WithArgs<ChannelInfo>(c => c.MixerName == "Test-1");
