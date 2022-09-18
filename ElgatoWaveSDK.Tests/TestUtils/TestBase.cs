@@ -19,9 +19,6 @@ public class TestBase
 
     internal int CommandId { get; set; }
 
-    private byte[]? ReceiveData { get;set;}
-    private int ReceiveDataCount => ReceiveData?.Length ?? 0;
-
     internal TestBase(ITestOutputHelper? output = null)
     {
         CommandId = new Random().Next(1000000);
