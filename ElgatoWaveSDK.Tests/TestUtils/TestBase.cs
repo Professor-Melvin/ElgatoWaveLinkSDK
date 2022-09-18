@@ -2,7 +2,9 @@
 using System.Text;
 using System.Text.Json;
 using ElgatoWaveSDK.HumbleObjects;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Moq;
+using Xunit.Abstractions;
 
 namespace ElgatoWaveSDK.Tests.TestUtils;
 
@@ -18,7 +20,7 @@ public class TestBase
     private byte[]? ReceiveData { get;set;}
     private int ReceiveDataCount => ReceiveData?.Length ?? 0;
 
-    internal TestBase()
+    internal TestBase(ITestOutputHelper? output = null)
     {
         CommandId = new Random().Next(1000000);
 
@@ -28,6 +30,11 @@ public class TestBase
         MockTracker.Setup(c => c.NextTransactionId()).Returns(CommandId);
 
         Subject = new ElgatoWaveClient(MockSocket.Object, MockTracker.Object);
+
+        Subject.ExceptionOccurred += (sender, exception) =>
+        {
+            output?.WriteLine("Exception Occurred: " + exception.Message + "\nState: " + exception.WebSocketState + "\n" + exception.StackTrace);
+        };
     }
 
     internal void SetupConnection(WebSocketState value = WebSocketState.Open)

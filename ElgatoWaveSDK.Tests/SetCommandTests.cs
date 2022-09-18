@@ -5,12 +5,13 @@ using ElgatoWaveSDK.Tests.TestUtils;
 using FluentAssertions;
 using Moq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace ElgatoWaveSDK.Tests;
 
 public class SetCommandTests : TestBase
 {
-    public SetCommandTests() : base()
+    public SetCommandTests(ITestOutputHelper output) : base(output)
     {
         SetupConnection();
     }
@@ -167,7 +168,7 @@ public class SetCommandTests : TestBase
                 }
             }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
-        result.Should().NotBeNull();
+        result.Should().NotBeNull("but found: " + result);
         result?.IsLocalOutMuted.Should().BeFalse();
         result?.IsStreamOutMuted.Should().BeTrue();
         result?.LocalVolumeOut.Should().Be(1);
