@@ -23,6 +23,7 @@ namespace ElgatoWaveSDK
         private CancellationTokenSource? _source;
         private readonly ITransactionTracker _transactionTracker;
         private readonly IReceiverUtils _receiver;
+
         #endregion
 
         #region Public Vars
@@ -43,6 +44,8 @@ namespace ElgatoWaveSDK
         public event EventHandler<List<ChannelInfo>>? ChannelsChanged;
 
         public event EventHandler<ElgatoException>? ExceptionOccurred;
+
+        internal event EventHandler<string>? TestMessages;
 
         #endregion
 
@@ -279,11 +282,14 @@ namespace ElgatoWaveSDK
                 var array = Encoding.UTF8.GetBytes(s);
                 await _socket.SendAsync(new ArraySegment<byte>(array), WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
 
+                TestMessages?.Invoke(this, "Waiting for response");
                 SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(Config.ResponseTimeout));
 
                 if (_responseCache.ContainsKey(baseObject.Id))
                 {
+                    TestMessages?.Invoke(this, "Found response: " + baseObject.Id);
                     var reply = _responseCache[baseObject.Id];
+                    TestMessages?.Invoke(this, "Response: " + JsonSerializer.Serialize(baseObject));
                     _responseCache.Remove(reply.Id);
 
                     return JsonSerializer.Deserialize<OutT?>(reply?.Result ?? JsonDocument.Parse("{}"));

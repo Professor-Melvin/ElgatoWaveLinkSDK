@@ -35,6 +35,11 @@ public class TestBase
         {
             output?.WriteLine("Exception Occurred: " + exception.Message + "\nState: " + exception.WebSocketState + "\n" + exception.StackTrace);
         };
+
+        Subject.TestMessages += (sender, s) =>
+        {
+            output?.WriteLine(s);
+        };
     }
 
     internal void SetupConnection(WebSocketState value = WebSocketState.Open)

@@ -14,7 +14,7 @@ namespace ElgatoWaveSDK.Tests;
 
 public class EventTests : TestBase
 {
-    private int waitTime = 300;
+    private int waitTime = 1000;
 
     public EventTests() : base()
     {
