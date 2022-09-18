@@ -13,6 +13,7 @@
     <NeutralLanguage>en</NeutralLanguage>
     <PackageTags>Elgato,Wave Link</PackageTags>
     <Description>.Net library for control of Elgato Wave Link</Description>
+	<IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
