@@ -273,12 +273,16 @@ namespace ElgatoWaveSDK
         {
             if (_socket?.State == WebSocketState.Open)
             {
+                var objId = _transactionTracker.NextTransactionId();
+                TestMessages?.Invoke(this, "Command ID being used: " + objId);
+
                 SocketBaseObject<InT?, OutT?> baseObject = new()
                 {
                     Method = method,
-                    Id = _transactionTracker.NextTransactionId(),
+                    Id = objId,
                     Obj = objectJson
                 };
+                TestMessages?.Invoke(this, "ID in SendObj: " + baseObject.Id);
                 var s = baseObject.ToJson();
                 var array = Encoding.UTF8.GetBytes(s);
                 await _socket.SendAsync(new ArraySegment<byte>(array), WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
