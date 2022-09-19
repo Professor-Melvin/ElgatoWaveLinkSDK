@@ -284,6 +284,7 @@ namespace ElgatoWaveSDK
                 };
                 TestMessages?.Invoke(this, "ID in SendObj: " + baseObject.Id);
                 var s = baseObject.ToJson();
+                TestMessages?.Invoke(this, "Sending json: " + s);
                 var array = Encoding.UTF8.GetBytes(s);
                 await _socket.SendAsync(new ArraySegment<byte>(array), WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
 

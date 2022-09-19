@@ -69,6 +69,9 @@ public class TestBase
             Obj = JsonNode.Parse(JsonSerializer.Serialize(replyObjectJson))
         };
 
+        _testOutput?.WriteLine("SetupReply 1 - Using ID: " + replyObject.Id);
+        _testOutput?.WriteLine("SetupReply 2 - Obj being mocked: " + replyObject.ToJson());
+
         MockReceiver.Setup(c => c.WaitForData(
                 It.IsAny<IHumbleClientWebSocket>(), 
                 It.IsAny<ClientConfig>(),
