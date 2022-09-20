@@ -291,7 +291,7 @@ namespace ElgatoWaveSDK
                 TestMessages?.Invoke(this, "SendCommand 1 - Waiting for response: " + baseObject.Id);
                 SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(Config.ResponseTimeout));
 
-                TestMessages?.Invoke(this, "SendCommand 2 - Responses in Cache: " + string.Join(",", _responseCache.Select(c => c.Key)));
+                TestMessages?.Invoke(this, "SendCommand 2 - Responses in Cache [" + _responseCache.Count + "]: " + string.Join(",", _responseCache.Select(c => c.Key)));
 
                 if (_responseCache.ContainsKey(baseObject.Id))
                 {
@@ -326,7 +326,7 @@ namespace ElgatoWaveSDK
                 {
                     try
                     {
-                        var baseObject = await _receiver.WaitForData(_socket, ClientConfig, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
+                        var baseObject = await _receiver.WaitForData(_socket, ClientConfig, _source?.Token ?? CancellationToken.None);
                         TestMessages?.Invoke(this, "ReceiverRun - Received object: " + JsonSerializer.Serialize(baseObject));
                         if (baseObject == null)
                         {
