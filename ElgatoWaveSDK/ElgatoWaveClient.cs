@@ -302,6 +302,10 @@ namespace ElgatoWaveSDK
 
                     return JsonSerializer.Deserialize<OutT?>(reply?.Result ?? JsonDocument.Parse("{}"));
                 }
+                else
+                {
+                    TestMessages?.Invoke(this, "SendCommand 5 - No response found");
+                }
             }
 
             return default;
