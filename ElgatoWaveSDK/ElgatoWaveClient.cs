@@ -326,7 +326,7 @@ namespace ElgatoWaveSDK
                 {
                     try
                     {
-                        var baseObject = await _receiver.WaitForData(_socket, ClientConfig, _source?.Token ?? CancellationToken.None);
+                        var baseObject = await _receiver.WaitForData(_socket, ClientConfig, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
                         TestMessages?.Invoke(this, "ReceiverRun - Received object: " + JsonSerializer.Serialize(baseObject));
                         if (baseObject == null)
                         {

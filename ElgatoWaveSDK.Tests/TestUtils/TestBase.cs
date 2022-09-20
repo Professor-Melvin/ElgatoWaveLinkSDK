@@ -76,6 +76,6 @@ public class TestBase
                 It.IsAny<IHumbleClientWebSocket>(), 
                 It.IsAny<ClientConfig>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(replyObject);
+            .ReturnsAsync((SocketBaseObject<JsonNode?, JsonDocument?>?)replyObject);
     }
 }
