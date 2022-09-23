@@ -39,7 +39,7 @@ public class TestBase
 
         Subject.ExceptionOccurred += (_, exception) =>
         {
-            var s = "Exception Occurred: " + exception.Message + "\nState: " + exception.WebSocketState + "\n" + exception.StackTrace;
+            var s = DateTime.Now.ToString() + ": Exception Occurred: " + exception.Message + "\nState: " + exception.WebSocketState + "\n" + exception.StackTrace;
 
             _testOutput?.WriteLine(s);
         };
@@ -48,7 +48,7 @@ public class TestBase
         {
             if (!usedLogs.Contains(s))
             {
-                _testOutput?.WriteLine(s);
+                _testOutput?.WriteLine(DateTime.Now.ToString() + ": " + s);
                 usedLogs.Add(s);
             }
         };

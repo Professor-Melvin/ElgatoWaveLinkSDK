@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -332,11 +330,12 @@ namespace ElgatoWaveSDK
 
         private void StartReceiver()
         {
-            Task.Run(ReceiverRun, _source?.Token ?? CancellationToken.None).Start();
+            Task.Run(ReceiverRun, _source?.Token ?? CancellationToken.None);
         }
 
         private async Task ReceiverRun()
         {
+            TestMessages?.Invoke(this, "ReceiverRun Started");
             while (!_source?.IsCancellationRequested ?? false)
             {
                 TestMessages?.Invoke(this, "ReceiverRun 1 - Socket State: " + (_socket?.State.ToString() ?? "MISSING STATE"));
