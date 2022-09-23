@@ -33,7 +33,8 @@ namespace ElgatoWaveSDK.Tests
                 InterfaceRevision = 5
             });
 
-            await Subject.ConnectAsync().ConfigureAwait(false);
+            await startMock();
+
             var result = await Subject.GetAppInfo().ConfigureAwait(false);
 
             MockSocket.Verify(c => c.SendAsync(
@@ -111,7 +112,8 @@ namespace ElgatoWaveSDK.Tests
                 }
             });
 
-            await Subject.ConnectAsync().ConfigureAwait(false);
+            await startMock();
+
             var result = await Subject.GetAllChannelInfo().ConfigureAwait(false);
 
             MockSocket.Verify(c => c.SendAsync(
@@ -181,7 +183,8 @@ namespace ElgatoWaveSDK.Tests
                 IsMicrophoneConnected = true
             });
 
-            await Subject.ConnectAsync().ConfigureAwait(false);
+            await startMock();
+
             var result = await Subject.GetMicrophoneState().ConfigureAwait(false);
 
             MockSocket.Verify(c => c.SendAsync(
@@ -207,7 +210,8 @@ namespace ElgatoWaveSDK.Tests
                 IsMicrophoneLowcutOn = false
             });
 
-            await Subject.ConnectAsync().ConfigureAwait(false);
+            await startMock();
+
             var result = await Subject.GetMicrophoneSettings().ConfigureAwait(false);
 
             MockSocket.Verify(c => c.SendAsync(
@@ -236,7 +240,8 @@ namespace ElgatoWaveSDK.Tests
                 StreamVolumeOut = 2
             });
 
-            await Subject.ConnectAsync().ConfigureAwait(false);
+            await startMock();
+
             var result = await Subject.GetMonitoringState().ConfigureAwait(false);
 
             MockSocket.Verify(c => c.SendAsync(
@@ -272,7 +277,8 @@ namespace ElgatoWaveSDK.Tests
                 }
             });
 
-            await Subject.ConnectAsync().ConfigureAwait(false);
+            await startMock();
+
             var result = await Subject.GetMonitorMixOutputList().ConfigureAwait(false);
 
             MockSocket.Verify(c => c.SendAsync(
@@ -303,7 +309,8 @@ namespace ElgatoWaveSDK.Tests
                 CurrentState = "LocalMix"
             });
 
-            await Subject.ConnectAsync().ConfigureAwait(false);
+            await startMock();
+
             var result = await Subject.GetSwitchState().ConfigureAwait(false);
 
             MockSocket.Verify(c => c.SendAsync(
@@ -324,7 +331,8 @@ namespace ElgatoWaveSDK.Tests
                 CurrentState = ""
             });
 
-            await Subject.ConnectAsync().ConfigureAwait(false);
+            await startMock();
+
             var result = await Subject.GetSwitchState().ConfigureAwait(false);
 
             MockSocket.Verify(c => c.SendAsync(
@@ -335,6 +343,12 @@ namespace ElgatoWaveSDK.Tests
                 }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
             result.Should().BeNull();
+        }
+
+        private async Task startMock()
+        {
+            await Subject.ConnectAsync().ConfigureAwait(false);
+            await Subject.waitForReceiverToStart(2000);
         }
     }
 }

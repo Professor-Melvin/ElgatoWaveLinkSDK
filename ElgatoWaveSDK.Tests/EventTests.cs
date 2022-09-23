@@ -17,8 +17,6 @@ namespace ElgatoWaveSDK.Tests;
 
 public class EventTests : TestBase
 {
-    private int waitTime = 1000;
-
     public EventTests(ITestOutputHelper output) : base(output)
     {
         SetupConnection();
@@ -34,9 +32,7 @@ public class EventTests : TestBase
             IsMicrophoneConnected = false
         }, "microphoneStateChanged", true);
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-
-        await Task.Delay(waitTime).ConfigureAwait(false);
+        await startMock();
 
         PrintWhatHasHappened(monitoredObject);
 
@@ -58,9 +54,7 @@ public class EventTests : TestBase
             MicrophoneOutputVolume = 3
         }, "microphoneSettingsChanged", true);
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-
-        await Task.Delay(waitTime).ConfigureAwait(false);
+        await startMock();
 
         PrintWhatHasHappened(monitoredObject);
 
@@ -83,9 +77,7 @@ public class EventTests : TestBase
             monitorMix = "Test"
         }, "localMonitorOutputChanged", true);
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-
-        await Task.Delay(waitTime).ConfigureAwait(false);
+        await startMock();
 
         PrintWhatHasHappened(monitoredObject);
 
@@ -103,9 +95,7 @@ public class EventTests : TestBase
             switchState = "LocalMix"
         }, "monitorSwitchOutputChanged", true);
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-
-        await Task.Delay(waitTime).ConfigureAwait(false);
+        await startMock();
 
         PrintWhatHasHappened(monitoredObject);
 
@@ -133,9 +123,7 @@ public class EventTests : TestBase
             }
         }, "channelsChanged", true);
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-
-        await Task.Delay(waitTime).ConfigureAwait(false);
+        await startMock();
 
         PrintWhatHasHappened(monitoredObject);
 
@@ -156,9 +144,7 @@ public class EventTests : TestBase
             StreamVolumeOut = 90
         }, "outputMixerChanged", true);
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-
-        await Task.Delay(waitTime).ConfigureAwait(false);
+        await startMock();
 
         PrintWhatHasHappened(monitoredObject);
 
@@ -180,9 +166,7 @@ public class EventTests : TestBase
             MixerName = "Test-1"
         }, "inputMixerChanged", true);
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-
-        await Task.Delay(waitTime).ConfigureAwait(false);
+        await startMock();
 
         PrintWhatHasHappened(monitoredObject);
 
@@ -193,5 +177,11 @@ public class EventTests : TestBase
     private void PrintWhatHasHappened(IMonitor<ElgatoWaveClient> monitoredObject)
     {
         _testOutput?.WriteLine("Events that have happened: " + string.Join(",", monitoredObject.OccurredEvents.Select(c => c.EventName)));
+    }
+
+    private async Task startMock()
+    {
+        await Subject.ConnectAsync().ConfigureAwait(false);
+        await Subject.waitForReceiverToStart(2000);
     }
 }

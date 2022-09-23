@@ -315,6 +315,21 @@ namespace ElgatoWaveSDK
 
         private readonly Dictionary<int, SocketBaseObject<JsonNode?, JsonDocument?>> _responseCache = new();
 
+        private bool _receiverStarted = false;
+        internal async Task waitForReceiverToStart(int timeout)
+        {
+            var timeLeft = timeout;
+            while (!_receiverStarted)
+            {
+                await Task.Delay(25);
+                timeLeft -= 25;
+                if (timeLeft < 0)
+                {
+                    throw new TimeoutException();
+                }
+            }
+        }
+
         private void StartReceiver()
         {
             Task.Run(ReceiverRun, _source?.Token ?? CancellationToken.None);
@@ -327,6 +342,8 @@ namespace ElgatoWaveSDK
                 TestMessages?.Invoke(this, "ReceiverRun 1 - Socket State: " + (_socket?.State.ToString() ?? "MISSING STATE"));
                 if (_socket?.State == WebSocketState.Open)
                 {
+                    _receiverStarted = true;
+
                     try
                     {
                         TestMessages?.Invoke(this, "ReceiverRun 2 - Looking for data...");

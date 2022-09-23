@@ -35,7 +35,8 @@ public class SetCommandTests : TestBase
             }
         });
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
+        await startMock();
+
         var result = await Subject.SetMonitorMixOutput("input").ConfigureAwait(false);
 
         MockSocket.Verify(c => c.SendAsync(
@@ -70,7 +71,8 @@ public class SetCommandTests : TestBase
             CurrentState = MixType.LocalMix.ToString()
         });
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
+        await startMock();
+
         var result = await Subject.SetMonitoringState(MixType.LocalMix).ConfigureAwait(false);
 
         MockSocket.Verify(c => c.SendAsync(
@@ -96,7 +98,8 @@ public class SetCommandTests : TestBase
             CurrentState = ""
         });
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
+        await startMock();
+
         var result = await Subject.SetMonitoringState(MixType.LocalMix).ConfigureAwait(false);
 
         result.Should().BeNull();
@@ -114,7 +117,8 @@ public class SetCommandTests : TestBase
             MicrophoneOutputVolume = 3
         });
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
+        await startMock();
+
         var result = await Subject.SetMicrophoneSettings(2, 3,1,true,false).ConfigureAwait(false);
 
         MockSocket.Verify(c => c.SendAsync(
@@ -151,7 +155,8 @@ public class SetCommandTests : TestBase
             StreamVolumeOut = 2
         });
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
+        await startMock();
+
         var result = await Subject.SetOutputMixer(1, true, 2, false).ConfigureAwait(false);
 
         MockSocket.Verify(c => c.SendAsync(
@@ -212,7 +217,8 @@ public class SetCommandTests : TestBase
             }
         });
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
+        await startMock();
+
         var result = await Subject
             .SetInputMixer("id1", 1, false, 2, true, new List<Filter>(), false, true, MixType.LocalMix)
             .ConfigureAwait(false);
@@ -264,5 +270,11 @@ public class SetCommandTests : TestBase
         filterTwo?.Active.Should().BeTrue();
         filterTwo?.FilterId.Should().Be("FilterId-2");
         filterTwo?.PluginId.Should().Be("PluginId-2");
+    }
+
+    private async Task startMock()
+    {
+        await Subject.ConnectAsync().ConfigureAwait(false);
+        await Subject.waitForReceiverToStart(2000);
     }
 }
