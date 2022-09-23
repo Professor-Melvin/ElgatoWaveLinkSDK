@@ -115,7 +115,7 @@ namespace ElgatoWaveSDK
                 ExceptionOccurred?.Invoke(this, ex);
                 throw ex;
             }
-
+            
             StartReceiver();
         }
 
@@ -332,7 +332,7 @@ namespace ElgatoWaveSDK
 
         private void StartReceiver()
         {
-            Task.Run(ReceiverRun, _source?.Token ?? CancellationToken.None);
+            Task.Run(ReceiverRun, _source?.Token ?? CancellationToken.None).Start();
         }
 
         private async Task ReceiverRun()
