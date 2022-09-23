@@ -18,7 +18,7 @@ namespace ElgatoWaveSDK
 #if  DEBUG
         public int ResponseTimeout { get; set; } = 600000;  
 #else
-        public int ResponseTimeout { get; set; } = 20000;
+        public int ResponseTimeout { get; set; } = 2000;
 #endif
     }
 }

@@ -53,7 +53,7 @@ namespace ElgatoWaveSDK
         public ElgatoWaveClient()
         {
             Config ??= new ClientConfig();
-            _source = new CancellationTokenSource();
+            _source ??= new CancellationTokenSource();
             _transactionTracker ??= new TransactionTracker();
             _receiver ??= new ReceiverUtils();
 
