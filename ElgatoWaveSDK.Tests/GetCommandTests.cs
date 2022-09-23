@@ -176,8 +176,6 @@ namespace ElgatoWaveSDK.Tests
         [Fact]
         public async Task GetMicrophoneState()
         {
-            SetupReply("{\"isMicrophoneConnected\":true}");
-
             SetupReply(new MicrophoneState()
             {
                 IsMicrophoneConnected = true
@@ -295,6 +293,27 @@ namespace ElgatoWaveSDK.Tests
             var mixListTwo = result?.MonitorMixList?.Last();
             mixListTwo.Should().NotBeNull();
             mixListTwo?.MonitorMix.Should().Be("SelectedMix-2");
+        }
+
+        [Fact]
+        public async Task GetSwitchState()
+        {
+            SetupReply(new SwitchState()
+            {
+                CurrentState = "LocalMix"
+            });
+
+            await Subject.ConnectAsync().ConfigureAwait(false);
+            var result = await Subject.GetSwitchState().ConfigureAwait(false);
+
+            MockSocket.Verify(c => c.SendAsync(
+                Encoding.UTF8.GetBytes(new SocketBaseObject<string, string>()
+                {
+                    Method = "getSwitchState",
+                    Id = CommandId
+                }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
+
+            result.Should().Be(MixType.LocalMix);
         }
 
         [Fact]
