@@ -324,12 +324,15 @@ namespace ElgatoWaveSDK
         {
             while (!_source?.IsCancellationRequested ?? false)
             {
+                TestMessages?.Invoke(this, "ReceiverRun 1 - Socket State: " + (_socket?.State.ToString() ?? "MISSING STATE"));
                 if (_socket?.State == WebSocketState.Open)
                 {
                     try
                     {
+                        TestMessages?.Invoke(this, "ReceiverRun 2 - Looking for data...");
                         var baseObject = await _receiver.WaitForData(_socket, ClientConfig, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
-                        TestMessages?.Invoke(this, "ReceiverRun - Received object: " + JsonSerializer.Serialize(baseObject));
+                        TestMessages?.Invoke(this, "ReceiverRun 3 - Received object");
+                        TestMessages?.Invoke(this, "ReceiverRun 4 - Received object: " + JsonSerializer.Serialize(baseObject));
                         if (baseObject == null)
                         {
                             continue;
@@ -344,6 +347,7 @@ namespace ElgatoWaveSDK
 
                         if (baseObject.Id == 0) //Not a command reply
                         {
+                            TestMessages?.Invoke(this, "ReceiverRun 4 - Pushing as event");
                             object? obj = null;
                             switch (baseObject.Method)
                             {
@@ -403,6 +407,7 @@ namespace ElgatoWaveSDK
                         }
                         else //Command reply
                         {
+                            TestMessages?.Invoke(this, "ReceiverRun 6 - Storing as cache");
                             if (!_responseCache.ContainsKey(baseObject.Id))
                             {
                                 _responseCache.Add(baseObject.Id, baseObject);
