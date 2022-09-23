@@ -15,18 +15,24 @@ namespace ElgatoWaveSDK
 {
     interface IReceiverUtils
     {
-        Task<SocketBaseObject<JsonNode?, JsonDocument?>?> WaitForData(IHumbleClientWebSocket socket, ClientConfig config, CancellationToken cancellationToken);
+        Task<SocketBaseObject<JsonNode?, JsonDocument?>?> WaitForData(IHumbleClientWebSocket? socket, ClientConfig config, CancellationToken cancellationToken);
     }
 
     internal class ReceiverUtils: IReceiverUtils
     {
-        public async Task<SocketBaseObject<JsonNode?, JsonDocument?>?> WaitForData(IHumbleClientWebSocket socket, ClientConfig config, CancellationToken cancellationToken)
+        public async Task<SocketBaseObject<JsonNode?, JsonDocument?>?> WaitForData(IHumbleClientWebSocket? socket, ClientConfig config, CancellationToken cancellationToken)
         {
             var buffer = new byte[config.BufferSize];
             var offset = 0;
             var free = buffer.Length;
 
-            WebSocketReceiveResult? receivedData = null;
+
+            if (socket is not { State: WebSocketState.Open })
+            {
+                throw new WebSocketException("Socket Not Connected");
+            }
+
+            WebSocketReceiveResult? receivedData;
             do
             {
                 receivedData = await socket.ReceiveAsync(new ArraySegment<byte>(buffer, offset, free), cancellationToken).ConfigureAwait(false);

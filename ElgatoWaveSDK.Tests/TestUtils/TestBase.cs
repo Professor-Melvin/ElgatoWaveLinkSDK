@@ -73,7 +73,7 @@ public class TestBase
         _testOutput?.WriteLine("SetupReply 2 - Obj being mocked: " + replyObject.ToJson());
 
         MockReceiver.Setup(c => c.WaitForData(
-                It.IsAny<IHumbleClientWebSocket>(), 
+                It.IsAny<IHumbleClientWebSocket?>(), 
                 It.IsAny<ClientConfig>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync((SocketBaseObject<JsonNode?, JsonDocument?>?)replyObject);
