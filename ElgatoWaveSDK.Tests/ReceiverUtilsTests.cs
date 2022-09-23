@@ -23,6 +23,7 @@ public class ReceiverUtilsTests
     public ReceiverUtilsTests()
     {
         MockSocket = new Mock<IHumbleClientWebSocket>();
+        MockSocket.Setup(c => c.State).Returns(WebSocketState.Open);
 
         CommandId = new Random().Next(1000000);
 
@@ -87,5 +88,6 @@ public class ReceiverUtilsTests
                 Array.Copy(ReceiveData, array.Offset, array.Array!, 0, array.Count);
             }
         }
+
     }
 }
