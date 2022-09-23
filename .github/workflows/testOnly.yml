@@ -1,0 +1,27 @@
+name: Tests Only
+
+on:
+    workflow_dispatch:
+
+jobs:
+    test:
+        name: Test
+        runs-on: windows-latest
+        environment:
+            name: pr
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Setup .Net
+              uses: actions/setup-dotnet@v2
+              with:
+                dotnet-version: 6.x
+
+            - name: Restore
+              run: dotnet restore
+
+            - name: Build Beta
+              run: dotnet build --configuration Release --no-restore
+
+            - name: Test
+              run: dotnet test --no-build -c Release --no-restore --collect "Code coverage" --blame
