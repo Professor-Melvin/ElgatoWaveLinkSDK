@@ -1,5 +1,4 @@
 ﻿using System.Net.WebSockets;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using ElgatoWaveSDK.HumbleObjects;
@@ -9,20 +8,31 @@ namespace ElgatoWaveSDK.Tests.TestUtils;
 
 public class TestBase
 {
-    internal ElgatoWaveClient Subject { get; set; }
+    internal ElgatoWaveClient Subject
+    {
+        get; set;
+    }
 
-    internal Mock<IHumbleClientWebSocket> MockSocket { get; set; }
-    internal Mock<ITransactionTracker> MockTracker { get; set; }
-    internal Mock<IReceiverUtils> MockReceiver { get; set; }
+    internal Mock<IHumbleClientWebSocket> MockSocket
+    {
+        get; set;
+    }
+    internal Mock<ITransactionTracker> MockTracker
+    {
+        get; set;
+    }
+    internal Mock<IReceiverUtils> MockReceiver
+    {
+        get; set;
+    }
 
-    internal int CommandId { get; set; }
-    
-
-    private List<string> usedLogs = new List<string>();
+    internal int CommandId
+    {
+        get; set;
+    }
 
     internal TestBase()
     {
-
         CommandId = new Random().Next(1000000);
 
         MockSocket = new Mock<IHumbleClientWebSocket>();
@@ -50,7 +60,7 @@ public class TestBase
         };
 
         MockReceiver.Setup(c => c.WaitForData(
-                It.IsAny<IHumbleClientWebSocket?>(), 
+                It.IsAny<IHumbleClientWebSocket?>(),
                 It.IsAny<ClientConfig>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync((SocketBaseObject<JsonNode?, JsonDocument?>?)replyObject);

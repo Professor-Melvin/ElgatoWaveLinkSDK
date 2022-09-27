@@ -5,7 +5,6 @@ using ElgatoWaveSDK.Tests.TestUtils;
 using FluentAssertions;
 using Moq;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace ElgatoWaveSDK.Tests;
 
@@ -35,7 +34,7 @@ public class SetCommandTests : TestBase
             }
         });
 
-        await startMock();
+        await StartMock();
 
         var result = await Subject.SetMonitorMixOutput("input").ConfigureAwait(false);
 
@@ -71,7 +70,7 @@ public class SetCommandTests : TestBase
             CurrentState = MixType.LocalMix.ToString()
         });
 
-        await startMock();
+        await StartMock();
 
         var result = await Subject.SetMonitoringState(MixType.LocalMix).ConfigureAwait(false);
 
@@ -98,7 +97,7 @@ public class SetCommandTests : TestBase
             CurrentState = ""
         });
 
-        await startMock();
+        await StartMock();
 
         var result = await Subject.SetMonitoringState(MixType.LocalMix).ConfigureAwait(false);
 
@@ -117,9 +116,9 @@ public class SetCommandTests : TestBase
             MicrophoneOutputVolume = 3
         });
 
-        await startMock();
+        await StartMock();
 
-        var result = await Subject.SetMicrophoneSettings(2, 3,1,true,false).ConfigureAwait(false);
+        var result = await Subject.SetMicrophoneSettings(2, 3, 1, true, false).ConfigureAwait(false);
 
         MockSocket.Verify(c => c.SendAsync(
             Encoding.UTF8.GetBytes(new SocketBaseObject<MicrophoneSettings, MicrophoneSettings>()
@@ -155,7 +154,7 @@ public class SetCommandTests : TestBase
             StreamVolumeOut = 2
         });
 
-        await startMock();
+        await StartMock();
 
         var result = await Subject.SetOutputMixer(1, true, 2, false).ConfigureAwait(false);
 
@@ -217,7 +216,7 @@ public class SetCommandTests : TestBase
             }
         });
 
-        await startMock();
+        await StartMock();
 
         var result = await Subject
             .SetInputMixer("id1", 1, false, 2, true, new List<Filter>(), false, true, MixType.LocalMix)
@@ -272,9 +271,9 @@ public class SetCommandTests : TestBase
         filterTwo?.PluginId.Should().Be("PluginId-2");
     }
 
-    private async Task startMock()
+    private async Task StartMock()
     {
         await Subject.ConnectAsync().ConfigureAwait(false);
-        await Subject.waitForReceiverToStart(2000);
+        await Subject.WaitForReceiverToStart(2000);
     }
 }

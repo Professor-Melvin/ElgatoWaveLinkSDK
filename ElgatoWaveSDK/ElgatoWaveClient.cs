@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -19,8 +17,14 @@ namespace ElgatoWaveSDK
         #region Private Vars
 
         private IHumbleClientWebSocket? _socket;
-        private ClientConfig Config { get; set; }
-        private int Port { get; set; }
+        private ClientConfig Config
+        {
+            get; set;
+        }
+        private int Port
+        {
+            get; set;
+        }
         private CancellationTokenSource? _source;
         private readonly ITransactionTracker _transactionTracker;
         private readonly IReceiverUtils _receiver;
@@ -82,7 +86,7 @@ namespace ElgatoWaveSDK
                         .ConnectAsync(new Uri($"ws://127.0.0.1:{Port}/"), _source?.Token ?? CancellationToken.None)
                         .ConfigureAwait(false);
                 }
-                catch (WebSocketException e) when(e.Message == "Unable to connect to the remote server")
+                catch (WebSocketException e) when (e.Message == "Unable to connect to the remote server")
                 {
                     //ignore for now
                     if (_socket.State is (WebSocketState.Aborted or WebSocketState.Closed or WebSocketState.CloseReceived))
@@ -281,9 +285,9 @@ namespace ElgatoWaveSDK
                 var s = baseObject.ToJson();
                 var array = Encoding.UTF8.GetBytes(s);
                 await _socket.SendAsync(new ArraySegment<byte>(array), WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
-                
+
                 SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(Config.ResponseTimeout));
-                
+
                 if (_responseCache.ContainsKey(baseObject.Id))
                 {
                     var reply = _responseCache[baseObject.Id];
@@ -303,7 +307,7 @@ namespace ElgatoWaveSDK
         private readonly Dictionary<int, SocketBaseObject<JsonNode?, JsonDocument?>> _responseCache = new();
 
         private bool _receiverStarted = false;
-        internal async Task waitForReceiverToStart(int timeout)
+        internal async Task WaitForReceiverToStart(int timeout)
         {
             var timeLeft = timeout;
             while (!_receiverStarted)

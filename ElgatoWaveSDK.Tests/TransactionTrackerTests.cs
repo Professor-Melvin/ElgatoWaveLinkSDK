@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace ElgatoWaveSDK.Tests;
 

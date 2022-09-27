@@ -5,18 +5,33 @@ namespace ElgatoWaveSDK.Models
     public class MicrophoneSettings
     {
         [JsonPropertyName("isMicrophoneClipguardOn")]
-        public bool? IsMicrophoneClipguardOn { get; set; }
+        public bool? IsMicrophoneClipguardOn
+        {
+            get; set;
+        }
 
         [JsonPropertyName("isMicrophoneLowcutOn")]
-        public bool? IsMicrophoneLowcutOn { get; set; }
+        public bool? IsMicrophoneLowcutOn
+        {
+            get; set;
+        }
 
         [JsonPropertyName("microphoneBalance")]
-        public int? MicrophoneBalance { get; set; }
+        public int? MicrophoneBalance
+        {
+            get; set;
+        }
 
         [JsonPropertyName("microphoneGain")]
-        public int? MicrophoneGain { get; set; }
+        public int? MicrophoneGain
+        {
+            get; set;
+        }
 
         [JsonPropertyName("microphoneOutputVolume")]
-        public int? MicrophoneOutputVolume { get; set; }
+        public int? MicrophoneOutputVolume
+        {
+            get; set;
+        }
     }
 }

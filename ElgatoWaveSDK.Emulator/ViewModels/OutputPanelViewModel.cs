@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Xml.Linq;
 using ElgatoWaveSDK.Emulator.Annotations;
 using ElgatoWaveSDK.Emulator.Utils;
 using ElgatoWaveSDK.Models;
@@ -11,11 +10,20 @@ namespace ElgatoWaveSDK.Emulator.ViewModels;
 
 internal interface IOutputPanelViewModel : INotifyPropertyChanged
 {
-    MixType Type { get; }
+    MixType Type
+    {
+        get;
+    }
 
-    string OutputName { get; }
+    string OutputName
+    {
+        get;
+    }
 
-    bool IsSelected { get; set; }
+    bool IsSelected
+    {
+        get; set;
+    }
 
     ICommand Select
     {
@@ -29,7 +37,10 @@ internal class OutputPanelViewModel : IOutputPanelViewModel
     {
         get; set;
     }
-    public MixType Type { get; private set; }
+    public MixType Type
+    {
+        get; private set;
+    }
 
     public string OutputName => Type == MixType.LocalMix ? "MONITOR MIX" : "STREAM MIX";
 
@@ -45,9 +56,12 @@ internal class OutputPanelViewModel : IOutputPanelViewModel
         }
     }
 
-    private MixType? SelectedType { get; set; }
+    private MixType? SelectedType
+    {
+        get; set;
+    }
 
-    public OutputPanelViewModel( MixType type)
+    public OutputPanelViewModel(MixType type)
     {
         Type = type;
 
