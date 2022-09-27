@@ -47,8 +47,8 @@ jobs:
             - name: Build Beta
               run: dotnet build --configuration Release --no-restore
 
-            - name: Test
-              run: dotnet test --no-build -c Release --no-restore --collect "Code coverage" --blame
+            #- name: Test
+            #  run: dotnet test --no-build -c Release --no-restore --collect "Code coverage" --blame
 
             - name: Upload Artifacts
               uses: actions/upload-artifact@v3
