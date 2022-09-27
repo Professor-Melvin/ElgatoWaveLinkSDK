@@ -1,18 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")] 
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace ElgatoWaveSDK.HumbleObjects
 {
     internal interface IHumbleClientWebSocket : IDisposable
     {
-        WebSocketState State { get; }
+        WebSocketState State
+        {
+            get;
+        }
 
         Task ConnectAsync(Uri uri, CancellationToken cancellationToken);
 
@@ -23,7 +23,10 @@ namespace ElgatoWaveSDK.HumbleObjects
 
     internal sealed class HumbleClientWebSocket : IHumbleClientWebSocket
     {
-        private ClientWebSocket Socket { get; set; }
+        private ClientWebSocket Socket
+        {
+            get; set;
+        }
 
         public HumbleClientWebSocket()
         {

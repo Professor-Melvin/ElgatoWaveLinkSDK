@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using System.Threading.Channels;
 using ElgatoWaveSDK.Models;
 
 namespace ElgatoWaveLinkEmulator;
@@ -33,7 +32,7 @@ internal static class ObjectGenerator
         };
 
     public static MicrophoneSettings GetMicrophoneSettings() =>
-        new ()
+        new()
         {
             IsMicrophoneLowcutOn = false,
             MicrophoneBalance = 50,
@@ -43,7 +42,7 @@ internal static class ObjectGenerator
         };
 
     public static MonitoringState GetMonitoringState() =>
-        new ()
+        new()
         {
             IsStreamOutMuted = true,
             LocalVolumeOut = 75,
@@ -52,13 +51,13 @@ internal static class ObjectGenerator
         };
 
     public static SwitchState GetSwitchState() =>
-        new ()
+        new()
         {
             CurrentState = MixType.LocalMix.ToString()
         };
 
     public static MonitorMixOutputList GetMonitorMixOutputList() =>
-        new ()
+        new()
         {
             MonitorMix = "SelectedOutput",
             MonitorMixList = new List<MonitorMixList>()

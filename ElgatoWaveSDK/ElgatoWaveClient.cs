@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -18,10 +17,17 @@ namespace ElgatoWaveSDK
         #region Private Vars
 
         private IHumbleClientWebSocket? _socket;
-        private ClientConfig Config { get; set; }
-        private int Port { get; set; }
+        private ClientConfig Config
+        {
+            get; set;
+        }
+        private int Port
+        {
+            get; set;
+        }
         private CancellationTokenSource? _source;
         private readonly ITransactionTracker _transactionTracker;
+        private readonly IReceiverUtils _receiver;
 
         #endregion
 
@@ -43,14 +49,14 @@ namespace ElgatoWaveSDK
         public event EventHandler<List<ChannelInfo>>? ChannelsChanged;
 
         public event EventHandler<ElgatoException>? ExceptionOccurred;
-
         #endregion
 
         public ElgatoWaveClient()
         {
             Config ??= new ClientConfig();
-            _source = new CancellationTokenSource();
+            _source ??= new CancellationTokenSource();
             _transactionTracker ??= new TransactionTracker();
+            _receiver ??= new ReceiverUtils();
 
             Port = Config.PortStart;
         }
@@ -60,9 +66,10 @@ namespace ElgatoWaveSDK
             Config = config;
         }
 
-        internal ElgatoWaveClient(IHumbleClientWebSocket socket, ITransactionTracker transactionTracker) : this()
+        internal ElgatoWaveClient(IHumbleClientWebSocket socket, IReceiverUtils receiver, ITransactionTracker transactionTracker) : this()
         {
             _socket = socket;
+            _receiver = receiver;
             _transactionTracker = transactionTracker;
         }
 
@@ -79,7 +86,7 @@ namespace ElgatoWaveSDK
                         .ConnectAsync(new Uri($"ws://127.0.0.1:{Port}/"), _source?.Token ?? CancellationToken.None)
                         .ConfigureAwait(false);
                 }
-                catch (WebSocketException e) when(e.Message == "Unable to connect to the remote server")
+                catch (WebSocketException e) when (e.Message == "Unable to connect to the remote server")
                 {
                     //ignore for now
                     if (_socket.State is (WebSocketState.Aborted or WebSocketState.Closed or WebSocketState.CloseReceived))
@@ -267,10 +274,12 @@ namespace ElgatoWaveSDK
         {
             if (_socket?.State == WebSocketState.Open)
             {
+                var objId = _transactionTracker.NextTransactionId();
+
                 SocketBaseObject<InT?, OutT?> baseObject = new()
                 {
                     Method = method,
-                    Id = _transactionTracker.NextTransactionId(),
+                    Id = objId,
                     Obj = objectJson
                 };
                 var s = baseObject.ToJson();
@@ -297,6 +306,21 @@ namespace ElgatoWaveSDK
 
         private readonly Dictionary<int, SocketBaseObject<JsonNode?, JsonDocument?>> _responseCache = new();
 
+        private bool _receiverStarted = false;
+        internal async Task WaitForReceiverToStart(int timeout)
+        {
+            var timeLeft = timeout;
+            while (!_receiverStarted)
+            {
+                await Task.Delay(25);
+                timeLeft -= 25;
+                if (timeLeft < 0)
+                {
+                    throw new TimeoutException();
+                }
+            }
+        }
+
         private void StartReceiver()
         {
             Task.Run(ReceiverRun, _source?.Token ?? CancellationToken.None);
@@ -308,38 +332,11 @@ namespace ElgatoWaveSDK
             {
                 if (_socket?.State == WebSocketState.Open)
                 {
+                    _receiverStarted = true;
+
                     try
                     {
-                        var buffer = new byte[Config.BufferSize];
-                        var offset = 0;
-                        var free = buffer.Length;
-
-                        WebSocketReceiveResult? result = null;
-                        do
-                        {
-                            result = await _socket.ReceiveAsync(new ArraySegment<byte>(buffer, offset, free), _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
-                            offset += result.Count;
-                            free -= result.Count;
-                            if (free == 0)
-                            {
-                                var newSize = buffer.Length + Config.BufferSize;
-                                if (newSize > Config.MaxBufferSize)
-                                {
-                                    throw new ElgatoException("Maximum receive buffer size exceeded", _socket.State);
-                                }
-                                var newBuffer = new byte[newSize];
-                                Array.Copy(buffer, 0, newBuffer, 0, offset);
-                                buffer = newBuffer;
-                                free = buffer.Length - offset;
-                            }
-
-                        } while (!result?.EndOfMessage ?? false);
-
-                        var json = Encoding.UTF8.GetString(buffer).Replace("\0", "");
-
-                        var emptyCount =  buffer.Count(c => c == 0);
-
-                        var baseObject = JsonSerializer.Deserialize<SocketBaseObject<JsonNode?, JsonDocument?>?>(json);
+                        var baseObject = await _receiver.WaitForData(_socket, ClientConfig, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
                         if (baseObject == null)
                         {
                             continue;

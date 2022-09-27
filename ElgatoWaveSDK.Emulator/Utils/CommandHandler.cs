@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
 
 namespace ElgatoWaveSDK.Emulator.Utils;

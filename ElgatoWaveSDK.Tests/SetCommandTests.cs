@@ -5,13 +5,12 @@ using ElgatoWaveSDK.Tests.TestUtils;
 using FluentAssertions;
 using Moq;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace ElgatoWaveSDK.Tests;
 
 public class SetCommandTests : TestBase
 {
-    public SetCommandTests(ITestOutputHelper output) : base(output)
+    public SetCommandTests() : base()
     {
         SetupConnection();
     }
@@ -35,7 +34,8 @@ public class SetCommandTests : TestBase
             }
         });
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
+        await StartMock();
+
         var result = await Subject.SetMonitorMixOutput("input").ConfigureAwait(false);
 
         MockSocket.Verify(c => c.SendAsync(
@@ -70,7 +70,8 @@ public class SetCommandTests : TestBase
             CurrentState = MixType.LocalMix.ToString()
         });
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
+        await StartMock();
+
         var result = await Subject.SetMonitoringState(MixType.LocalMix).ConfigureAwait(false);
 
         MockSocket.Verify(c => c.SendAsync(
@@ -96,7 +97,8 @@ public class SetCommandTests : TestBase
             CurrentState = ""
         });
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
+        await StartMock();
+
         var result = await Subject.SetMonitoringState(MixType.LocalMix).ConfigureAwait(false);
 
         result.Should().BeNull();
@@ -114,8 +116,9 @@ public class SetCommandTests : TestBase
             MicrophoneOutputVolume = 3
         });
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-        var result = await Subject.SetMicrophoneSettings(2, 3,1,true,false).ConfigureAwait(false);
+        await StartMock();
+
+        var result = await Subject.SetMicrophoneSettings(2, 3, 1, true, false).ConfigureAwait(false);
 
         MockSocket.Verify(c => c.SendAsync(
             Encoding.UTF8.GetBytes(new SocketBaseObject<MicrophoneSettings, MicrophoneSettings>()
@@ -151,7 +154,8 @@ public class SetCommandTests : TestBase
             StreamVolumeOut = 2
         });
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
+        await StartMock();
+
         var result = await Subject.SetOutputMixer(1, true, 2, false).ConfigureAwait(false);
 
         MockSocket.Verify(c => c.SendAsync(
@@ -168,7 +172,7 @@ public class SetCommandTests : TestBase
                 }
             }.ToJson()), WebSocketMessageType.Text, true, It.IsAny<CancellationToken>()), Times.Once);
 
-        result.Should().NotBeNull("but found: " + result);
+        result.Should().NotBeNull();
         result?.IsLocalOutMuted.Should().BeFalse();
         result?.IsStreamOutMuted.Should().BeTrue();
         result?.LocalVolumeOut.Should().Be(1);
@@ -212,7 +216,8 @@ public class SetCommandTests : TestBase
             }
         });
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
+        await StartMock();
+
         var result = await Subject
             .SetInputMixer("id1", 1, false, 2, true, new List<Filter>(), false, true, MixType.LocalMix)
             .ConfigureAwait(false);
@@ -264,5 +269,11 @@ public class SetCommandTests : TestBase
         filterTwo?.Active.Should().BeTrue();
         filterTwo?.FilterId.Should().Be("FilterId-2");
         filterTwo?.PluginId.Should().Be("PluginId-2");
+    }
+
+    private async Task StartMock()
+    {
+        await Subject.ConnectAsync().ConfigureAwait(false);
+        await Subject.WaitForReceiverToStart(2000);
     }
 }

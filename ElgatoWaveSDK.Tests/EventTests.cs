@@ -1,21 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
-using ElgatoWaveSDK.Models;
+﻿using ElgatoWaveSDK.Models;
 using ElgatoWaveSDK.Tests.TestUtils;
 using FluentAssertions;
 using Xunit;
-using Xunit.Sdk;
 
 namespace ElgatoWaveSDK.Tests;
 
 public class EventTests : TestBase
 {
-    private int waitTime = 2000;
-
     public EventTests() : base()
     {
         SetupConnection();
@@ -31,9 +22,7 @@ public class EventTests : TestBase
             IsMicrophoneConnected = false
         }, "microphoneStateChanged", true);
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-
-        await Task.Delay(waitTime).ConfigureAwait(false);
+        await StartMock();
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.MicStateChanged));
         eventMonitor.WithArgs<MicrophoneState>(c => c.IsMicrophoneConnected == (bool?)false);
@@ -53,12 +42,10 @@ public class EventTests : TestBase
             MicrophoneOutputVolume = 3
         }, "microphoneSettingsChanged", true);
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-
-        await Task.Delay(waitTime).ConfigureAwait(false);
+        await StartMock();
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.MicSettingsChanged));
-        eventMonitor.WithArgs<MicrophoneSettings>(c => 
+        eventMonitor.WithArgs<MicrophoneSettings>(c =>
             c.IsMicrophoneClipguardOn == false &&
             c.IsMicrophoneLowcutOn == true &&
             c.MicrophoneBalance == 1 &&
@@ -76,9 +63,7 @@ public class EventTests : TestBase
             monitorMix = "Test"
         }, "localMonitorOutputChanged", true);
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-
-        await Task.Delay(waitTime).ConfigureAwait(false);
+        await StartMock();
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.LocalMonitorOutputChanged));
         eventMonitor.WithArgs<string>(c => c == "Test");
@@ -94,9 +79,7 @@ public class EventTests : TestBase
             switchState = "LocalMix"
         }, "monitorSwitchOutputChanged", true);
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-
-        await Task.Delay(waitTime).ConfigureAwait(false);
+        await StartMock();
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.MonitorSwitchOutputChanged));
         eventMonitor.WithArgs<MixType>(c => c == MixType.LocalMix);
@@ -122,9 +105,7 @@ public class EventTests : TestBase
             }
         }, "channelsChanged", true);
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-
-        await Task.Delay(waitTime).ConfigureAwait(false);
+        await StartMock();
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.ChannelsChanged));
         eventMonitor.WithArgs<List<ChannelInfo>>(c => c.Last().MixerName == "Test-2" && c.Count == 2);
@@ -143,12 +124,10 @@ public class EventTests : TestBase
             StreamVolumeOut = 90
         }, "outputMixerChanged", true);
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-
-        await Task.Delay(waitTime).ConfigureAwait(false);
+        await StartMock();
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.OutputMixerChanged));
-        eventMonitor.WithArgs<MonitoringState>(c => 
+        eventMonitor.WithArgs<MonitoringState>(c =>
             c.IsLocalOutMuted == true &&
             c.IsStreamOutMuted == false &&
             c.LocalVolumeOut == 10 &&
@@ -165,11 +144,15 @@ public class EventTests : TestBase
             MixerName = "Test-1"
         }, "inputMixerChanged", true);
 
-        await Subject.ConnectAsync().ConfigureAwait(false);
-
-        await Task.Delay(waitTime).ConfigureAwait(false);
+        await StartMock();
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.InputMixerChanged));
         eventMonitor.WithArgs<ChannelInfo>(c => c.MixerName == "Test-1");
+    }
+
+    private async Task StartMock()
+    {
+        await Subject.ConnectAsync().ConfigureAwait(false);
+        await Subject.WaitForReceiverToStart(2000);
     }
 }

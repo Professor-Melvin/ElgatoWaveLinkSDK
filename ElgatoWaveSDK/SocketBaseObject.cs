@@ -10,22 +10,37 @@ namespace ElgatoWaveSDK
     internal class SocketBaseObject<InT, OutT>
     {
         [JsonPropertyName("id")]
-        public int Id { get; set; }
+        public int Id
+        {
+            get; set;
+        }
 
         [JsonPropertyName("jsonrpc")]
         public string? JsonRpc { get; } = "2.0";
 
         [JsonPropertyName("method")]
-        public string? Method { get; set; }
+        public string? Method
+        {
+            get; set;
+        }
 
         [JsonPropertyName("params")]
-        public InT? Obj { get; set; }
+        public InT? Obj
+        {
+            get; set;
+        }
 
         [JsonPropertyName("result")]
-        public OutT? Result { get; set; }
+        public OutT? Result
+        {
+            get; set;
+        }
 
-        [JsonIgnore] 
-        public DateTime? ReceivedAt { get; set; }
+        [JsonIgnore]
+        public DateTime? ReceivedAt
+        {
+            get; set;
+        }
 
         public string ToJson()
         {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace ElgatoWaveSDK
 {
@@ -26,7 +25,7 @@ namespace ElgatoWaveSDK
 
         public int NextTransactionId()
         {
-            if(_baseNum == 0)
+            if (_baseNum == 0)
             {
                 _baseNum = new Random().Next(0, 121);
             }
@@ -38,13 +37,13 @@ namespace ElgatoWaveSDK
                 _transactionId = 0;
                 _baseNum++;
 
-                if(_baseNum >= 121)
+                if (_baseNum >= 121)
                 {
                     _baseNum = 0;
                 }
             }
 
-            return Int32.Parse($"{_baseNum:D3}{_transactionId:D7}");
+            return int.Parse($"{_baseNum:D3}{_transactionId:D7}");
         }
     }
 }

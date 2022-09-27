@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
-using ElgatoWaveSDK.Emulator.Utils;
 
 namespace ElgatoWaveSDK.Emulator.ViewModels;
 
 public interface IMainWindowViewModel
 {
-    ObservableCollection<IChannelPanelViewModel> Channels { get; }
+    ObservableCollection<IChannelPanelViewModel> Channels
+    {
+        get;
+    }
     //ICommand ConnectCommand { get; set; }
 }
 
