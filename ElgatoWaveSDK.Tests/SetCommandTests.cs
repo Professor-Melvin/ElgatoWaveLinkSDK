@@ -11,7 +11,7 @@ namespace ElgatoWaveSDK.Tests;
 
 public class SetCommandTests : TestBase
 {
-    public SetCommandTests(ITestOutputHelper output) : base(output)
+    public SetCommandTests() : base()
     {
         SetupConnection();
     }

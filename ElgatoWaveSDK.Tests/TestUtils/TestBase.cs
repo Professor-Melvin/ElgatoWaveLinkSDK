@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using ElgatoWaveSDK.HumbleObjects;
 using Moq;
-using Xunit.Abstractions;
 
 namespace ElgatoWaveSDK.Tests.TestUtils;
 
@@ -17,17 +16,14 @@ public class TestBase
     internal Mock<IReceiverUtils> MockReceiver { get; set; }
 
     internal int CommandId { get; set; }
-
-    internal ITestOutputHelper? _testOutput;
+    
 
     private List<string> usedLogs = new List<string>();
 
-    internal TestBase(ITestOutputHelper? output = null)
+    internal TestBase()
     {
-        _testOutput = output;
 
         CommandId = new Random().Next(1000000);
-        _testOutput?.WriteLine("Setting Command ID: " + CommandId);
 
         MockSocket = new Mock<IHumbleClientWebSocket>();
         MockTracker = new Mock<ITransactionTracker>();
@@ -36,22 +32,6 @@ public class TestBase
         MockTracker.Setup(c => c.NextTransactionId()).Returns(CommandId);
 
         Subject = new ElgatoWaveClient(MockSocket.Object, MockReceiver.Object, MockTracker.Object);
-
-        Subject.ExceptionOccurred += (_, exception) =>
-        {
-            var s = "Exception Occurred: " + exception.Message + "\nState: " + exception.WebSocketState + "\n" + exception.StackTrace;
-
-            _testOutput?.WriteLine(s);
-        };
-
-        Subject.TestMessages += (_, s) =>
-        {
-            if (!usedLogs.Contains(s))
-            {
-                _testOutput?.WriteLine(s);
-                usedLogs.Add(s);
-            }
-        };
     }
 
     internal void SetupConnection(WebSocketState value = WebSocketState.Open)
@@ -68,9 +48,6 @@ public class TestBase
             Result = JsonDocument.Parse(JsonSerializer.Serialize(replyObjectJson)),
             Obj = JsonNode.Parse(JsonSerializer.Serialize(replyObjectJson))
         };
-
-        _testOutput?.WriteLine("SetupReply 1 - Using ID: " + replyObject.Id);
-        _testOutput?.WriteLine("SetupReply 2 - Obj being mocked: " + replyObject.ToJson());
 
         MockReceiver.Setup(c => c.WaitForData(
                 It.IsAny<IHumbleClientWebSocket?>(), 

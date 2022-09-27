@@ -1,6 +1,4 @@
 ﻿using System.Net.WebSockets;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
 using ElgatoWaveSDK.Models;
 using ElgatoWaveSDK.Tests.TestUtils;
 using FluentAssertions;

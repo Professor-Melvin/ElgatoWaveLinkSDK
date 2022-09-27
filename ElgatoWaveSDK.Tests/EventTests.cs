@@ -1,23 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
-using ElgatoWaveSDK.Models;
+﻿using ElgatoWaveSDK.Models;
 using ElgatoWaveSDK.Tests.TestUtils;
 using FluentAssertions;
 using FluentAssertions.Events;
 using Xunit;
-using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace ElgatoWaveSDK.Tests;
 
 public class EventTests : TestBase
 {
-    public EventTests(ITestOutputHelper output) : base(output)
+    public EventTests() : base()
     {
         SetupConnection();
     }
