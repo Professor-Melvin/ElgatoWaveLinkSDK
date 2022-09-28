@@ -18,16 +18,16 @@ public class TestBase
 
     internal int CommandId { get; set; }
 
-    internal ITestOutputHelper? _testOutput;
+    internal ITestOutputHelper? TestOutput;
 
-    private List<string> usedLogs = new List<string>();
+    private readonly List<string> _usedLogs = new();
 
     internal TestBase(ITestOutputHelper? output = null)
     {
-        _testOutput = output;
+        TestOutput = output;
 
         CommandId = new Random().Next(1000000);
-        _testOutput?.WriteLine("Setting Command ID: " + CommandId);
+        TestOutput?.WriteLine("Setting Command ID: " + CommandId);
 
         MockSocket = new Mock<IHumbleClientWebSocket>();
         MockTracker = new Mock<ITransactionTracker>();
@@ -39,17 +39,17 @@ public class TestBase
 
         Subject.ExceptionOccurred += (_, exception) =>
         {
-            var s = DateTime.Now.ToString() + ": Exception Occurred: " + exception.Message + "\nState: " + exception.WebSocketState + "\n" + exception.StackTrace;
+            var s = DateTime.Now + ": Exception Occurred: " + exception.Message + "\nState: " + exception.WebSocketState + "\n" + exception.StackTrace;
 
-            _testOutput?.WriteLine(s);
+            TestOutput?.WriteLine(s);
         };
 
         Subject.TestMessages += (_, s) =>
         {
-            if (!usedLogs.Contains(s))
+            if (!_usedLogs.Contains(s))
             {
-                _testOutput?.WriteLine(DateTime.Now.ToString() + ": " + s);
-                usedLogs.Add(s);
+                TestOutput?.WriteLine(DateTime.Now + ": " + s);
+                _usedLogs.Add(s);
             }
         };
     }
@@ -69,8 +69,8 @@ public class TestBase
             Obj = JsonNode.Parse(JsonSerializer.Serialize(replyObjectJson))
         };
 
-        _testOutput?.WriteLine("SetupReply 1 - Using ID: " + replyObject.Id);
-        _testOutput?.WriteLine("SetupReply 2 - Obj being mocked: " + replyObject.ToJson());
+        TestOutput?.WriteLine("SetupReply 1 - Using ID: " + replyObject.Id);
+        TestOutput?.WriteLine("SetupReply 2 - Obj being mocked: " + replyObject.ToJson());
 
         MockReceiver.Setup(c => c.WaitForData(
                 It.IsAny<IHumbleClientWebSocket?>(), 
