@@ -8,47 +8,89 @@ namespace ElgatoWaveSDK.Models
     public class ChannelInfo
     {
         [JsonInclude]
-        [JsonPropertyName("slider")] 
-        public string? Slider { get; internal set; }
+        [JsonPropertyName("slider")]
+        public string? Slider
+        {
+            get; internal set;
+        }
 
         [JsonInclude]
         [JsonPropertyName("bgColor")]
-        public string? BgColor { get; internal set; }
+        public string? BgColor
+        {
+            get; internal set;
+        }
 
         [JsonPropertyName("filters")]
-        public List<Filter>? Filters { get; set; }
+        public List<Filter>? Filters
+        {
+            get; set;
+        }
 
         [JsonPropertyName("iconData")]
-        public string? IconData { get; set; }
+        public string? IconData
+        {
+            get; set;
+        }
 
         [JsonPropertyName("inputType")]
-        public int? InputType { get; set; }
+        public int? InputType
+        {
+            get; set;
+        }
 
         [JsonPropertyName("isAvailable")]
-        public bool? IsAvailable { get; set; }
+        public bool? IsAvailable
+        {
+            get; set;
+        }
 
         [JsonPropertyName("isLocalInMuted")]
-        public bool? IsLocalInMuted { get; set; }
+        public bool? IsLocalInMuted
+        {
+            get; set;
+        }
 
         [JsonPropertyName("isStreamInMuted")]
-        public bool? IsStreamInMuted { get; set; }
+        public bool? IsStreamInMuted
+        {
+            get; set;
+        }
 
         [JsonPropertyName("localMixFilterBypass")]
-        public bool? LocalMixFilterBypass { get; set; }
+        public bool? LocalMixFilterBypass
+        {
+            get; set;
+        }
 
         [JsonPropertyName("localVolumeIn")]
-        public int? LocalVolumeIn { get; set; }
+        public int? LocalVolumeIn
+        {
+            get; set;
+        }
 
         [JsonPropertyName("mixId")]
-        public string? MixId { get; set; }
+        public string? MixId
+        {
+            get; set;
+        }
 
         [JsonPropertyName("mixerName")]
-        public string? MixerName { get; set; }
+        public string? MixerName
+        {
+            get; set;
+        }
 
         [JsonPropertyName("streamMixFilterBypass")]
-        public bool? StreamMixFilterBypass { get; set; }
+        public bool? StreamMixFilterBypass
+        {
+            get; set;
+        }
 
         [JsonPropertyName("streamVolumeIn")]
-        public int? StreamVolumeIn { get; set; }
+        public int? StreamVolumeIn
+        {
+            get; set;
+        }
     }
 }

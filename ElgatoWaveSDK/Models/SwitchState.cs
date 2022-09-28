@@ -5,6 +5,9 @@ namespace ElgatoWaveSDK.Models
     public class SwitchState
     {
         [JsonPropertyName("switchState")]
-        public string? CurrentState { get; set; }
+        public string? CurrentState
+        {
+            get; set;
+        }
     }
 }

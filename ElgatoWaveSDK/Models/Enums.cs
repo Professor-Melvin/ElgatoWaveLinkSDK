@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ElgatoWaveSDK.Models
+﻿namespace ElgatoWaveSDK.Models
 {
     public enum MixType
     {

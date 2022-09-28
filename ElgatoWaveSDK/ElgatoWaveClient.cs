@@ -17,8 +17,14 @@ namespace ElgatoWaveSDK
         #region Private Vars
 
         private IHumbleClientWebSocket? _socket;
-        private ClientConfig Config { get; set; }
-        private int Port { get; set; }
+        private ClientConfig Config
+        {
+            get; set;
+        }
+        private int Port
+        {
+            get; set;
+        }
         private CancellationTokenSource? _source;
         private readonly ITransactionTracker _transactionTracker;
         private readonly IReceiverUtils _receiver;
@@ -83,7 +89,7 @@ namespace ElgatoWaveSDK
                         .ConnectAsync(new Uri($"ws://127.0.0.1:{Port}/"), _source?.Token ?? CancellationToken.None)
                         .ConfigureAwait(false);
                 }
-                catch (WebSocketException e) when(e.Message == "Unable to connect to the remote server")
+                catch (WebSocketException e) when (e.Message == "Unable to connect to the remote server")
                 {
                     //ignore for now
                     if (_socket.State is (WebSocketState.Aborted or WebSocketState.Closed or WebSocketState.CloseReceived))
@@ -314,7 +320,7 @@ namespace ElgatoWaveSDK
         private readonly Dictionary<int, SocketBaseObject<JsonNode?, JsonDocument?>> _responseCache = new();
 
         private bool _receiverStarted = false;
-        internal async Task waitForReceiverToStart(int timeout)
+        internal async Task WaitForReceiverToStart(int timeout)
         {
             var timeLeft = timeout;
             while (!_receiverStarted)

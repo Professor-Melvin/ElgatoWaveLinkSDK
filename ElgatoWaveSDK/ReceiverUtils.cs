@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -13,12 +10,12 @@ using ElgatoWaveSDK.Models;
 
 namespace ElgatoWaveSDK
 {
-    interface IReceiverUtils
+    internal interface IReceiverUtils
     {
         Task<SocketBaseObject<JsonNode?, JsonDocument?>?> WaitForData(IHumbleClientWebSocket? socket, ClientConfig config, CancellationToken cancellationToken);
     }
 
-    internal class ReceiverUtils: IReceiverUtils
+    internal class ReceiverUtils : IReceiverUtils
     {
         public async Task<SocketBaseObject<JsonNode?, JsonDocument?>?> WaitForData(IHumbleClientWebSocket? socket, ClientConfig config, CancellationToken cancellationToken)
         {

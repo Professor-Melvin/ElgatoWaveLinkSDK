@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -12,9 +11,15 @@ namespace ElgatoWaveSDK.Emulator.ViewModels;
 
 public interface IChannelPanelViewModel : INotifyPropertyChanged
 {
-    ICommand MuteLocal { get; set; }
+    ICommand MuteLocal
+    {
+        get; set;
+    }
 
-    ICommand MuteStream { get; set; }
+    ICommand MuteStream
+    {
+        get; set;
+    }
 
     string Name
     {
@@ -49,10 +54,19 @@ public interface IChannelPanelViewModel : INotifyPropertyChanged
 
 public class ChannelPanelViewModel : IChannelPanelViewModel
 {
-    private ChannelInfo Info { get; set; }
+    private ChannelInfo Info
+    {
+        get; set;
+    }
 
-    public ICommand MuteLocal { get; set; }
-    public ICommand MuteStream { get; set; }
+    public ICommand MuteLocal
+    {
+        get; set;
+    }
+    public ICommand MuteStream
+    {
+        get; set;
+    }
 
     public ChannelPanelViewModel(ChannelInfo info)
     {

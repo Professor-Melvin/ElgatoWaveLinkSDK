@@ -21,9 +21,9 @@ public class ModelTests
     public void SdkModels(Type classType)
     {
 
-    var testData = ModelUtils.GenerateValues(classType);
+        var testData = ModelUtils.GenerateValues(classType);
 
-    ModelUtils.Verify(classType, testData.Item1, testData.values);
+        ModelUtils.Verify(classType, testData.Item1, testData.values);
 
         if (classType == typeof(ApplicationInfo))
         {
@@ -43,7 +43,7 @@ public class ModelTests
         var classType = typeof(SocketBaseObject<SwitchState, SwitchState>);
         var testData = ModelUtils.GenerateValues(classType);
 
-        ModelUtils.Verify(classType,testData.Item1,testData.values);
+        ModelUtils.Verify(classType, testData.Item1, testData.values);
 
         var obj = testData.Item1 as SocketBaseObject<SwitchState, SwitchState>;
         obj.Should().NotBeNull();

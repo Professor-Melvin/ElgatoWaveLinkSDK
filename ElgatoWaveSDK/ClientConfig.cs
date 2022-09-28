@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ElgatoWaveSDK
+﻿namespace ElgatoWaveSDK
 {
     public class ClientConfig
     {
@@ -16,7 +10,7 @@ namespace ElgatoWaveSDK
         public int MaxBufferSize { get; set; } = 51200; //50mb
 
 #if  DEBUG
-        public int ResponseTimeout { get; set; } = 600000;  
+        public int ResponseTimeout { get; set; } = 600000;
 #else
         public int ResponseTimeout { get; set; } = 2000;
 #endif

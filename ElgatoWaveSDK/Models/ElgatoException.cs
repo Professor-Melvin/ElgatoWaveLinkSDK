@@ -6,9 +6,12 @@ namespace ElgatoWaveSDK.Models
 {
     public class ElgatoException : Exception
     {
-        public WebSocketState? WebSocketState { get; set; }
+        public WebSocketState? WebSocketState
+        {
+            get; set;
+        }
 
-        public ElgatoException(string message, WebSocketState? socketState): base(message)
+        public ElgatoException(string message, WebSocketState? socketState) : base(message)
         {
             WebSocketState = socketState;
         }

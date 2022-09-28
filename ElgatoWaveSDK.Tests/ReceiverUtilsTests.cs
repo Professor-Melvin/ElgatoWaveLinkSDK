@@ -1,9 +1,5 @@
-﻿using System.ComponentModel.Design;
-using System.Net.WebSockets;
-using System.Security.Cryptography;
+﻿using System.Net.WebSockets;
 using System.Text;
-using System.Text.Json.Nodes;
-using System.Text.Json;
 using ElgatoWaveSDK.HumbleObjects;
 using FluentAssertions;
 using Moq;
@@ -13,12 +9,22 @@ namespace ElgatoWaveSDK.Tests;
 
 public class ReceiverUtilsTests
 {
-    private ReceiverUtils Subject;
+    private readonly ReceiverUtils Subject;
 
-    private Mock<IHumbleClientWebSocket> MockSocket { get; set; }
-    private ClientConfig _config { get; set; }
+    private Mock<IHumbleClientWebSocket> MockSocket
+    {
+        get; set;
+    }
 
-    private int CommandId { get; set; }
+    private ClientConfig Config
+    {
+        get;
+    }
+
+    private int CommandId
+    {
+        get; set;
+    }
 
     public ReceiverUtilsTests()
     {
@@ -27,7 +33,7 @@ public class ReceiverUtilsTests
 
         CommandId = new Random().Next(1000000);
 
-        _config = new ClientConfig();
+        Config = new ClientConfig();
         Subject = new ReceiverUtils();
     }
 
@@ -36,16 +42,25 @@ public class ReceiverUtilsTests
     {
         SetupSocket(new
         {
-            hello = "World", This = "Is", A = "Test", Json = "Woo", Which = "Needs", Long = "String", Stirng = "_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!"
+            hello = "World",
+            This = "Is",
+            A = "Test",
+            Json = "Woo",
+            Which = "Needs",
+            Long = "String",
+            Stirng = "_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!_!"
         }, "helloWorld");
 
-        var reply = await Subject.WaitForData(MockSocket.Object, _config, CancellationToken.None).ConfigureAwait(false);
+        var reply = await Subject.WaitForData(MockSocket.Object, Config, CancellationToken.None).ConfigureAwait(false);
 
         reply.Should().NotBeNull();
         reply?.Method.Should().Be("helloWorld");
     }
 
-    private byte[]? ReceiveData { get; set; }
+    private byte[]? ReceiveData
+    {
+        get; set;
+    }
     private int ReceiveDataCount => ReceiveData?.Length ?? 0;
 
     private void SetupSocket(object? replyObjectJson, string? method = null, bool isEvent = false)

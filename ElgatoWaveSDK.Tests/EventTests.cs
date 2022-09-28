@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
-using ElgatoWaveSDK.Models;
+﻿using ElgatoWaveSDK.Models;
 using ElgatoWaveSDK.Tests.TestUtils;
 using FluentAssertions;
 using FluentAssertions.Events;
@@ -32,7 +25,7 @@ public class EventTests : TestBase
             IsMicrophoneConnected = false
         }, "microphoneStateChanged", true);
 
-        await startMock();
+        await StartMock();
 
         PrintWhatHasHappened(monitoredObject);
 
@@ -54,12 +47,12 @@ public class EventTests : TestBase
             MicrophoneOutputVolume = 3
         }, "microphoneSettingsChanged", true);
 
-        await startMock();
+        await StartMock();
 
         PrintWhatHasHappened(monitoredObject);
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.MicSettingsChanged));
-        eventMonitor.WithArgs<MicrophoneSettings>(c => 
+        eventMonitor.WithArgs<MicrophoneSettings>(c =>
             c.IsMicrophoneClipguardOn == false &&
             c.IsMicrophoneLowcutOn == true &&
             c.MicrophoneBalance == 1 &&
@@ -77,7 +70,7 @@ public class EventTests : TestBase
             monitorMix = "Test"
         }, "localMonitorOutputChanged", true);
 
-        await startMock();
+        await StartMock();
 
         PrintWhatHasHappened(monitoredObject);
 
@@ -95,7 +88,7 @@ public class EventTests : TestBase
             switchState = "LocalMix"
         }, "monitorSwitchOutputChanged", true);
 
-        await startMock();
+        await StartMock();
 
         PrintWhatHasHappened(monitoredObject);
 
@@ -123,8 +116,8 @@ public class EventTests : TestBase
             }
         }, "channelsChanged", true);
 
-        await startMock();
-
+        await StartMock(); 
+        
         PrintWhatHasHappened(monitoredObject);
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.ChannelsChanged));
@@ -144,12 +137,12 @@ public class EventTests : TestBase
             StreamVolumeOut = 90
         }, "outputMixerChanged", true);
 
-        await startMock();
+        await StartMock();
 
         PrintWhatHasHappened(monitoredObject);
 
         var eventMonitor = monitoredObject.Should().Raise(nameof(Subject.OutputMixerChanged));
-        eventMonitor.WithArgs<MonitoringState>(c => 
+        eventMonitor.WithArgs<MonitoringState>(c =>
             c.IsLocalOutMuted == true &&
             c.IsStreamOutMuted == false &&
             c.LocalVolumeOut == 10 &&
@@ -166,7 +159,7 @@ public class EventTests : TestBase
             MixerName = "Test-1"
         }, "inputMixerChanged", true);
 
-        await startMock();
+        await StartMock();
 
         PrintWhatHasHappened(monitoredObject);
 
@@ -176,12 +169,12 @@ public class EventTests : TestBase
 
     private void PrintWhatHasHappened(IMonitor<ElgatoWaveClient> monitoredObject)
     {
-        _testOutput?.WriteLine("Events that have happened: " + string.Join(",", monitoredObject.OccurredEvents.Select(c => c.EventName)));
+        TestOutput?.WriteLine("Events that have happened: " + string.Join(",", monitoredObject.OccurredEvents.Select(c => c.EventName)));
     }
 
-    private async Task startMock()
+    private async Task StartMock()
     {
         await Subject.ConnectAsync().ConfigureAwait(false);
-        await Subject.waitForReceiverToStart(2000);
+        await Subject.WaitForReceiverToStart(2000);
     }
 }
