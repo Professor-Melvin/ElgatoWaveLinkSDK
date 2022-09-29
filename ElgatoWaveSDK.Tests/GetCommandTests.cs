@@ -5,12 +5,13 @@ using ElgatoWaveSDK.Tests.TestUtils;
 using FluentAssertions;
 using Moq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace ElgatoWaveSDK.Tests;
 
 public class GetCommandTests : TestBase
 {
-    public GetCommandTests() : base()
+    public GetCommandTests(ITestOutputHelper output) : base(output)
     {
         SetupConnection();
     }
@@ -348,5 +349,6 @@ public class GetCommandTests : TestBase
     {
         await Subject.ConnectAsync().ConfigureAwait(false);
         await Subject.WaitForReceiverToStart(2000);
+
     }
 }

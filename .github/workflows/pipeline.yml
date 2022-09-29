@@ -17,10 +17,9 @@ on:
 env:
     betaVersion:  beta
 
-#Not sure if I want this to cancel the previous build yet
-#concurrency:
-#  group: ${{ github.workflow }}-${{ github.ref }}
-#  cancel-in-progress: true
+concurrency: 
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
     build:
@@ -47,8 +46,8 @@ jobs:
             - name: Build Beta
               run: dotnet build --configuration Release --no-restore
 
-            #- name: Test
-            #  run: dotnet test --no-build -c Release --no-restore --collect "Code coverage" --blame
+            - name: Test
+              run: dotnet test --no-build -c Release --no-restore --collect "Code coverage" --blame
 
             - name: Upload Artifacts
               uses: actions/upload-artifact@v3

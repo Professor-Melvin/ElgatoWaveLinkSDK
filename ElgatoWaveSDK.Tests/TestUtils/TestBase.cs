@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using ElgatoWaveSDK.HumbleObjects;
 using Moq;
+using Xunit.Abstractions;
 
 namespace ElgatoWaveSDK.Tests.TestUtils;
 
@@ -31,9 +32,16 @@ public class TestBase
         get; set;
     }
 
-    internal TestBase()
+    internal ITestOutputHelper? TestOutput;
+
+    private readonly List<string> _usedLogs = new();
+
+    internal TestBase(ITestOutputHelper? output = null)
     {
+        TestOutput = output;
+
         CommandId = new Random().Next(1000000);
+        TestOutput?.WriteLine("Setting Command ID: " + CommandId);
 
         MockSocket = new Mock<IHumbleClientWebSocket>();
         MockTracker = new Mock<ITransactionTracker>();
@@ -42,6 +50,22 @@ public class TestBase
         MockTracker.Setup(c => c.NextTransactionId()).Returns(CommandId);
 
         Subject = new ElgatoWaveClient(MockSocket.Object, MockReceiver.Object, MockTracker.Object);
+
+        Subject.ExceptionOccurred += (_, exception) =>
+        {
+            var s = DateTime.Now + ": Exception Occurred: " + exception.Message + "\nState: " + exception.WebSocketState + "\n" + exception.StackTrace;
+
+            TestOutput?.WriteLine(s);
+        };
+
+        Subject.TestMessages += (_, s) =>
+        {
+            if (!_usedLogs.Contains(s))
+            {
+                TestOutput?.WriteLine(DateTime.Now + ": " + s);
+                _usedLogs.Add(s);
+            }
+        };
     }
 
     internal void SetupConnection(WebSocketState value = WebSocketState.Open)
@@ -58,6 +82,9 @@ public class TestBase
             Result = JsonDocument.Parse(JsonSerializer.Serialize(replyObjectJson)),
             Obj = JsonNode.Parse(JsonSerializer.Serialize(replyObjectJson))
         };
+
+        TestOutput?.WriteLine("SetupReply 1 - Using ID: " + replyObject.Id);
+        TestOutput?.WriteLine("SetupReply 2 - Obj being mocked: " + replyObject.ToJson());
 
         MockReceiver.Setup(c => c.WaitForData(
                 It.IsAny<IHumbleClientWebSocket?>(),

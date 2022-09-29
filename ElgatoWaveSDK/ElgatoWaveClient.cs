@@ -49,6 +49,9 @@ namespace ElgatoWaveSDK
         public event EventHandler<List<ChannelInfo>>? ChannelsChanged;
 
         public event EventHandler<ElgatoException>? ExceptionOccurred;
+
+        internal event EventHandler<string>? TestMessages;
+
         #endregion
 
         public ElgatoWaveClient()
@@ -116,7 +119,7 @@ namespace ElgatoWaveSDK
                 ExceptionOccurred?.Invoke(this, ex);
                 throw ex;
             }
-
+            
             StartReceiver();
         }
 
@@ -275,6 +278,7 @@ namespace ElgatoWaveSDK
             if (_socket?.State == WebSocketState.Open)
             {
                 var objId = _transactionTracker.NextTransactionId();
+                TestMessages?.Invoke(this, "Command ID being used: " + objId);
 
                 SocketBaseObject<InT?, OutT?> baseObject = new()
                 {
@@ -282,19 +286,28 @@ namespace ElgatoWaveSDK
                     Id = objId,
                     Obj = objectJson
                 };
+                TestMessages?.Invoke(this, "ID in SendObj: " + baseObject.Id);
                 var s = baseObject.ToJson();
+                TestMessages?.Invoke(this, "Sending json: " + s);
                 var array = Encoding.UTF8.GetBytes(s);
                 await _socket.SendAsync(new ArraySegment<byte>(array), WebSocketMessageType.Text, true, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
 
+                TestMessages?.Invoke(this, "SendCommand 1 - Waiting for response: " + baseObject.Id);
                 SpinWait.SpinUntil(() => _responseCache.ContainsKey(baseObject.Id), TimeSpan.FromMilliseconds(Config.ResponseTimeout));
+
+                TestMessages?.Invoke(this, "SendCommand 2 - Responses in Cache [" + _responseCache.Count + "]: " + string.Join(",", _responseCache.Select(c => c.Key)));
 
                 if (_responseCache.ContainsKey(baseObject.Id))
                 {
+                    TestMessages?.Invoke(this, "SendCommand 3 - Found response: " + baseObject.Id);
                     var reply = _responseCache[baseObject.Id];
+                    TestMessages?.Invoke(this, "SendCommand 4 - Response: " + JsonSerializer.Serialize(baseObject));
                     _responseCache.Remove(reply.Id);
 
                     return JsonSerializer.Deserialize<OutT?>(reply?.Result ?? JsonDocument.Parse("{}"));
                 }
+
+                TestMessages?.Invoke(this, "SendCommand 5 - No response found");
             }
 
             return default;
@@ -328,15 +341,20 @@ namespace ElgatoWaveSDK
 
         private async Task ReceiverRun()
         {
+            TestMessages?.Invoke(this, "ReceiverRun Started");
             while (!_source?.IsCancellationRequested ?? false)
             {
+                TestMessages?.Invoke(this, "ReceiverRun 1 - Socket State: " + (_socket?.State.ToString() ?? "MISSING STATE"));
                 if (_socket?.State == WebSocketState.Open)
                 {
                     _receiverStarted = true;
 
                     try
                     {
+                        TestMessages?.Invoke(this, "ReceiverRun 2 - Looking for data...");
                         var baseObject = await _receiver.WaitForData(_socket, ClientConfig, _source?.Token ?? CancellationToken.None).ConfigureAwait(false);
+                        TestMessages?.Invoke(this, "ReceiverRun 3 - Received object");
+                        TestMessages?.Invoke(this, "ReceiverRun 4 - Received object: " + JsonSerializer.Serialize(baseObject));
                         if (baseObject == null)
                         {
                             continue;
@@ -351,6 +369,7 @@ namespace ElgatoWaveSDK
 
                         if (baseObject.Id == 0) //Not a command reply
                         {
+                            TestMessages?.Invoke(this, "ReceiverRun 4 - Pushing as event");
                             object? obj = null;
                             switch (baseObject.Method)
                             {
@@ -410,6 +429,7 @@ namespace ElgatoWaveSDK
                         }
                         else //Command reply
                         {
+                            TestMessages?.Invoke(this, "ReceiverRun 6 - Storing as cache");
                             if (!_responseCache.ContainsKey(baseObject.Id))
                             {
                                 _responseCache.Add(baseObject.Id, baseObject);

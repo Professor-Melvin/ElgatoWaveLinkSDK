@@ -5,12 +5,13 @@ using ElgatoWaveSDK.Tests.TestUtils;
 using FluentAssertions;
 using Moq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace ElgatoWaveSDK.Tests;
 
 public class SetCommandTests : TestBase
 {
-    public SetCommandTests() : base()
+    public SetCommandTests(ITestOutputHelper output) : base(output)
     {
         SetupConnection();
     }
