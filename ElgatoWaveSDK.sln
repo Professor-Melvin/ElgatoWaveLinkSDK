@@ -33,6 +33,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElgatoWaveSDK.Emulator", "E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElgatoWaveLinkEmulator", "ElgatoWaveLinkEmulator\ElgatoWaveLinkEmulator.csproj", "{C81C2057-D263-403B-9ED0-A21618BE7AE4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WaveLinkJsFiles", "WaveLinkJsFiles", "{CD22A7BE-665A-4D9A-B922-3881277555A5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pre1.6", "Pre1.6", "{95340C19-0DF2-443B-A8CF-4AA56C043AE9}"
+	ProjectSection(SolutionItems) = preProject
+		WaveLinkJsFiles\Pre1.6\WaveLinkClient.js = WaveLinkJsFiles\Pre1.6\WaveLinkClient.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1.6", "1.6", "{DD4E21F6-33C2-458B-BB7B-1DECAD7C6163}"
+	ProjectSection(SolutionItems) = preProject
+		WaveLinkJsFiles\1.6\AppClient.js = WaveLinkJsFiles\1.6\AppClient.js
+		WaveLinkJsFiles\1.6\WaveLinkClient.js = WaveLinkJsFiles\1.6\WaveLinkClient.js
+		WaveLinkJsFiles\1.6\WaveLinkConstants.js = WaveLinkJsFiles\1.6\WaveLinkConstants.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -142,6 +156,9 @@ Global
 		{D57ABE4E-C961-4708-B816-C69C5CC5EF7E} = {4D7ADF04-C55A-428C-8775-B2AEE85DA4F3}
 		{9E6B7ED9-7837-4DAA-A56F-F7CD15E3FB6D} = {F519EC32-F28C-4F81-A71D-333C0C73C03A}
 		{C81C2057-D263-403B-9ED0-A21618BE7AE4} = {F519EC32-F28C-4F81-A71D-333C0C73C03A}
+		{CD22A7BE-665A-4D9A-B922-3881277555A5} = {7F6F3443-DC33-4E63-8F6E-6DED90F8BEAC}
+		{95340C19-0DF2-443B-A8CF-4AA56C043AE9} = {CD22A7BE-665A-4D9A-B922-3881277555A5}
+		{DD4E21F6-33C2-458B-BB7B-1DECAD7C6163} = {CD22A7BE-665A-4D9A-B922-3881277555A5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8048D06D-05D5-4CBC-974B-B2A0B8C15B23}
