@@ -14,7 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFiles", "SolutionFi
 		LICENSE = LICENSE
 		README.md = README.md
 		VersionCheck.ps1 = VersionCheck.ps1
-		WaveLinkClient.js = WaveLinkClient.js
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github Pipeline", "Github Pipeline", "{7F6F3443-DC33-4E63-8F6E-6DED90F8BEAC}"
@@ -41,6 +40,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pre1.6", "Pre1.6", "{95340C
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1.6", "1.6", "{DD4E21F6-33C2-458B-BB7B-1DECAD7C6163}"
+	ProjectSection(SolutionItems) = preProject
+		WaveLinkJsFiles\1.6\AppClient.js = WaveLinkJsFiles\1.6\AppClient.js
+		WaveLinkJsFiles\1.6\WaveLinkClient.js = WaveLinkJsFiles\1.6\WaveLinkClient.js
+		WaveLinkJsFiles\1.6\WaveLinkConstants.js = WaveLinkJsFiles\1.6\WaveLinkConstants.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WaveLinkJs", "WaveLinkJs", "{C39E77B6-7170-487F-B025-8817DE6436A4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pre1.6", "Pre1.6", "{8015C84A-2E33-49EA-BBB8-84BE08031567}"
+	ProjectSection(SolutionItems) = preProject
+		WaveLinkJsFiles\Pre1.6\WaveLinkClient.js = WaveLinkJsFiles\Pre1.6\WaveLinkClient.js
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1.6", "1.6", "{AF0ADF80-D872-467F-A3E9-31D7184C40AE}"
 	ProjectSection(SolutionItems) = preProject
 		WaveLinkJsFiles\1.6\AppClient.js = WaveLinkJsFiles\1.6\AppClient.js
 		WaveLinkJsFiles\1.6\WaveLinkClient.js = WaveLinkJsFiles\1.6\WaveLinkClient.js
@@ -159,6 +172,9 @@ Global
 		{CD22A7BE-665A-4D9A-B922-3881277555A5} = {7F6F3443-DC33-4E63-8F6E-6DED90F8BEAC}
 		{95340C19-0DF2-443B-A8CF-4AA56C043AE9} = {CD22A7BE-665A-4D9A-B922-3881277555A5}
 		{DD4E21F6-33C2-458B-BB7B-1DECAD7C6163} = {CD22A7BE-665A-4D9A-B922-3881277555A5}
+		{C39E77B6-7170-487F-B025-8817DE6436A4} = {C439C54E-6751-4BE2-9C83-CA847F677B8A}
+		{8015C84A-2E33-49EA-BBB8-84BE08031567} = {C39E77B6-7170-487F-B025-8817DE6436A4}
+		{AF0ADF80-D872-467F-A3E9-31D7184C40AE} = {C39E77B6-7170-487F-B025-8817DE6436A4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8048D06D-05D5-4CBC-974B-B2A0B8C15B23}

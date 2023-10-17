@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using ElgatoWaveSDK.Clients;
 
 namespace ElgatoWaveSDK.TestRig;
 
@@ -8,147 +11,174 @@ internal static class Program
 {
     public static async Task Main()
     {
-        ElgatoWaveClient client = new();
-        client.MicStateChanged += (sender, state) =>
-        {
-            Console.WriteLine($"\nUpdate | Mic Connected: {state.IsMicrophoneConnected}");
-        };
-        client.MicSettingsChanged += (sender, micSettings) =>
-        {
-            Console.WriteLine($"Update | Mic Setting:" +
-                              $"\n\tMic Balance: {micSettings.MicrophoneBalance}" +
-                              $"\n\tMic Gain: {micSettings.MicrophoneGain}" +
-                              $"\n\tMic Output Vol: {micSettings.MicrophoneOutputVolume}" +
-                              $"\n\tLowCut On: {micSettings.IsMicrophoneLowcutOn}" +
-                              $"\n\tClipGuard On: {micSettings.IsMicrophoneClipguardOn}");
-        };
-        client.OutputMixerChanged += (sender, monitoringState) =>
-        {
-            Console.WriteLine($"Update | Monitoring State:" +
-                              $"\n\tLocal Vol: {monitoringState.LocalVolumeOut}" +
-                              $"\n\tLocal Muted: {monitoringState.IsLocalOutMuted}" +
-                              $"\n\tStream Vol: {monitoringState.StreamVolumeOut}" +
-                              $"\n\tStream Muted: {monitoringState.IsStreamOutMuted}");
-        };
-        client.MonitorSwitchOutputChanged += (sender, mix) =>
-        {
-            Console.WriteLine($"Update | Switch State: {mix}");
-        };
-        client.LocalMonitorOutputChanged += (sender, s) =>
-        {
-            Console.WriteLine($"Update | Monitor Output: {s}");
-        };
-        client.InputMixerChanged += (sender, c) =>
-        {
-            Console.WriteLine($"Update | Input Changed:" +
-                              $"\n\tInput Type: {c.InputType}" +
-                              $"\n\tIcon Data: {c.IconData}" +
-                              $"\n\tLocal Vol: {c.LocalVolumeIn}" +
-                              $"\n\tIs Local Muted: {c.IsLocalInMuted}" +
-                              $"\n\tStream Vol: {c.StreamVolumeIn}" +
-                              $"\n\tIs Stream Muted: {c.IsStreamInMuted}" +
-                              $"\n\tIs Available: {c.IsAvailable}");
-        };
-        client.ChannelsChanged += (sender, list) =>
-        {
-            list.ForEach(c =>
-            {
-                Console.Write($"\n\t{c.MixerName}:" +
-                              $"\n\t\tID: {c.MixId}" +
-                              $"\n\t\tColor: ");
-                var channelColor = ColorTranslator.FromHtml(c.BgColor);
-                Console.ForegroundColor = ClosestConsoleColour(channelColor.R, channelColor.G, channelColor.B);
-                Console.Write(c.BgColor);
-                Console.ForegroundColor = ConsoleColor.White;
+        ElgatoWaveClient newClient = new ();
 
-                Console.Write($"\n\t\tInput Type: {c.InputType}" +
-                              $"\n\t\tIcon Data: {c.IconData}" +
-                              $"\n\t\tLocal Vol: {c.LocalVolumeIn}" +
-                              $"\n\t\tIs Local Muted: {c.IsLocalInMuted}" +
-                              $"\n\t\tStream Vol: {c.StreamVolumeIn}" +
-                              $"\n\t\tIs Stream Muted: {c.IsStreamInMuted}" +
-                              $"\n\t\tIs Available: {c.IsAvailable}");
-            });
+        newClient.InputVolumeChanged += (sender, changed) =>
+        {
+            Console.WriteLine($"Input Vol Change: {changed.ChannelId} - {changed.MixerId} - {changed.Value}");
+        };
+        newClient.OutputSwitched += (sender, switched) =>
+        {
+            Console.WriteLine($"Switch to {switched.MixerId}");
         };
 
-        try
-        {
-            await client.ConnectAsync().ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Failed to connect: " + ex.Message);
-            return;
-        }
+        await newClient.ConnectAsync();
 
-        Console.WriteLine("Connected!\n\n");
+        var appInfo = await newClient.GetAppInfo();
 
-        Console.WriteLine("\nPress any key to start test...");
+        var mics = await newClient.GetMicConfigs();
+
+        var state = await newClient.GetSwitchState();
+        //await newClient.SwitchState();
+
+        var outputs = await newClient.GetOutputs();
+
+        var outputConfig = await newClient.GetOutputConfig();
+
         Console.ReadKey();
 
-        var appInfo = await client.GetAppInfo().ConfigureAwait(false);
-        Console.WriteLine($"App Settings:" +
-                          $"\n\tApp ID: {appInfo.Id}" +
-                          $"\n\tApp Name: {appInfo.Name}" +
-                          $"\n\tVersion: {appInfo.Version}" +
-                          $"\n\tInterface Revision: {appInfo.InterfaceRevision}\n");
+        //LegacyElgatoWaveClient client = new();
 
-        var channelInfos = await client.GetAllChannelInfo().ConfigureAwait(false);
-        Console.WriteLine($"All Channel Info:");
-        channelInfos?.ForEach(c =>
-        {
-            Console.Write($"\n\t{c.MixerName}:" +
-                          $"\n\t\tID: {c.MixId}" +
-                          $"\n\t\tColor: ");
-            var channelColour = ColorTranslator.FromHtml(c.BgColor ?? "");
-            Console.ForegroundColor = ClosestConsoleColour(channelColour.R, channelColour.G, channelColour.B);
-            Console.Write(c.BgColor);
-            Console.ForegroundColor = ConsoleColor.White;
+        //client.MicStateChanged += (sender, state) =>
+        //{
+        //    Console.WriteLine($"\nUpdate | Mic Connected: {state.IsMicrophoneConnected}");
+        //};
+        //client.MicSettingsChanged += (sender, micSettings) =>
+        //{
+        //    Console.WriteLine($"Update | Mic Setting:" +
+        //                      $"\n\tMic Balance: {micSettings.MicrophoneBalance}" +
+        //                      $"\n\tMic Gain: {micSettings.MicrophoneGain}" +
+        //                      $"\n\tMic Output Vol: {micSettings.MicrophoneOutputVolume}" +
+        //                      $"\n\tLowCut On: {micSettings.IsMicrophoneLowcutOn}" +
+        //                      $"\n\tClipGuard On: {micSettings.IsMicrophoneClipguardOn}");
+        //};
+        //client.OutputMixerChanged += (sender, monitoringState) =>
+        //{
+        //    Console.WriteLine($"Update | Monitoring State:" +
+        //                      $"\n\tLocal Vol: {monitoringState.LocalVolumeOut}" +
+        //                      $"\n\tLocal Muted: {monitoringState.IsLocalOutMuted}" +
+        //                      $"\n\tStream Vol: {monitoringState.StreamVolumeOut}" +
+        //                      $"\n\tStream Muted: {monitoringState.IsStreamOutMuted}");
+        //};
+        //client.MonitorSwitchOutputChanged += (sender, mix) =>
+        //{
+        //    Console.WriteLine($"Update | Switch State: {mix}");
+        //};
+        //client.LocalMonitorOutputChanged += (sender, s) =>
+        //{
+        //    Console.WriteLine($"Update | Monitor Output: {s}");
+        //};
+        //client.InputMixerChanged += (sender, c) =>
+        //{
+        //    Console.WriteLine($"Update | Input Changed:" +
+        //                      $"\n\tInput Type: {c.InputType}" +
+        //                      $"\n\tIcon Data: {c.IconData}" +
+        //                      $"\n\tLocal Vol: {c.LocalVolumeIn}" +
+        //                      $"\n\tIs Local Muted: {c.IsLocalInMuted}" +
+        //                      $"\n\tStream Vol: {c.StreamVolumeIn}" +
+        //                      $"\n\tIs Stream Muted: {c.IsStreamInMuted}" +
+        //                      $"\n\tIs Available: {c.IsAvailable}");
+        //};
+        //client.ChannelsChanged += (sender, list) =>
+        //{
+        //    list.ForEach(c =>
+        //    {
+        //        Console.Write($"\n\t{c.MixerName}:" +
+        //                      $"\n\t\tID: {c.MixId}" +
+        //                      $"\n\t\tColor: ");
+        //        var channelColor = ColorTranslator.FromHtml(c.BgColor);
+        //        Console.ForegroundColor = ClosestConsoleColour(channelColor.R, channelColor.G, channelColor.B);
+        //        Console.Write(c.BgColor);
+        //        Console.ForegroundColor = ConsoleColor.White;
 
-            Console.Write($"\n\t\tInput Type: {c.InputType}" +
-                          $"\n\t\tIcon Data: {c.IconData}" +
-                          $"\n\t\tLocal Vol: {c.LocalVolumeIn}" +
-                          $"\n\t\tIs Local Muted: {c.IsLocalInMuted}" +
-                          $"\n\t\tStream Vol: {c.StreamVolumeIn}" +
-                          $"\n\t\tIs Stream Muted: {c.IsStreamInMuted}" +
-                          $"\n\t\tIs Available: {c.IsAvailable}");
-        });
+        //        Console.Write($"\n\t\tInput Type: {c.InputType}" +
+        //                      $"\n\t\tIcon Data: {c.IconData}" +
+        //                      $"\n\t\tLocal Vol: {c.LocalVolumeIn}" +
+        //                      $"\n\t\tIs Local Muted: {c.IsLocalInMuted}" +
+        //                      $"\n\t\tStream Vol: {c.StreamVolumeIn}" +
+        //                      $"\n\t\tIs Stream Muted: {c.IsStreamInMuted}" +
+        //                      $"\n\t\tIs Available: {c.IsAvailable}");
+        //    });
+        //};
 
-        var micState = await client.GetMicrophoneState().ConfigureAwait(false);
-        Console.WriteLine($"\nMic Connected: {micState?.IsMicrophoneConnected ?? false}");
+        //try
+        //{
+        //    await client.ConnectAsync().ConfigureAwait(false);
+        //}
+        //catch (Exception ex)
+        //{
+        //    Console.WriteLine("Failed to connect: " + ex.Message);
+        //    return;
+        //}
 
-        var micSettings = await client.GetMicrophoneSettings().ConfigureAwait(false);
-        Console.WriteLine($"Mic Setting:" +
-                          $"\n\tMic Balance: {micSettings?.MicrophoneBalance}" +
-                          $"\n\tMic Gain: {micSettings?.MicrophoneGain}" +
-                          $"\n\tMic Output Vol: {micSettings?.MicrophoneOutputVolume}" +
-                          $"\n\tLowCut On: {micSettings?.IsMicrophoneLowcutOn}" +
-                          $"\n\tClipGuard On: {micSettings?.IsMicrophoneClipguardOn}");
-        if (micSettings != null)
-        {
-            micSettings.MicrophoneGain = 100;
-        }
+        //Console.WriteLine("Connected!\n\n");
+
+        //Console.WriteLine("\nPress any key to start test...");
+        //Console.ReadKey();
+
+        //var appInfo = await client.GetAppInfo().ConfigureAwait(false);
+        //Console.WriteLine($"App Settings:" +
+        //                  $"\n\tApp ID: {appInfo.Id}" +
+        //                  $"\n\tApp Name: {appInfo.Name}" +
+        //                  $"\n\tVersion: {appInfo.Version}" +
+        //                  $"\n\tInterface Revision: {appInfo.InterfaceRevision}\n");
+
+        //var channelInfos = await client.GetAllChannelInfo().ConfigureAwait(false);
+        //Console.WriteLine($"All Channel Info:");
+        //channelInfos?.ForEach(c =>
+        //{
+        //    Console.Write($"\n\t{c.MixerName}:" +
+        //                  $"\n\t\tID: {c.MixId}" +
+        //                  $"\n\t\tColor: ");
+        //    var channelColour = ColorTranslator.FromHtml(c.BgColor ?? "");
+        //    Console.ForegroundColor = ClosestConsoleColour(channelColour.R, channelColour.G, channelColour.B);
+        //    Console.Write(c.BgColor);
+        //    Console.ForegroundColor = ConsoleColor.White;
+
+        //    Console.Write($"\n\t\tInput Type: {c.InputType}" +
+        //                  $"\n\t\tIcon Data: {c.IconData}" +
+        //                  $"\n\t\tLocal Vol: {c.LocalVolumeIn}" +
+        //                  $"\n\t\tIs Local Muted: {c.IsLocalInMuted}" +
+        //                  $"\n\t\tStream Vol: {c.StreamVolumeIn}" +
+        //                  $"\n\t\tIs Stream Muted: {c.IsStreamInMuted}" +
+        //                  $"\n\t\tIs Available: {c.IsAvailable}");
+        //});
+
+        //var micState = await client.GetMicrophoneState().ConfigureAwait(false);
+        //Console.WriteLine($"\nMic Connected: {micState?.IsMicrophoneConnected ?? false}");
+
+        //var micSettings = await client.GetMicrophoneSettings().ConfigureAwait(false);
+        //Console.WriteLine($"Mic Setting:" +
+        //                  $"\n\tMic Balance: {micSettings?.MicrophoneBalance}" +
+        //                  $"\n\tMic Gain: {micSettings?.MicrophoneGain}" +
+        //                  $"\n\tMic Output Vol: {micSettings?.MicrophoneOutputVolume}" +
+        //                  $"\n\tLowCut On: {micSettings?.IsMicrophoneLowcutOn}" +
+        //                  $"\n\tClipGuard On: {micSettings?.IsMicrophoneClipguardOn}");
+        //if (micSettings != null)
+        //{
+        //    micSettings.MicrophoneGain = 100;
+        //}
 
 
-        var monitoringState = await client.GetMonitoringState().ConfigureAwait(false);
-        Console.WriteLine($"Monitoring State:" +
-                          $"\n\tLocal Vol: {monitoringState?.LocalVolumeOut}" +
-                          $"\n\tLocal Muted: {monitoringState?.IsLocalOutMuted}" +
-                          $"\n\tStream Vol: {monitoringState?.StreamVolumeOut}" +
-                          $"\n\tStream Muted: {monitoringState?.IsStreamOutMuted}");
+        //var monitoringState = await client.GetMonitoringState().ConfigureAwait(false);
+        //Console.WriteLine($"Monitoring State:" +
+        //                  $"\n\tLocal Vol: {monitoringState?.LocalVolumeOut}" +
+        //                  $"\n\tLocal Muted: {monitoringState?.IsLocalOutMuted}" +
+        //                  $"\n\tStream Vol: {monitoringState?.StreamVolumeOut}" +
+        //                  $"\n\tStream Muted: {monitoringState?.IsStreamOutMuted}");
 
-        var monitorMixOutputList = await client.GetMonitorMixOutputList().ConfigureAwait(false);
-        Console.WriteLine($"Monitor Output: {monitorMixOutputList?.MonitorMix}" +
-                          $"\nPossible Outputs:");
-        monitorMixOutputList?.MonitorMixList?.ForEach(o => Console.WriteLine($"\t{o.MonitorMix}"));
+        //var monitorMixOutputList = await client.GetMonitorMixOutputList().ConfigureAwait(false);
+        //Console.WriteLine($"Monitor Output: {monitorMixOutputList?.MonitorMix}" +
+        //                  $"\nPossible Outputs:");
+        //monitorMixOutputList?.MonitorMixList?.ForEach(o => Console.WriteLine($"\t{o.MonitorMix}"));
 
-        var switchState = await client.GetSwitchState().ConfigureAwait(false);
-        Console.WriteLine($"Switch State: {switchState}");
+        //var switchState = await client.GetSwitchState().ConfigureAwait(false);
+        //Console.WriteLine($"Switch State: {switchState}");
 
-        Console.WriteLine("\nPress any key to exit...");
-        Console.ReadKey();
+        //Console.WriteLine("\nPress any key to exit...");
+        //Console.ReadKey();
 
-        client.Disconnect();
+        //client.Disconnect();
     }
 
     private static ConsoleColor ClosestConsoleColour(byte r, byte g, byte b)

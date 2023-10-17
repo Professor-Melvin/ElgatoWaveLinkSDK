@@ -1,4 +1,4 @@
-﻿namespace ElgatoWaveSDK.Models
+﻿namespace ElgatoWaveSDK.Models.Old
 {
     public enum MixType
     {

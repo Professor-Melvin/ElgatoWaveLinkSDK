@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.WebSockets;
 
-
 namespace ElgatoWaveSDK.Models
 {
     public class ElgatoException : Exception
@@ -9,6 +8,10 @@ namespace ElgatoWaveSDK.Models
         public WebSocketState? WebSocketState
         {
             get; set;
+        }
+
+        public ElgatoException(string message) : this(message, System.Net.WebSockets.WebSocketState.None)
+        {
         }
 
         public ElgatoException(string message, WebSocketState? socketState) : base(message)

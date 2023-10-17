@@ -10,7 +10,7 @@ namespace ElgatoWaveSDK.Emulator;
 public partial class MainWindow : Window
 {
 
-    public static ElgatoWaveClient Client { get; set; } = new();
+    public static OldElgatoWaveClient Client { get; set; } = new();
 
     public MainWindow()
     {

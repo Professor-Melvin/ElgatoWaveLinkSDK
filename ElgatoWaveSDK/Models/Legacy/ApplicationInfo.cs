@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace ElgatoWaveSDK.Models
+namespace ElgatoWaveSDK.Models.Old
 {
     public class ApplicationInfo
     {

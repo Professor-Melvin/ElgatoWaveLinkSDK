@@ -1,4 +1,4 @@
-﻿using ElgatoWaveSDK.Models;
+﻿using ElgatoWaveSDK.Models.Old;
 using ElgatoWaveSDK.Tests.TestUtils;
 using FluentAssertions;
 using Xunit;

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 [assembly: InternalsVisibleTo("System.Text.Json")]
-namespace ElgatoWaveSDK.Models
+namespace ElgatoWaveSDK.Models.Old
 {
     public class ChannelInfo
     {

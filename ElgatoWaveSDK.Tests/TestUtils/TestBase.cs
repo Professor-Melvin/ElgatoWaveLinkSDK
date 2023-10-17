@@ -1,6 +1,7 @@
 ﻿using System.Net.WebSockets;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using ElgatoWaveSDK.Clients;
 using ElgatoWaveSDK.HumbleObjects;
 using Moq;
 
@@ -8,7 +9,7 @@ namespace ElgatoWaveSDK.Tests.TestUtils;
 
 public class TestBase
 {
-    internal ElgatoWaveClient Subject
+    internal LegacyElgatoWaveClient Subject
     {
         get; set;
     }
@@ -41,7 +42,7 @@ public class TestBase
 
         MockTracker.Setup(c => c.NextTransactionId()).Returns(CommandId);
 
-        Subject = new ElgatoWaveClient(MockSocket.Object, MockReceiver.Object, MockTracker.Object);
+        Subject = new LegacyElgatoWaveClient(MockSocket.Object, MockReceiver.Object, MockTracker.Object);
     }
 
     internal void SetupConnection(WebSocketState value = WebSocketState.Open)

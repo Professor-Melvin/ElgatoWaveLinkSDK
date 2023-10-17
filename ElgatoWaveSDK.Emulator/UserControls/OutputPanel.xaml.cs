@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using ElgatoWaveSDK.Emulator.ViewModels;
-using ElgatoWaveSDK.Models;
+using ElgatoWaveSDK.Models.Old;
 
 namespace ElgatoWaveSDK.Emulator.UserControls;
 /// <summary>

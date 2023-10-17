@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using ElgatoWaveSDK.Emulator.Annotations;
 using ElgatoWaveSDK.Emulator.Utils;
-using ElgatoWaveSDK.Models;
+using ElgatoWaveSDK.Models.Old;
 
 namespace ElgatoWaveSDK.Emulator.ViewModels;
 

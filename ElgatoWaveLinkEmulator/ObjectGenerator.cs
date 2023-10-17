@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using ElgatoWaveSDK.Models;
+using ElgatoWaveSDK.Models.Old;
 
 namespace ElgatoWaveLinkEmulator;
 
